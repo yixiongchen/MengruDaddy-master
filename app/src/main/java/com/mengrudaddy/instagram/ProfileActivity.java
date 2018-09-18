@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +28,7 @@ public class ProfileActivity extends AppCompatActivity{
     private Context context=ProfileActivity.this;
     private static final int ACTIVITY_NUM=4;
     private TextView title, username, email;
+    private ProgressBar progressBar;
     private ImageView logout;
 
     // friebase authentication
@@ -48,6 +50,7 @@ public class ProfileActivity extends AppCompatActivity{
         username = (TextView)findViewById(R.id.username);
         email = (TextView)findViewById(R.id.email);
         logout = (ImageView)findViewById(R.id.logout);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 
 
@@ -100,6 +103,7 @@ public class ProfileActivity extends AppCompatActivity{
                 title.setText(newUser.username);
                 username.setText(newUser.username);
                 email.setText(newUser.email);
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
