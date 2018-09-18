@@ -71,7 +71,8 @@ public class SignupBActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String password = inputPassword.getText().toString().trim();
-                signUp(inputEmail, password);
+                String username = inputUsername.getText().toString().trim();
+                signUp(inputEmail, password,username);
 
             }
         });
@@ -86,7 +87,12 @@ public class SignupBActivity extends AppCompatActivity {
 
 
 
-    public void signUp(String email, String password){
+    public void signUp(String email, String password, String username){
+        if (TextUtils.isEmpty(username)) {
+            Toast.makeText(getApplicationContext(), "Enter username please!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (TextUtils.isEmpty(email)) {
             Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
             return;
