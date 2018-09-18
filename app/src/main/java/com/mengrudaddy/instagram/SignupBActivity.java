@@ -23,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class SignupBActivity extends AppCompatActivity {
 
     private EditText inputUsername;
+    private String username;
     private  android.support.design.widget.TextInputEditText inputPassword;
     private String inputEmail;
     private Button btnSignIn, btnSignUp;
@@ -70,9 +71,10 @@ public class SignupBActivity extends AppCompatActivity {
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String password = inputPassword.getText().toString().trim();
-                String username = inputUsername.getText().toString().trim();
-                signUp(inputEmail, password,username);
+                username = inputUsername.getText().toString().trim();
+                signUp(inputEmail, password);
 
             }
         });
@@ -87,10 +89,9 @@ public class SignupBActivity extends AppCompatActivity {
 
 
 
-    public void signUp(String email, String password, String username){
+    public void signUp(String email, String password){
         if (TextUtils.isEmpty(username)) {
-            Toast.makeText(getApplicationContext(), "Enter username please!", Toast.LENGTH_SHORT).show();
-            return;
+            username = usernameFromEmail(email);
         }
 
         if (TextUtils.isEmpty(email)) {
@@ -124,7 +125,6 @@ public class SignupBActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
 
                         } else {
-                            String username = inputUsername.getText().toString().trim();
                             onAuthSuccess(username, task.getResult().getUser());
                         }
                     }
@@ -144,6 +144,15 @@ public class SignupBActivity extends AppCompatActivity {
     public void writeNewUser(String userId, String name, String email) {
         User user = new User(name, email);
         mDatabase.child("users").child(userId).setValue(user);
+    }
+
+
+    public String usernameFromEmail(String email) {
+        if (email.contains("@")) {
+            return email.split("@")[0];
+        } else {
+            return email;
+        }
     }
 
 
