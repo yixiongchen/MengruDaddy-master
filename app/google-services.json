@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "3801539425",
+    "firebase_url": "https://instgram-620cd.firebaseio.com",
+    "project_id": "instgram-620cd",
+    "storage_bucket": "instgram-620cd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:3801539425:android:234cd355bda15237",
+        "android_client_info": {
+          "package_name": "com.mengrudaddy.instagram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "3801539425-6d90l1d3867ad4h7l8be287f5grie19k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mengrudaddy.instagram",
+            "certificate_hash": "abfefa020f0ada65a21959b084862d313a2bbe6e"
+          }
+        },
+        {
+          "client_id": "3801539425-vds82j58jv8hnkklhklqvcd0og83rk3b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDj3FmX3uo4LZcGftfwSETyMR3ewcYAcQk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "3801539425-vds82j58jv8hnkklhklqvcd0og83rk3b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

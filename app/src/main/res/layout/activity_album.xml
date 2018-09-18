@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:id="@+id/icon_cancle"
+            android:src="@drawable/ic_action_cancle"
+            android:layout_height="match_parent"
+            android:onClick="close"
+            android:contentDescription="@string/cancle"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/all_photos"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_gravity="center"
+            android:id="@+id/toolbar_video" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:id="@+id/icon_next"
+            android:src="@drawable/ic_action_next"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:paddingEnd="10dp"
+            android:contentDescription="@string/next"/>
+    </android.support.v7.widget.Toolbar>
+    <!--android:onClick="function name"-->
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/bottom_switch"
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bottom_switch_album"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_gravity="start"
+            android:paddingStart="40dp"
+            android:textColor="@color/black"
+            android:id="@+id/action_album"
+            android:onClick="switch_upload_mode"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bottom_switch_photo"
+            android:textSize="18sp"
+            android:textColor="@color/textNotClicked"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:paddingLeft="10dp"
+            android:id="@+id/action_photo"
+            android:onClick="switch_upload_mode"/>
+    <!--
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bottom_switch_video"
+        android:textSize="18sp"
+        android:textColor="@color/textNotClicked"
+        android:textStyle="bold"
+        android:layout_gravity="end"
+        android:paddingEnd="40dp"
+        android:id="@+id/action_video"
+        android:onClick="switch_upload_mode"/>
+        -->
+    </android.support.v7.widget.Toolbar>
+<!--android:onClick="function name"-->
+
+</RelativeLayout>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/action_local"
+        android:icon="@drawable/ic_action_local"
+        android:title=""
+        android:paddingTop="30dp"/>
+
+    <item android:id="@+id/action_photo"
+        android:title="@string/bottom_switch_photo"/>
+
+    <item android:id="@+id/action_video"
+        android:title="@string/bottom_switch_video"/>
+
+
+</menu>

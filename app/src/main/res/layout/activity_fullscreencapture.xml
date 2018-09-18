@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:background="@android:color/white"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:id="@+id/icon_cancle"
+            android:src="@drawable/ic_action_cancle"
+            android:layout_height="match_parent"
+            android:onClick="close"
+            android:contentDescription="@string/cancle"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:id="@+id/icon_next"
+            android:src="@drawable/ic_action_next"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:paddingEnd="10dp"
+            android:contentDescription="@string/next"/>
+    </android.support.v7.widget.Toolbar>
+</RelativeLayout>

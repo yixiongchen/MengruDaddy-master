@@ -1,0 +1,86 @@
+<resources>
+    <string name="app_name">Instagram</string>
+
+    <string name="bottom_switch_photo">Photo</string>
+    <string name="bottom_switch_video">Video</string>
+    <string name="bottom_switch_album">Library</string>
+    <string name="cancle">Cancle</string>
+    <string name="next">Next</string>
+
+    <string name="all_photos">All Photos</string>
+    <string name="username">UserName</string>
+
+    <string name="tab1">this is tab 1</string>
+    <string name="tab2">this is tab 2</string>
+
+    <string name="post_num">132</string>
+    <string name="following_num">47</string>
+    <string name="follower_num">47</string>
+
+    <string name="post">posts</string>
+    <string name="following">following</string>
+    <string name="follower">followers</string>
+    <string name="edit_profile">Edit Profile</string>
+
+    <string name="user_description1">Study at Melbourne Uni</string>
+    <string name="user_description2">xi xi xi xi xi xi :-) </string>
+    <string name="likes">User Mengchao, ABC likes this photo</string>
+
+    <string name="comment_user">Jack</string>
+    <string name="comment_content">: cool cool cool!!</string>
+    <string name="add_comment">Add a comment...</string>
+    <string name="follow_new">Follow</string>
+    <string name="delete">Delete</string>
+
+    <string name="edit_fragment">Edit</string>
+    <string name="filter_fragment">Filter</string>
+    <string name="brightness">Brigtness</string>
+
+    <string name="filter_name">Filter A</string>
+
+
+    <!-- Strings related to authentication -->
+    <string name="action_sign_in_short">Register</string>
+    <string name="email">Email</string>
+    <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
+    <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
+    <string name="change_email">Change Email</string>
+    <string name="change_password">Change Password</string>
+    <string name="send_password_reset_email">Send Password reset email</string>
+    <string name="remove_user">Remove user</string>
+    <string name="new_pass">New Password</string>
+    <string name="title_activity_profile">Firebase</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_name">Name</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="btn_link_to_register">Not a member? Get registered now!</string>
+    <string name="btn_link_to_login">Already registered. Login Me!</string>
+    <string name="title_activity_reset_password">ResetPasswordActivity</string>
+    <string name="btn_forgot_password">Forgot your password?</string>
+    <string name="btn_reset_password">Reset Password</string>
+    <string name="btn_back"><![CDATA[<< Back]]></string>
+    <string name="hint_new_email">New Email</string>
+    <string name="btn_change">Change</string>
+    <string name="btn_send">Send</string>
+    <string name="btn_remove">Remove</string>
+    <string name="btn_sign_out">Sign Out</string>
+    <string name="lbl_forgot_password">Forgot password?</string>
+    <string name="forgot_password_msg">We just need your registered Email Address to sent you password reset instructions.</string>
+    <string name="title_activity_signup">SignUpActivity</string>
+    <string name="title_activity_info_register">Register</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+</resources>
