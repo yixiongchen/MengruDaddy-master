@@ -32,8 +32,7 @@ public class SignupBActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     public static final String INTENT_KEY = "email_key";
 
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
