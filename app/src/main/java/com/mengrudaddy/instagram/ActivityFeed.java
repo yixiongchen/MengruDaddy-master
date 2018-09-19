@@ -1,5 +1,10 @@
 package com.mengrudaddy.instagram;
 
+/*
+ActivityFeed.java
+This class is activity for showing tab-activity of 'Following' and 'You' by clicking 'heart' icon in main bottom navigation
+ */
+
 import android.content.Context;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.TabLayout;
@@ -9,21 +14,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.mengrudaddy.instagram.Adapter.ViewPagerAdapter;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
-import com.mengrudaddy.instagram.utils.TabAdapter;
 
 public class ActivityFeed extends AppCompatActivity{
     private static final String TAG = "ActivityFeed";
     private Context context=ActivityFeed.this;
     private static final int ACTIVITY_NUM=3;
-    private TabAdapter tabPage;
+    private ViewPagerAdapter tabPage;
     private ViewPager viewPage;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
         setUpBottomNavigView();
-        tabPage = new TabAdapter(getSupportFragmentManager());
+        tabPage = new ViewPagerAdapter(getSupportFragmentManager());
         viewPage = findViewById(R.id.container);
         setUpTabView(viewPage);
 
@@ -48,9 +54,8 @@ public class ActivityFeed extends AppCompatActivity{
     }
 
     private void setUpTabView(ViewPager page){
-        //TabAdapter tab = new TabAdapter(getSupportFragmentManager());
-        tabPage.addFragment(new Tab1Following(),"Following");
-        tabPage.addFragment(new Tab2You(),"You");
+        tabPage.addFragment(new FollowingFragment(),"Following");
+        tabPage.addFragment(new YouFragment(),"You");
         page.setAdapter(tabPage);
 
     }

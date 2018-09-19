@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:id="@+id/coordinator"
-    tools:context=".ImageFilter">
+    tools:context=".UploadActivity">
 
     <android.support.design.widget.AppBarLayout
         android:theme="@style/AppTheme.AppBarOverlay"
@@ -21,11 +21,20 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:id="@+id/icon_cancle"
-                android:src="@drawable/ic_action_back"
+                android:src="@drawable/ic_action_cancle"
                 android:layout_height="match_parent"
                 android:clickable="true"
-                android:onClick="goPhoto"
+                android:onClick="close"
                 android:contentDescription="@string/cancle"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/upload"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_gravity="center"
+                android:id="@+id/toolbar_video" />
             <ImageView
                 android:layout_width="wrap_content"
                 android:id="@+id/icon_next"
@@ -34,9 +43,10 @@
                 android:layout_gravity="end"
                 android:paddingEnd="30dp"
                 android:clickable="true"
+                android:onClick="goFilter"
                 android:contentDescription="@string/next"/>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
-    <include layout = "@layout/halfscreen_image"/>
+    <include layout = "@layout/halfscreen_capture"/>
 
 </android.support.constraint.ConstraintLayout>

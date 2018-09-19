@@ -1,5 +1,10 @@
 package com.mengrudaddy.instagram.Adapter;
 
+/*
+ThumbNailAdapter.java
+This class is adpter for filter display in recycle view
+ */
+
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +23,7 @@ import com.zomato.photofilters.utils.ThumbnailItem;
 import java.util.List;
 
 public class ThumbNailAdapter extends RecyclerView.Adapter<ThumbNailAdapter.MyViewHolder>{
+    private static final String TAG = "ThumbNailAdapter";
 
     private List<ThumbnailItem> thumbnailItems;
     private FilterListFragmentListener listener;

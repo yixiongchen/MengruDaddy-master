@@ -1,5 +1,10 @@
 package com.mengrudaddy.instagram;
 
+/*
+SearchActivity.java
+This class is activity to search users
+ */
+
 import android.content.Context;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -23,10 +28,10 @@ public class SearchActivity extends AppCompatActivity{
 
 
     }
+
     /*
     Bottom Navigation Set up
      */
-
     private void setUpBottomNavigView(){
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         Log.d(TAG, "setUpBottomNavigView: "+bottomNavigationView);

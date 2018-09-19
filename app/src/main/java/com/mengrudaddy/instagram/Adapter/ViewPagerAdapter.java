@@ -1,4 +1,9 @@
 package com.mengrudaddy.instagram.Adapter;
+/*
+ViewPagerAdapter.java
+This class is adpter for display fragment of tabs in all related layouts
+ */
+
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter{
+    private static final String TAG = "ViewPagerAdapter";
     private final List<Fragment> fmList = new ArrayList<>();
     private final List<String> fmTitleList = new ArrayList<>();
 

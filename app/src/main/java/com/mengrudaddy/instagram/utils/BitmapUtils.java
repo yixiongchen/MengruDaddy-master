@@ -1,5 +1,10 @@
 package com.mengrudaddy.instagram.utils;
 
+/*
+BitmapUitls.java
+This class is utilization of images
+ */
+
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -19,6 +24,8 @@ import java.io.InputStream;
 
 public class BitmapUtils {
     private static final String TAG = "BitmapUtils";
+
+    // get image from android workspace asset
     public static Bitmap getBitmapFromAssets(Context context, String filename, int width, int height){
         AssetManager assetManager = context.getAssets();
         InputStream inputStream;
@@ -38,6 +45,7 @@ public class BitmapUtils {
         return bitmap;
     }
 
+    // get image from local gallery
     public static Bitmap getBitmapFromGallery(Context context, Uri uri, int width, int height){
         String[] filePathColumn = {MediaStore.Images.Media.DATA};
         Cursor cursor = context.getContentResolver().query(uri,filePathColumn,null,null);

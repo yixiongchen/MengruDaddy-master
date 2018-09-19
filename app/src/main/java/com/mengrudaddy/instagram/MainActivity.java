@@ -1,5 +1,11 @@
 package com.mengrudaddy.instagram;
 
+
+/*
+MainActivity.java
+This class is activity for showing photo posting activities of following users in home page
+ */
+
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.BottomNavigationView;

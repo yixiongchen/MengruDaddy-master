@@ -1,5 +1,11 @@
 package com.mengrudaddy.instagram;
 
+
+/*
+EditFragment.java
+This class is activity for showing photo editing choices
+ */
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +31,7 @@ public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
         // Inflate the layout for this fragment
         View itemView = inflater.inflate(R.layout.fragment_edit, container, false);
 
+        // brightness and contrast seekbar set up
         seekBar_brighteness = (SeekBar)itemView.findViewById(R.id.brightness_seekbar);
         seekbar_contrast = (SeekBar)itemView.findViewById(R.id.contrast_seekbar);
 
@@ -44,6 +51,7 @@ public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
 
     }
 
+    // on brightness and contrast change method
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
         if(listener != null){
@@ -58,6 +66,7 @@ public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
         }
     }
 
+    // on start touching seekbar
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
         if (listener != null){
@@ -65,12 +74,15 @@ public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
         }
     }
 
+    // on finish touching seekbar
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         if(listener!=null){
             listener.onEditCompleted();
         }
     }
+
+    // on brightness and contrast values reset to initial state
     public void resetControls(){
         seekBar_brighteness.setProgress(100);
         seekbar_contrast.setProgress(0);

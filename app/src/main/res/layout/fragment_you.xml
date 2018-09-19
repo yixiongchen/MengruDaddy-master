@@ -10,8 +10,8 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:textSize="20sp"
-        android:text="this is tab 1"
+        android:text="@string/tab2"
         android:layout_marginTop="40dp"
-        android:id="@+id/tab1_text"/>
+        android:id="@+id/tab2_text"/>
 
 </RelativeLayout>
