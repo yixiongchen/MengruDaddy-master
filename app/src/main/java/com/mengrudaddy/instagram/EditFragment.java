@@ -14,7 +14,7 @@ import com.mengrudaddy.instagram.Interface.EditImageFragmentListener;
 public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeListener {
 
     private EditImageFragmentListener listener;
-    SeekBar seekBar_brighteness;
+    SeekBar seekBar_brighteness, seekbar_contrast;
 
     public void setListener(EditImageFragmentListener listener1){
         this.listener = listener1;
@@ -24,11 +24,18 @@ public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View itemView = inflater.inflate(R.layout.fragment_edit, container, false);
+
         seekBar_brighteness = (SeekBar)itemView.findViewById(R.id.brightness_seekbar);
+        seekbar_contrast = (SeekBar)itemView.findViewById(R.id.contrast_seekbar);
 
         seekBar_brighteness.setMax(200);
         seekBar_brighteness.setProgress(100);
+
+        seekbar_contrast.setMax(20);
+        seekbar_contrast.setMin(-20);
+        seekbar_contrast.setProgress(0);
         seekBar_brighteness.setOnSeekBarChangeListener(this);
+        seekbar_contrast.setOnSeekBarChangeListener(this);
 
         return itemView;
     }
@@ -42,6 +49,11 @@ public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
         if(listener != null){
             if (seekBar.getId() == R.id.brightness_seekbar){
                 listener.onBrightnessChanged(i-100);
+            }
+            if (seekBar.getId() == R.id.contrast_seekbar){
+                i+=10;
+                float value = .10f*i;
+                listener.onContrastChanged(value);
             }
         }
     }
@@ -61,5 +73,6 @@ public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
     }
     public void resetControls(){
         seekBar_brighteness.setProgress(100);
+        seekbar_contrast.setProgress(0);
     }
 }

@@ -1,42 +1,42 @@
 <resources>
     <string name="app_name">Instagram</string>
 
+    <!-- Strings related to layout elements -->
     <string name="bottom_switch_photo">Photo</string>
     <string name="bottom_switch_video">Video</string>
     <string name="bottom_switch_album">Library</string>
     <string name="cancle">Cancle</string>
     <string name="next">Next</string>
-
     <string name="all_photos">All Photos</string>
     <string name="username">UserName</string>
-
     <string name="tab1">this is tab 1</string>
     <string name="tab2">this is tab 2</string>
 
+    <!-- Strings related to user profile view -->
     <string name="post_num">132</string>
     <string name="following_num">47</string>
     <string name="follower_num">47</string>
-
     <string name="post">posts</string>
     <string name="following">following</string>
     <string name="follower">followers</string>
     <string name="edit_profile">Edit Profile</string>
-
     <string name="user_description1">Study at Melbourne Uni</string>
     <string name="user_description2">xi xi xi xi xi xi :-) </string>
     <string name="likes">User Mengchao, ABC likes this photo</string>
 
+    <!-- Strings related to home card view -->
     <string name="comment_user">Jack</string>
     <string name="comment_content">: cool cool cool!!</string>
     <string name="add_comment">Add a comment...</string>
     <string name="follow_new">Follow</string>
     <string name="delete">Delete</string>
 
+    <!-- Strings related to edit photo -->
     <string name="edit_fragment">Edit</string>
     <string name="filter_fragment">Filter</string>
     <string name="brightness">Brigtness</string>
-
     <string name="filter_name">Filter A</string>
+    <string name="contrast">Contrast</string>
 
 
     <!-- Strings related to authentication -->

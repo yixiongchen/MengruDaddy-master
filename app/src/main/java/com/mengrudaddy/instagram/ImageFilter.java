@@ -1,5 +1,6 @@
 package com.mengrudaddy.instagram;
 
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import com.mengrudaddy.instagram.Interface.FilterListFragmentListener;
 import com.mengrudaddy.instagram.utils.BitmapUtils;
 import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubFilter;
+import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubFilter;
 
 public class ImageFilter extends AppCompatActivity implements FilterListFragmentListener,EditImageFragmentListener{
     public static final  String pic_name = "dad.jpg";
@@ -34,6 +36,8 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     EditFragment editFragment;
 
     int brightnessFinal = 0;
+    float contrastFinal = 1.0f;
+
 
     static {
         System.loadLibrary("NativeImageProcessor");
@@ -90,6 +94,16 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     }
 
     @Override
+    public void onContrastChanged(float contrast) {
+        contrastFinal = contrast;
+        Filter flter = new Filter();
+        flter.addSubFilter(new ContrastSubFilter(contrast));
+        imageView.setImageBitmap(flter.processFilter(finalImg.copy(Bitmap.Config.ARGB_8888,true)));
+
+    }
+
+
+    @Override
     public void onEditStarted() {
 
     }
@@ -98,10 +112,12 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     public void onEditCompleted() {
         Bitmap bitmap = filtered.copy(Bitmap.Config.ARGB_8888,true);
 
-        Filter flter = new Filter();
-        flter.addSubFilter(new BrightnessSubFilter(brightnessFinal));
+        Filter filter = new Filter();
+        filter.addSubFilter(new BrightnessSubFilter(brightnessFinal));
+        filter.addSubFilter(new ContrastSubFilter(contrastFinal));
 
-        finalImg =flter.processFilter(bitmap);
+
+        finalImg =filter.processFilter(bitmap);
 
     }
 
@@ -119,6 +135,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
             editFragment.resetControls();
         }
         brightnessFinal=0;
+        contrastFinal = 1.0f;
 
     }
 }
