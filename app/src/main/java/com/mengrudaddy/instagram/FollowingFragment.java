@@ -1,5 +1,11 @@
 package com.mengrudaddy.instagram;
 
+/*
+Tab1Following.java
+This class is activity for tab 'following'
+To show that following activities of users that current user are following
+ */
+
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,12 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class Tab2You extends Fragment{
-    private static final String TAG = "Tab2You";
+public class FollowingFragment extends Fragment{
+    private static final String TAG = "FollowingFragment";
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_tab2you,container,false);
+        View view = inflater.inflate(R.layout.fragment_following,container,false);
         return view;
     }
 }

@@ -1,5 +1,11 @@
 package com.mengrudaddy.instagram.utils;
 
+/*
+NoSwipeView.java
+This class is to make sure image is none-swipeable on top half of the screen
+when swipe and select filters on bottome half of the screen
+ */
+
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -50,7 +56,6 @@ public class NoSwipeView extends ViewPager{
 
     private class MyScroller extends Scroller{
         public MyScroller(Context context) {
-
             super(context,new DecelerateInterpolator());
         }
 

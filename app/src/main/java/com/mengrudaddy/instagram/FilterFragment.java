@@ -1,5 +1,11 @@
 package com.mengrudaddy.instagram;
 
+/*
+FilterFragment.java
+This class is activity for showing filters that user can select
+ */
+
+
 import android.content.Context;
 import android.graphics.Bitmap;
 
@@ -35,7 +41,6 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
     FilterListFragmentListener listener;
 
     public void setListener(FilterListFragmentListener listener1){
-
         this.listener = listener1;
     }
 
@@ -51,9 +56,8 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
         View itemView = inflater.inflate(R.layout.fragment_filter, container, false);
         nails = new ArrayList<>();
 
-        //****
+        //filters is showed in recycler view
         adapter = new ThumbNailAdapter(nails, this, getActivity());
-
         recyclerView = (RecyclerView) itemView.findViewById(R.id.filter_recycle_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL,false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -65,6 +69,7 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
         return itemView;
     }
 
+    // display filters in thumbnail layout
     private void displayFilterNails(final Bitmap bitmap) {
         Runnable run = new Runnable() {
             @Override

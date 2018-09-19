@@ -1,5 +1,13 @@
 package com.mengrudaddy.instagram;
 
+
+/*
+ProfileActivity.java
+This class is activity for showing user profile after the user login
+To Display stats on posts, followers and following, profile pic
+Display all user photos uploaded
+ */
+
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.BottomNavigationView;

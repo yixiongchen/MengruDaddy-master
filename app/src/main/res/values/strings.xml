@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">Instagram</string>
 
-    <!-- Strings related to layout elements -->
+    <!-- Strings related to layout main elements -->
     <string name="bottom_switch_photo">Photo</string>
     <string name="bottom_switch_video">Video</string>
     <string name="bottom_switch_album">Library</string>
     <string name="cancle">Cancle</string>
     <string name="next">Next</string>
-    <string name="all_photos">All Photos</string>
+    <string name="upload">Upload</string>
     <string name="username">UserName</string>
     <string name="tab1">this is tab 1</string>
     <string name="tab2">this is tab 2</string>
@@ -82,5 +82,8 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
