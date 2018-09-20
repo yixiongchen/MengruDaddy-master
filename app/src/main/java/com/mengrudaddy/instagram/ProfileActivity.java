@@ -79,7 +79,9 @@ public class ProfileActivity extends AppCompatActivity{
             public void onClick(View view) {
                 if(auth.getCurrentUser() != null){
                     auth.signOut();
-                    startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+                    Intent i = new Intent(ProfileActivity.this, LoginActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(i);
                     finish();
                 }
             }});
@@ -111,6 +113,7 @@ public class ProfileActivity extends AppCompatActivity{
                 title.setText(newUser.username);
                 username.setText(newUser.username);
                 email.setText(newUser.email);
+                //Log.d("Test for datachange:", "okok");
                 progressBar.setVisibility(View.GONE);
             }
 
