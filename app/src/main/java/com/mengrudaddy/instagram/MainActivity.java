@@ -20,7 +20,6 @@ import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 
 public class MainActivity extends AppCompatActivity {
-    int i=0;
     private static final String TAG = "MainActivity";
     private Context context=MainActivity.this;
     private static final int ACTIVITY_NUM=0;
