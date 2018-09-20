@@ -155,7 +155,8 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     }
 
     public void goPhoto(View view) {
-        Intent upload = new Intent(context, UploadActivity.class);//ACTIVITY_NUM=2
-        context.startActivity(upload);
+        finish();
+        //Intent upload = new Intent(context, UploadActivity.class);//ACTIVITY_NUM=2
+        //context.startActivity(upload);
     }
 }
