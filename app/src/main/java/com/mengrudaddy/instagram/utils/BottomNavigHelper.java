@@ -10,7 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import com.mengrudaddy.instagram.ActivityFeed;
 import com.mengrudaddy.instagram.MainActivity;
@@ -29,10 +31,13 @@ public class BottomNavigHelper {
     public static void setUp(BottomNavigationView bt_navig) {
         Log.d(TAG, "setUpBottomNavigView: "+bt_navig);
 
-
     }
+
+    //private static int currentActivityNum = -1;
+
     public static void NavigEnable(final Context context, BottomNavigationView bt_navig){
         bt_navig.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 int id=menuItem.getItemId();
@@ -41,6 +46,7 @@ public class BottomNavigHelper {
                         Intent home = new Intent(context, MainActivity.class); //ACTIVITY_NUM=0
                         //home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         context.startActivity(home);
+
                         break;
                     case R.id.action_search:
                         Intent search = new Intent(context, SearchActivity.class);//ACTIVITY_NUM=1
@@ -50,7 +56,7 @@ public class BottomNavigHelper {
                     case R.id.action_upload:
                         Intent upload = new Intent(context, UploadActivity.class);//ACTIVITY_NUM=2
                         context.startActivity(upload);
-                        ((Activity)context).overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
+                        //((Activity)context).overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
                         break;
                     case R.id.action_activity:
                         Intent activity = new Intent(context, ActivityFeed.class);//ACTIVITY_NUM=3
@@ -66,6 +72,7 @@ public class BottomNavigHelper {
                 }
                 return true;
             }
+
         });
 
     }

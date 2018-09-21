@@ -28,7 +28,7 @@ public class ActivityFeed extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
-        setUpBottomNavigView();
+        //setUpBottomNavigView();
         tabPage = new ViewPagerAdapter(getSupportFragmentManager());
         viewPage = findViewById(R.id.container);
         setUpTabView(viewPage);
@@ -51,6 +51,8 @@ public class ActivityFeed extends AppCompatActivity{
         Menu menu = bottomNavigationView.getMenu();
         MenuItem mItem = menu.getItem(ACTIVITY_NUM);
         mItem.setChecked(true);
+        //mItem.setEnabled(false);
+        mItem.setEnabled(false);
     }
 
     private void setUpTabView(ViewPager page){
@@ -59,4 +61,13 @@ public class ActivityFeed extends AppCompatActivity{
         page.setAdapter(tabPage);
 
     }
+
+
+    @Override
+    protected void  onStart(){
+        super.onStart();
+        setUpBottomNavigView();
+
+    }
+
 }

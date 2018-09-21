@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setUpBottomNavigView();
+        //setUpBottomNavigView();
         //finish();
     }
     /*
@@ -40,12 +40,24 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigHelper.NavigEnable(context,bottomNavigationView);
         Menu menu = bottomNavigationView.getMenu();
         MenuItem mItem = menu.getItem(ACTIVITY_NUM);
-        mItem.setChecked(false);
+        mItem.setChecked(true);
+        //mItem.setCheckable(false);
+        mItem.setEnabled(false);
+
     }
     public void openFullScreenCamera(View view){
         Intent activity = new Intent(MainActivity.this, FullScreenCapture.class);
         startActivity(activity);
     }
+
+
+    @Override
+    protected void  onStart(){
+        super.onStart();
+        setUpBottomNavigView();
+
+    }
+
 
 
 }

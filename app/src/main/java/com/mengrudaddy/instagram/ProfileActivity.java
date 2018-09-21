@@ -39,6 +39,8 @@ public class ProfileActivity extends AppCompatActivity{
     private ProgressBar progressBar;
     private ImageView logout;
 
+    private ValueEventListener mPostListener;
+
     // friebase authentication
     private FirebaseAuth auth;
     // real time database
@@ -61,7 +63,6 @@ public class ProfileActivity extends AppCompatActivity{
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 
-
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
@@ -73,7 +74,7 @@ public class ProfileActivity extends AppCompatActivity{
         String indexPath = "users/"+user.getUid();
         userRef = database.getReference(indexPath);
 
-        setUpBottomNavigView();
+        //setUpBottomNavigView();
 
         logout.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
@@ -99,12 +100,15 @@ public class ProfileActivity extends AppCompatActivity{
         Menu menu = bottomNavigationView.getMenu();
         MenuItem mItem = menu.getItem(ACTIVITY_NUM);
         mItem.setChecked(true);
+        //mItem.setCheckable(false);
+        mItem.setEnabled(false);
+
     }
 
-
     @Override
-    public void onStart() {
+    protected void onStart() {
         super.onStart();
+        setUpBottomNavigView();
         //read user info
         ValueEventListener userListener = new ValueEventListener() {
             @Override
@@ -116,12 +120,26 @@ public class ProfileActivity extends AppCompatActivity{
                 //Log.d("Test for datachange:", "okok");
                 progressBar.setVisibility(View.GONE);
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
 
         userRef.addValueEventListener(userListener);
+        mPostListener = userListener;
 
     }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Remove post value event listener
+        if (mPostListener != null) {
+            userRef.removeEventListener(mPostListener);
+        }
+    }
+
+
+
+
 }

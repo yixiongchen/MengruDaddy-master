@@ -23,8 +23,8 @@ public class SearchActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        setUpBottomNavigView();
-
+        //Log.d("Search:", "Created");
+        //setUpBottomNavigView();
 
 
     }
@@ -40,7 +40,17 @@ public class SearchActivity extends AppCompatActivity{
         Menu menu = bottomNavigationView.getMenu();
         MenuItem mItem = menu.getItem(ACTIVITY_NUM);
         mItem.setChecked(true);
+        mItem.setEnabled(false);
+
     }
+
+    @Override
+    protected void  onStart(){
+        super.onStart();
+        setUpBottomNavigView();
+
+    }
+
 
 
 }

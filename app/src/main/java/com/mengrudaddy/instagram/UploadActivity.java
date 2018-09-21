@@ -67,7 +67,10 @@ public class UploadActivity extends AppCompatActivity{
     }
     public void close(View view) {
         finish();
+        Log.d("UploadActivity", "Close it");
         // onBackPressed();
-
     }
+
+
+
 }
