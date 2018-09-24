@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram;
+package com.mengrudaddy.instagram.Camera;
 
 /**
  * Created by 50650 on 2018/9/20

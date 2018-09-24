@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram;
+package com.mengrudaddy.instagram.Home;
 
 
 /*
@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mengrudaddy.instagram.Camera.FullScreenCapture;
+import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 

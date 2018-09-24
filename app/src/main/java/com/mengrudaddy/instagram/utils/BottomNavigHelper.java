@@ -5,21 +5,18 @@ BottomSwitchHelper.java
 This class is activity for help on listening click event on main bottome menu navigation
  */
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import com.mengrudaddy.instagram.ActivityFeed;
-import com.mengrudaddy.instagram.MainActivity;
-import com.mengrudaddy.instagram.ProfileActivity;
+import com.mengrudaddy.instagram.Home.ActivityFeed;
+import com.mengrudaddy.instagram.Home.MainActivity;
+import com.mengrudaddy.instagram.Profile.ProfileActivity;
 import com.mengrudaddy.instagram.R;
-import com.mengrudaddy.instagram.SearchActivity;
-import com.mengrudaddy.instagram.UploadActivity;
+import com.mengrudaddy.instagram.Search.SearchActivity;
+import com.mengrudaddy.instagram.Camera.UploadActivity;
 
 /*
  Created by mengru

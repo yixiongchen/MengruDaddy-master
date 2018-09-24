@@ -3,14 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PhotoFragment">
+    tools:context=".Camera.PhotoFragment">
 
     <Button
         android:id="@+id/take"
-        android:paddingTop="50dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginLeft="30dp"
         android:layout_gravity="center"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Open Camera"
+        android:textSize="30sp"
        />
 
 </FrameLayout>

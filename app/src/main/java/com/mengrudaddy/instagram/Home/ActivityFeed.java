@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram;
+package com.mengrudaddy.instagram.Home;
 
 /*
 ActivityFeed.java
@@ -16,6 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.mengrudaddy.instagram.Adapter.ViewPagerAdapter;
+import com.mengrudaddy.instagram.Following.FollowingFragment;
+import com.mengrudaddy.instagram.R;
+import com.mengrudaddy.instagram.Following.YouFragment;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 public class ActivityFeed extends AppCompatActivity{

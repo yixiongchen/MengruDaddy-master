@@ -8,20 +8,12 @@
     android:background="@color/white"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".UploadActivity"
+    tools:context=".Camera.UploadActivity"
     tools:showIn="@layout/activity_upload">
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="420dp"
-        android:scaleType="centerCrop"
-        android:id="@+id/new_capture"
-        android:background="@color/black"/>
-
     <com.mengrudaddy.instagram.utils.NoSwipeView
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_below="@+id/new_capture"
+        android:layout_height="match_parent"
         android:layout_above="@+id/album_photo_tabs"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
     </com.mengrudaddy.instagram.utils.NoSwipeView>

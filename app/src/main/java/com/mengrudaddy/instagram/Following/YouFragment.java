@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram;
+package com.mengrudaddy.instagram.Following;
 
 /*
 Tab2You.java
@@ -13,6 +13,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.mengrudaddy.instagram.R;
 
 public class YouFragment extends Fragment{
     private static final String TAG = "YouFragment";

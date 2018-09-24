@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    tools:context=".EditFragment">
+    tools:context=".Camera.EditFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

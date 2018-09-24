@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram;
+package com.mengrudaddy.instagram.Login;
 
 
 import android.content.Intent;
@@ -16,6 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.mengrudaddy.instagram.R;
 
 public class SignupAActivity extends AppCompatActivity {
 

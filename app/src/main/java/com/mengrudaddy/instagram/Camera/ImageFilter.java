@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram;
+package com.mengrudaddy.instagram.Camera;
 
 /*
 ImageFilter.java
@@ -7,27 +7,28 @@ This class is to edit image : crop, filter, brightness and contrast
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.mengrudaddy.instagram.Adapter.ViewPagerAdapter;
+import com.mengrudaddy.instagram.Home.MainActivity;
 import com.mengrudaddy.instagram.Interface.EditImageFragmentListener;
 import com.mengrudaddy.instagram.Interface.FilterListFragmentListener;
-import com.mengrudaddy.instagram.utils.BitmapUtils;
+import com.mengrudaddy.instagram.R;
 import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubFilter;
 import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubFilter;
+
+import java.io.ByteArrayOutputStream;
 
 public class ImageFilter extends AppCompatActivity implements FilterListFragmentListener,EditImageFragmentListener{
     public static final  String pic_name = "dad.jpg";
@@ -36,14 +37,14 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     private Context context = ImageFilter.this;
 
 
-    ImageView imageView;
-    TabLayout tabLayout;
-    ViewPager viewPager;
-    ConstraintLayout constraintLayout;
-    Bitmap orginal, filtered, finalImg;
+    private ImageView imageView, btnCancel, btnNext;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private ConstraintLayout constraintLayout;
+    private Bitmap orginal, filtered, finalImg;
 
-    FilterFragment filterFragment;
-    EditFragment editFragment;
+    private FilterFragment filterFragment;
+    private EditFragment editFragment;
 
     int brightnessFinal = 0;
     float contrastFinal = 1.0f;
@@ -64,33 +65,65 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         getSupportActionBar().setTitle("Instagram Filter");
         */
 
+
         //View
+        Log.d(TAG, "Start filtering");
         imageView = (ImageView) findViewById(R.id.new_image);
+        btnCancel = (ImageView) findViewById(R.id.icon_cancle);
+        btnNext = (ImageView) findViewById(R.id.icon_next);
         tabLayout = (TabLayout) findViewById(R.id.filter_edit_tabs);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         constraintLayout = (ConstraintLayout) findViewById(R.id.coordinator);
 
-        loadImage();
+        //get image from camera
+        Bundle extras = getIntent().getExtras();
+        byte[] byteArray = extras.getByteArray("picture");
+        Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+        imageView.setImageBitmap(bitmap);
+        loadImage(bitmap);
+        //set view pager and fragments
         setUpViewPager(viewPager);
         tabLayout.setupWithViewPager(viewPager);
+
+
+        //toolbar options
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: closing the filter fragment.");
+                finish();
+            }
+        });
+        //forward image to share activity
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: Ready to post the photo.");
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                finalImg.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+                byte[] image = stream.toByteArray();
+                Intent intent = new Intent(ImageFilter.this, ShareActivity.class);
+                intent.putExtra("PostImage", image);
+                startActivity(intent);
+            }
+        });
     }
 
     // load image on half of the screen
-    private void loadImage(){
-        orginal = BitmapUtils.getBitmapFromAssets(this,pic_name,300,30);
+    private void loadImage(Bitmap bitmap){
+        //orginal = BitmapUtils.getBitmapFromAssets(this,pic_name,300,30);
+        orginal  = bitmap;
         filtered = orginal.copy(Bitmap.Config.ARGB_8888,true);
         finalImg = orginal.copy(Bitmap.Config.ARGB_8888,true);
-        imageView.setImageBitmap(orginal);
-
-
     }
 
     // set up fragment of filter and edit
     private void setUpViewPager(ViewPager vp){
         ViewPagerAdapter adpter = new ViewPagerAdapter(getSupportFragmentManager());
         filterFragment = new FilterFragment();
-        filterFragment.setListener(this);
         editFragment = new EditFragment();
+
+        filterFragment.setListener(this);
         editFragment.setListener(this);
         adpter.addFragment(filterFragment,"Filter");
         adpter.addFragment(editFragment,"Edit");
@@ -151,7 +184,6 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         }
         brightnessFinal=0;
         contrastFinal = 1.0f;
-
     }
 
     public void goPhoto(View view) {

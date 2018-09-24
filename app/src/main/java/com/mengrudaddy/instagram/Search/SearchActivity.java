@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram;
+package com.mengrudaddy.instagram.Search;
 
 /*
 SearchActivity.java
@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 

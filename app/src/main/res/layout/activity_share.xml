@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/relLayout1">
+
+                <!-- toolbar -->
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/title_bar"
+                    android:layout_width="match_parent"
+                    android:background="@color/colorPrimaryDark"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:id="@+id/icon_cancle"
+                        android:src="@drawable/ic_action_back"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/cancle"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Share"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/black"
+                        android:layout_gravity="center"
+                        android:id="@+id/toolbar_video" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:id="@+id/icon_next"
+                        android:src="@drawable/ic_action_send"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="end"
+                        android:paddingEnd="10dp"
+                        android:contentDescription="@string/next"/>
+                </android.support.v7.widget.Toolbar>
+                <!--android:onClick="function name"-->
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relLayout1"
+                android:id="@+id/relLayout2"
+                >
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/imageShare"
+                    android:scaleType="centerCrop"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="40dp"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/imageShare"
+                    android:textSize="25dp"
+                    android:id="@+id/caption"
+                    android:hint="Write a description..."
+                    android:layout_marginLeft="20dp"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relLayout2"
+                android:id="@+id/relLayout3">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/location"
+                    android:text="Add Location"
+                    android:textColor="@color/black"
+                    android:scaleType="centerCrop"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="40dp"/>
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:hint="Write a description..."
+                    android:layout_marginLeft="20dp"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    />
+            </RelativeLayout>
+
+        </RelativeLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+</RelativeLayout>

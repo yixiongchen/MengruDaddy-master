@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:id="@+id/coordinator"
-    tools:context=".ImageFilter">
+    tools:context=".Camera.ImageFilter">
 
     <android.support.design.widget.AppBarLayout
         android:theme="@style/AppTheme.AppBarOverlay"

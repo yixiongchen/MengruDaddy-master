@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram;
+package com.mengrudaddy.instagram.Camera;
 
 /*
 FilterFragment.java
@@ -6,11 +6,15 @@ This class is activity for showing filters that user can select
  */
 
 
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 
+import com.mengrudaddy.instagram.Camera.ImageFilter;
+import com.mengrudaddy.instagram.R;
 import com.zomato.photofilters.FilterPack;
 import com.zomato.photofilters.imageprocessors.Filter;
+
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,10 +22,12 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.mengrudaddy.instagram.Adapter.ThumbNailAdapter;
 import com.mengrudaddy.instagram.Interface.FilterListFragmentListener;
@@ -39,6 +45,9 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
     ThumbNailAdapter adapter;
     List<ThumbnailItem> nails;
     FilterListFragmentListener listener;
+    Bitmap bitmap;
+
+    private static final String TAG ="FilterFragement:";
 
     public void setListener(FilterListFragmentListener listener1){
         this.listener = listener1;
@@ -50,11 +59,14 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
         // Required empty public constructor
     }
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View itemView = inflater.inflate(R.layout.fragment_filter, container, false);
         nails = new ArrayList<>();
+        Log.d(TAG, "Start:");
+
 
         //filters is showed in recycler view
         adapter = new ThumbNailAdapter(nails, this, getActivity());
@@ -65,7 +77,12 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
         recyclerView.addItemDecoration(new SpacesItemDecoration(space));
         recyclerView.setAdapter(adapter);
 
-        displayFilterNails(null);
+        //retrieve image and convert it to filtered thumbnails
+        ImageView new_image = getActivity().findViewById(R.id.new_image);
+        if(new_image != null){
+            BitmapDrawable drawable = (BitmapDrawable) new_image.getDrawable();
+            displayFilterNails(drawable.getBitmap());
+        }
         return itemView;
     }
 

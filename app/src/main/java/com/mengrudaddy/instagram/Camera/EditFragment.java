@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram;
+package com.mengrudaddy.instagram.Camera;
 
 
 /*
@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 
 import com.mengrudaddy.instagram.Interface.EditImageFragmentListener;
+import com.mengrudaddy.instagram.R;
 
 public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeListener {
 

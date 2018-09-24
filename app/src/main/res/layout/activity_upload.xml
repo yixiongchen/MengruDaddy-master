@@ -6,47 +6,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:id="@+id/coordinator"
-    tools:context=".UploadActivity">
+    tools:context=".Camera.UploadActivity">
 
-    <android.support.design.widget.AppBarLayout
-        android:theme="@style/AppTheme.AppBarOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:background="@color/colorPrimaryDark"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            android:layout_height="?attr/actionBarSize">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:id="@+id/icon_cancle"
-                android:src="@drawable/ic_action_cancle"
-                android:layout_height="match_parent"
-                android:clickable="true"
-                android:onClick="close"
-                android:contentDescription="@string/cancle"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/upload"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:layout_gravity="center"
-                android:id="@+id/toolbar_video" />
-            <ImageView
-                android:layout_width="wrap_content"
-                android:id="@+id/icon_next"
-                android:src="@drawable/ic_action_next"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:paddingEnd="30dp"
-                android:clickable="true"
-                android:onClick="goFilter"
-                android:contentDescription="@string/next"/>
-        </android.support.v7.widget.Toolbar>
-    </android.support.design.widget.AppBarLayout>
+
     <include layout = "@layout/halfscreen_capture"/>
 
 </android.support.constraint.ConstraintLayout>

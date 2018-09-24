@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram;
+package com.mengrudaddy.instagram.Profile;
 
 
 /*
@@ -28,6 +28,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.mengrudaddy.instagram.Login.LoginActivity;
+import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.models.User;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
