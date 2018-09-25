@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.mengrudaddy.instagram.Home.MainActivity;
 import com.mengrudaddy.instagram.R;
-import com.mengrudaddy.instagram.models.User;
+import com.mengrudaddy.instagram.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;

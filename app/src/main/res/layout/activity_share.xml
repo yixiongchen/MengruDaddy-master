@@ -28,7 +28,7 @@
 
                     <ImageView
                         android:layout_width="wrap_content"
-                        android:id="@+id/icon_cancle"
+                        android:id="@+id/icon_back"
                         android:src="@drawable/ic_action_back"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/cancle"/>
@@ -62,8 +62,8 @@
                 android:id="@+id/relLayout2"
                 >
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:id="@+id/imageShare"
                     android:scaleType="centerCrop"
                     android:layout_centerVertical="true"
@@ -71,16 +71,15 @@
                     android:layout_marginBottom="40dp"/>
 
                 <EditText
+                    android:id="@+id/caption"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/imageShare"
-                    android:textSize="25dp"
-                    android:id="@+id/caption"
-                    android:hint="Write a description..."
-                    android:layout_marginLeft="20dp"
                     android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_toRightOf="@+id/imageShare"
                     android:background="@null"
-                    />
+                    android:hint="Write a description..."
+                    android:textSize="22dp" />
             </RelativeLayout>
             <RelativeLayout
                 android:layout_width="match_parent"

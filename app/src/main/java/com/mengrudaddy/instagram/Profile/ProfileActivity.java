@@ -30,7 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mengrudaddy.instagram.Login.LoginActivity;
 import com.mengrudaddy.instagram.R;
-import com.mengrudaddy.instagram.models.User;
+import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 public class ProfileActivity extends AppCompatActivity{

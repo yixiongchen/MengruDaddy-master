@@ -9,7 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
@@ -29,6 +32,11 @@ import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubFilter;
 import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubFilter;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ImageFilter extends AppCompatActivity implements FilterListFragmentListener,EditImageFragmentListener{
     public static final  String pic_name = "dad.jpg";
@@ -41,7 +49,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private ConstraintLayout constraintLayout;
-    private Bitmap orginal, filtered, finalImg;
+    private Bitmap orginal, filtered, finalImg, resize;
 
     private FilterFragment filterFragment;
     private EditFragment editFragment;
@@ -76,14 +84,17 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         constraintLayout = (ConstraintLayout) findViewById(R.id.coordinator);
 
         //get image from camera
-        Bundle extras = getIntent().getExtras();
-        byte[] byteArray = extras.getByteArray("picture");
-        Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-        imageView.setImageBitmap(bitmap);
-        loadImage(bitmap);
-        //set view pager and fragments
+        String path = getIntent().getStringExtra("picture");
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        //resize bitmap
+        resize = Bitmap.createScaledBitmap(bitmap, 1080, 1080, true);
+        imageView.setImageBitmap(resize);
+        //loadImage(resize);
+        loadImage(resize);
         setUpViewPager(viewPager);
         tabLayout.setupWithViewPager(viewPager);
+        Log.d(TAG, "show the filtered");
+        //set view pager and fragments
 
 
         //toolbar options
@@ -99,11 +110,11 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClick: Ready to post the photo.");
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                finalImg.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-                byte[] image = stream.toByteArray();
+                //first save the filtered image
+                String filepath = StoreFilteredImage();
+
                 Intent intent = new Intent(ImageFilter.this, ShareActivity.class);
-                intent.putExtra("PostImage", image);
+                intent.putExtra("PostImage", filepath);
                 startActivity(intent);
             }
         });
@@ -136,7 +147,6 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         Filter flter = new Filter();
         flter.addSubFilter(new BrightnessSubFilter(brightness));
         imageView.setImageBitmap(flter.processFilter(finalImg.copy(Bitmap.Config.ARGB_8888,true)));
-
     }
 
     // listening for contrast seekbar changing
@@ -146,7 +156,6 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         Filter flter = new Filter();
         flter.addSubFilter(new ContrastSubFilter(contrast));
         imageView.setImageBitmap(flter.processFilter(finalImg.copy(Bitmap.Config.ARGB_8888,true)));
-
     }
 
 
@@ -191,4 +200,54 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         //Intent upload = new Intent(context, UploadActivity.class);//ACTIVITY_NUM=2
         //context.startActivity(upload);
     }
+
+    public String StoreFilteredImage(){
+        final String path = Environment.getExternalStorageDirectory().getAbsolutePath() +
+                File.separator + "MobileIns"+File.separator+"Filtered";
+        File destDir = new File(path);
+        if (!destDir.exists()) {
+            destDir.mkdirs();
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String filepath = "Filter"+timeStamp+".jpg";
+
+        File file = new File(destDir, filepath);
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            filtered.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String filterPath = Uri.fromFile(file).getPath();
+
+        return filterPath;
+
+    }
+
+    //resize bitmap
+    public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(
+                bm, 0, 0, width, height, matrix, false);
+        bm.recycle();
+        return resizedBitmap;
+    }
+
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+
+
+    }
+
 }

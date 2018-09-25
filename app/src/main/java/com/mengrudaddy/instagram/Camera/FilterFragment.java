@@ -54,11 +54,9 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
     }
 
 
-
     public FilterFragment() {
         // Required empty public constructor
     }
-
 
     @Nullable
     @Override
@@ -91,6 +89,7 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
         Runnable run = new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "running thread");
                 Bitmap thumbImg;
                 if(bitmap == null){
                     thumbImg = BitmapUtils.getBitmapFromAssets(getActivity(), ImageFilter.pic_name,100,100);

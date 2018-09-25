@@ -1,4 +1,4 @@
-package com.mengrudaddy.instagram.models;
+package com.mengrudaddy.instagram.Models;
 
 
 import com.google.firebase.database.IgnoreExtraProperties;
