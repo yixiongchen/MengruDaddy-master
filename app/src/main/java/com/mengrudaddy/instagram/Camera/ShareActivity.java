@@ -6,9 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -16,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -32,6 +36,7 @@ import java.util.UUID;
 public class ShareActivity extends AppCompatActivity {
 
     private FirebaseStorage storage;
+    private DatabaseReference mDatabase;
     private FirebaseUser authUser;
     private StorageReference storageReference;
     private String imagePath;
@@ -50,41 +55,49 @@ public class ShareActivity extends AppCompatActivity {
         imagePath = path;
 
 
-
         ImageView image =  (ImageView)findViewById(R.id.imageShare);
-        ImageView btnBack =  (ImageView)findViewById(R.id.icon_back);
+        //ImageView btnBack =  (ImageView)findViewById(R.id.icon_back);
         ImageView btnPost =  (ImageView)findViewById(R.id.icon_next);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.title_bar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               finish();
+            }
+        });
 
         //set imageView
         image.setImageBitmap(bitmap);
 
-        //send image to fireBase
+        //send image to fireBase storage
         storage = FirebaseStorage.getInstance();
         authUser =FirebaseAuth.getInstance().getCurrentUser();
-        //post/userId/postid
+        //posts/userId/postid/
         String userRef = "posts/"+authUser.getUid();
         storageReference = storage.getReference(userRef).child(UUID.randomUUID().toString());
 
-
+        //send post info to firebase database
+        String key = mDatabase.child("posts").push().getKey();
 
         btnPost.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                uploadImage();
+                uploadPost();
             }
         });
-        btnBack.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+
     }
 
+    //upload post
+    private void uploadPost() {
 
-    //upload image
-    private void uploadImage() {
+
 
         if(storageReference != null)
         {
@@ -116,10 +129,10 @@ public class ShareActivity extends AppCompatActivity {
                         }
                     });
 
+
+
         }
 
     }
-
-
 
 }

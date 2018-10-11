@@ -16,6 +16,7 @@ import com.zomato.photofilters.imageprocessors.Filter;
 
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -46,8 +47,10 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
     List<ThumbnailItem> nails;
     FilterListFragmentListener listener;
     Bitmap bitmap;
+    private boolean flag = false;
 
     private static final String TAG ="FilterFragement:";
+    private Handler handler;
 
     public void setListener(FilterListFragmentListener listener1){
         this.listener = listener1;
@@ -65,7 +68,6 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
         nails = new ArrayList<>();
         Log.d(TAG, "Start:");
 
-
         //filters is showed in recycler view
         adapter = new ThumbNailAdapter(nails, this, getActivity());
         recyclerView = (RecyclerView) itemView.findViewById(R.id.filter_recycle_view);
@@ -78,14 +80,17 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
         //retrieve image and convert it to filtered thumbnails
         ImageView new_image = getActivity().findViewById(R.id.new_image);
         if(new_image != null){
+            Log.d(TAG, "new image is not null");
             BitmapDrawable drawable = (BitmapDrawable) new_image.getDrawable();
-            displayFilterNails(drawable.getBitmap());
+            bitmap = drawable.getBitmap();
         }
+        displayFilterNails(bitmap);
         return itemView;
     }
 
     // display filters in thumbnail layout
     private void displayFilterNails(final Bitmap bitmap) {
+        flag = true;
         Runnable run = new Runnable() {
             @Override
             public void run() {
@@ -128,7 +133,9 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
                 });
             }
         };
-        new Thread(run).start();
+        Thread thread = new Thread(run);
+        thread.start();
+
     }
 
     @Override
@@ -136,5 +143,13 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
         if (listener !=null){
             listener.onFilterSelected(filter);
         }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        //displayFilterNails(bitmap);
+        Log.d(TAG, "Filter Fragment is resumed");
+
     }
 }

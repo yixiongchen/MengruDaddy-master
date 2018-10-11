@@ -43,12 +43,12 @@ public class AlbumFragment extends Fragment{
     }
 
 
-
     public void redirectToFilter(){
         Intent getFilter = new Intent(getActivity(), ImageFilter.class);
         //home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(getFilter);
     }
+
     public void close() {
         getActivity().finish();
         Log.d("UploadActivity", "Close it");

@@ -22,33 +22,19 @@
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/title_bar"
                     android:layout_width="match_parent"
-                    android:background="@color/colorPrimaryDark"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true">
+                    android:layout_alignParentTop="true"
+                    android:background="@color/colorPrimaryDark">
+
 
                     <ImageView
-                        android:layout_width="wrap_content"
-                        android:id="@+id/icon_back"
-                        android:src="@drawable/ic_action_back"
-                        android:layout_height="match_parent"
-                        android:contentDescription="@string/cancle"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Share"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/black"
-                        android:layout_gravity="center"
-                        android:id="@+id/toolbar_video" />
-                    <ImageView
-                        android:layout_width="wrap_content"
                         android:id="@+id/icon_next"
-                        android:src="@drawable/ic_action_send"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_gravity="end"
+                        android:contentDescription="@string/next"
                         android:paddingEnd="10dp"
-                        android:contentDescription="@string/next"/>
+                        android:src="@drawable/ic_action_send" />
                 </android.support.v7.widget.Toolbar>
                 <!--android:onClick="function name"-->
 

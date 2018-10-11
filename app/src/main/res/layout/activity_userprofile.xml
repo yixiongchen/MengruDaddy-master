@@ -123,11 +123,13 @@
             </RelativeLayout>
             <ProgressBar
                 android:id="@+id/progressBar"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_centerInParent="true"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
                 android:layout_gravity="center"
-                android:visibility="gone" />
+                android:visibility="visible" />
         </RelativeLayout>
 
     <android.support.design.widget.BottomNavigationView

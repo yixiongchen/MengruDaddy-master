@@ -247,6 +247,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     protected void onStart(){
         super.onStart();
 
+        Log.d(TAG, "return to");
 
     }
 
