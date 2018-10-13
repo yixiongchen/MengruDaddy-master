@@ -95,13 +95,10 @@ public class FilterFragment extends Fragment implements FilterListFragmentListen
             @Override
             public void run() {
                 Log.d(TAG, "running thread");
-                Bitmap thumbImg;
-                if(bitmap == null){
-                    thumbImg = BitmapUtils.getBitmapFromAssets(getActivity(), ImageFilter.pic_name,100,100);
-                }
-                else {
-                    thumbImg = Bitmap.createScaledBitmap(bitmap,100,100,false);
-                }
+
+                    //thumbImg = BitmapUtils.getBitmapFromAssets(getActivity(), ImageFilter.pic_name,100,100);
+                Bitmap thumbImg = Bitmap.createScaledBitmap(bitmap,100,100,false);
+
                 if(thumbImg == null)
                     return;
 

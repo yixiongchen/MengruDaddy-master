@@ -5,6 +5,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @IgnoreExtraProperties
@@ -16,8 +17,8 @@ public class Post {
     public String latitude;
     public String longitude;
     public Date date;
-    public ArrayList<String> comments;
-    public ArrayList<String> likes;
+    public List<String> comments;
+    public List<String> likes;
 
 
     public Post(){
@@ -25,8 +26,8 @@ public class Post {
     }
 
     public Post(String username, String userId, String description, String latitude,
-                String longitude, Date date,  ArrayList<String> comments,
-                ArrayList<String> likes){
+                String longitude, Date date,  List<String> comments,
+                List<String> likes){
         this.username = username;
         this.userId =userId;
         this.description = description;
@@ -35,7 +36,6 @@ public class Post {
         this.date = date;
         this.comments = comments;
         this.likes = likes;
-
     }
 
     @Exclude

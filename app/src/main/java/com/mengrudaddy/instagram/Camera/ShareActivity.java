@@ -14,39 +14,67 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.mengrudaddy.instagram.Home.MainActivity;
+import com.mengrudaddy.instagram.Models.Post;
+import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import android.widget.ProgressBar;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 
 public class ShareActivity extends AppCompatActivity {
 
     private FirebaseStorage storage;
-    private DatabaseReference mDatabase;
+    private DatabaseReference UserDatabaseRef;
+    private DatabaseReference DatabaseRef;
     private FirebaseUser authUser;
     private StorageReference storageReference;
+    private FirebaseDatabase database;
     private String imagePath;
     private ProgressBar progressBar;
+    private EditText postContent;
+    private ImageView image,btnPost;
+    private String username;
+    private String latitude, longitude, content, postId;
+    private Date date;
+    private ArrayList<String> posts;
+
+    private ValueEventListener mPostListener;
+
+
+
     private static final String TAG = "ShareActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share);
+        Log.d(TAG, "start");
 
         //receive image intent
         String path = getIntent().getStringExtra("PostImage");
@@ -54,11 +82,13 @@ public class ShareActivity extends AppCompatActivity {
         Log.d(TAG, path);
         imagePath = path;
 
-
-        ImageView image =  (ImageView)findViewById(R.id.imageShare);
+        //get views
+        image =  (ImageView)findViewById(R.id.imageShare);
         //ImageView btnBack =  (ImageView)findViewById(R.id.icon_back);
-        ImageView btnPost =  (ImageView)findViewById(R.id.icon_next);
+        postContent = (EditText) findViewById(R.id.postcontent);
+        btnPost =  (ImageView)findViewById(R.id.icon_next);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.title_bar);
         setSupportActionBar(toolbar);
@@ -75,30 +105,58 @@ public class ShareActivity extends AppCompatActivity {
         //set imageView
         image.setImageBitmap(bitmap);
 
-        //send image to fireBase storage
-        storage = FirebaseStorage.getInstance();
+        //initialize a date
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        date = new Date();
+        String strDate = dateFormat.format(date).toString();
+
+        //access user's username
+        database = FirebaseDatabase.getInstance();
         authUser =FirebaseAuth.getInstance().getCurrentUser();
-        //posts/userId/postid/
-        String userRef = "posts/"+authUser.getUid();
-        storageReference = storage.getReference(userRef).child(UUID.randomUUID().toString());
+        UserDatabaseRef = database.getReference("users/"+ authUser.getUid());
 
-        //send post info to firebase database
-        String key = mDatabase.child("posts").push().getKey();
 
+        //access location
+        latitude = "80";
+        longitude = "20";
+
+        //access descritipn content
+        content = postContent.getText().toString();
+
+        //database location: posts/userId/postid/
+        DatabaseRef = database.getReference();
+        //database: create a postId into the firebase database
+        postId = DatabaseRef.child("posts/").push().getKey();
+
+        //storage location: posts/postid/
+        String postRef = "posts/";
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference(postRef).child(postId);
+
+        Log.d(TAG, content);
         btnPost.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                uploadPost();
+                //upload image to storage
+                uploadImage();
+
+                //write post info to database
+                ArrayList<String> comments = new ArrayList<String>();
+                ArrayList<String> likes = new ArrayList<String>();
+                content = postContent.getText().toString();
+                writePost(postId, username, authUser.getUid(), content, latitude,longitude,
+                        date, comments, likes);
+
+                //update user profile : add a postId
+                updateUser(authUser.getUid(), posts);
+
             }
         });
 
     }
 
-    //upload post
-    private void uploadPost() {
-
-
-
+    //upload photo
+    private void uploadImage() {
         if(storageReference != null)
         {
             progressBar.setVisibility(View.VISIBLE);
@@ -128,11 +186,68 @@ public class ShareActivity extends AppCompatActivity {
                             Toast.makeText(ShareActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
-
-
-
         }
+    }
+
+
+
+    //upload post info
+    public void writePost(String postId, String username, String userId, String description, String latitude,
+                          String longitude, Date date,  ArrayList<String> comments,
+                          ArrayList<String> likes){
+
+        Post post = new Post(username, userId, description,latitude,longitude, date, comments , likes);
+        Map<String, Object> postValues = post.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/posts/" + postId, postValues);
+        DatabaseRef.updateChildren(childUpdates);
 
     }
+
+    //update user's post list
+    public void updateUser(String userid, ArrayList<String> posts){
+        DatabaseReference ref = DatabaseRef.child("users/").child(userid);
+        Map<String, Object> updates = new HashMap<String,Object>();
+        updates.put("posts", posts);
+        ref.updateChildren(updates);
+    }
+
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        ValueEventListener userListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)  {
+                User newUser = dataSnapshot.getValue(User.class);
+                username = newUser.username;
+                if(newUser.posts != null){
+                    posts = (ArrayList<String>)newUser.posts;
+                    posts.add(postId);
+                }
+                else{
+                    posts = new ArrayList<String>();
+                    posts.add(postId);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+        UserDatabaseRef.addValueEventListener(userListener);
+        mPostListener = userListener;
+    }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Remove post value event listener
+        if (mPostListener != null) {
+            UserDatabaseRef.removeEventListener(mPostListener);
+        }
+    }
+
+
+
 
 }

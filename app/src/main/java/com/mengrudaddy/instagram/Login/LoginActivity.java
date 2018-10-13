@@ -30,6 +30,8 @@ import com.mengrudaddy.instagram.Home.MainActivity;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.Models.User;
 
+import java.util.ArrayList;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText inputEmail;
@@ -247,7 +249,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email);
+        User user = new User(name, email, new ArrayList<String>(), new ArrayList<String>(),
+                new ArrayList<String>());
 
         mDatabase.child("users").child(userId).setValue(user);
     }

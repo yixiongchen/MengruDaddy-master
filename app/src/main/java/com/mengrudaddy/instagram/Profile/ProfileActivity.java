@@ -17,9 +17,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,18 +31,24 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.mengrudaddy.instagram.Adapter.photoAdapter;
 import com.mengrudaddy.instagram.Login.LoginActivity;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
+import java.util.ArrayList;
+
 public class ProfileActivity extends AppCompatActivity{
     private static final String TAG = "ProfileActivity";
     private Context context=ProfileActivity.this;
     private static final int ACTIVITY_NUM=4;
-    private TextView title, username, email;
+    private TextView title, username, email, followerNum, followingNum, postNum;
     private ProgressBar progressBar;
     private ImageView logout;
+    private GridView gridview;
 
     private ValueEventListener mPostListener;
 
@@ -48,6 +57,9 @@ public class ProfileActivity extends AppCompatActivity{
     // real time database
     private FirebaseDatabase database;
     private DatabaseReference userRef;
+    //photo storage
+    private String[] photoIds;
+
 
     private FirebaseUser user;
 
@@ -56,28 +68,34 @@ public class ProfileActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userprofile);
 
-
         //View initialization
         title=(TextView)findViewById(R.id.toolbar_userprofile);
         username = (TextView)findViewById(R.id.username);
         email = (TextView)findViewById(R.id.email);
+        followerNum =  (TextView)findViewById(R.id.followers_num);
+        followingNum =  (TextView)findViewById(R.id.following_num);
+        postNum =  (TextView)findViewById(R.id.post_num);
         logout = (ImageView)findViewById(R.id.logout);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        gridview = (GridView) findViewById(R.id.gridView);
 
 
-        auth = FirebaseAuth.getInstance();
+
+        //real time database
         database = FirebaseDatabase.getInstance();
 
         //auth
+        auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         if (user == null) {
             finish();
         }
+        //userId path
         String indexPath = "users/"+user.getUid();
         userRef = database.getReference(indexPath);
 
-        //setUpBottomNavigView();
 
+        //logout
         logout.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
                 if(auth.getCurrentUser() != null){
@@ -89,11 +107,14 @@ public class ProfileActivity extends AppCompatActivity{
                 }
             }});
 
+
+
+
     }
+
     /*
     Bottom Navigation Set up
      */
-
     private void setUpBottomNavigView(){
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         Log.d(TAG, "setUpBottomNavigView: "+bottomNavigationView);
@@ -118,14 +139,40 @@ public class ProfileActivity extends AppCompatActivity{
                 User newUser = dataSnapshot.getValue(User.class);
                 title.setText(newUser.username);
                 username.setText(newUser.username);
+                if(newUser.followers == null){
+                    followerNum.setText("0");
+                }
+                else{
+                    followerNum.setText(Integer.toString(newUser.followers.size()));
+                }
+                if(newUser.following == null){
+                    followingNum.setText("0");
+                }
+                else{
+                    followingNum.setText(Integer.toString(newUser.following.size()));
+
+                }
+                if(newUser.posts == null){
+                    postNum.setText("0");
+                    photoIds  = new String[0];
+                }
+                else{
+                    photoIds =  new String[newUser.posts.size()];
+                    photoIds = newUser.posts.toArray(photoIds);
+
+                    postNum.setText(Integer.toString(newUser.posts.size()));
+                }
                 email.setText(newUser.email);
-                //Log.d("Test for datachange:", "okok");
+
+                photoAdapter adapter = new photoAdapter(getApplicationContext(), photoIds);
+                gridview.setAdapter(adapter);
+
+
                 progressBar.setVisibility(View.GONE);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-
         userRef.addValueEventListener(userListener);
         mPostListener = userListener;
 

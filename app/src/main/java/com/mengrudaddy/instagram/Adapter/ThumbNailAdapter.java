@@ -64,7 +64,6 @@ public class ThumbNailAdapter extends RecyclerView.Adapter<ThumbNailAdapter.MyVi
         else{
             myViewHolder.filter_name.setTextColor(ContextCompat.getColor(context,R.color.normal_filter));
         }
-
     }
 
     @Override
