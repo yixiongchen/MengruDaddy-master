@@ -3,6 +3,7 @@ package com.mengrudaddy.instagram.Adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,14 +18,15 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mengrudaddy.instagram.R;
+import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 
 public class photoAdapter extends BaseAdapter {
 
     private final Context mContext;
     private final String[] photos;
     private FirebaseStorage storage;
+    private final String TAG ="photoAdapter::";
 
     // 1
     public photoAdapter(Context context, String[] photos) {
@@ -65,43 +67,49 @@ public class photoAdapter extends BaseAdapter {
         if (convertView == null) {
             final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
             convertView = layoutInflater.inflate(R.layout.grid_layout, null);
+            final ImageView imageView = (ImageView)convertView.findViewById(R.id.imageview_photo);
+            final ProgressBar progressBar = (ProgressBar)convertView.findViewById(R.id.ImageProgress);
+            final ViewHolder viewHolder = new ViewHolder(imageView,progressBar);
+            convertView.setTag(viewHolder);
+
         }
-        //3
 
-        final ImageView imageView = (ImageView)convertView.findViewById(R.id.imageview_cover_art);
+        final ViewHolder viewHolder = (ViewHolder)convertView.getTag();
 
-        final ProgressBar progressBar = (ProgressBar)convertView.findViewById(R.id.ImageProgress);
 
-        StorageReference photoRef = storage.getReference("posts/"+photoUrl);
+        StorageReference photoRef = storage.getReference("posts/thumbnails/"+photoUrl);
 
-        final long ONE_MEGABYTE = 2000 * 2000;
-        photoRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+        //final long ONE_MEGABYTE = 1024 * 1024;
+        photoRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
-            public void onSuccess(byte[] bytes) {
-                // Data for "images/island.jpg" is returns, use this as needed
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                //Bitmap bitmap = BitmapFactory.decodeResource(convertView.getResources(), R.drawable.dad);
-                Bitmap thumbImg = Bitmap.createScaledBitmap(bitmap,300,300,false);
-                Log.d("photoAdapter::", "Hello");
-                imageView.setImageBitmap(thumbImg);
-                progressBar.setVisibility(View.GONE);
+            public void onSuccess(Uri uri) {
 
+                //picasso lib load remote image
+                Picasso.with(mContext).load(uri.toString()).into(viewHolder.imageViewPhoto);
+                viewHolder.progressBar.setVisibility(View.GONE);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
+                Log.d(TAG, "Can not download file, please check connection");
             }
         });
 
-
-        //Bitmap bitmap = BitmapFactory.decodeResource(mContext, R.drawable.dad);
-
-        //Bitmap thumbImg = Bitmap.createScaledBitmap(bitmap,300,300,false);
-
-        //imageView.setImageBitmap(thumbImg);
-
         return convertView;
+    }
+
+
+    private class ViewHolder {
+
+        private final ImageView imageViewPhoto;
+        private final ProgressBar progressBar;
+
+
+        public ViewHolder(ImageView imageViewPhoto, ProgressBar progressBar) {
+            this.imageViewPhoto = imageViewPhoto;
+            this.progressBar = progressBar;
+
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NavUtils;
@@ -36,7 +37,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import android.widget.ProgressBar;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -53,7 +58,7 @@ public class ShareActivity extends AppCompatActivity {
     private DatabaseReference UserDatabaseRef;
     private DatabaseReference DatabaseRef;
     private FirebaseUser authUser;
-    private StorageReference storageReference;
+    private StorageReference imageReference, thumbReference;
     private FirebaseDatabase database;
     private String imagePath;
     private ProgressBar progressBar;
@@ -65,6 +70,10 @@ public class ShareActivity extends AppCompatActivity {
     private ArrayList<String> posts;
 
     private ValueEventListener mPostListener;
+
+    private InputStream thumbStream;
+    private Bitmap thumbBitmap;
+    private byte[] thumbData;
 
 
 
@@ -108,7 +117,7 @@ public class ShareActivity extends AppCompatActivity {
         //initialize a date
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         date = new Date();
-        String strDate = dateFormat.format(date).toString();
+        //String strDate = dateFormat.format(date).toString();
 
         //access user's username
         database = FirebaseDatabase.getInstance();
@@ -130,8 +139,11 @@ public class ShareActivity extends AppCompatActivity {
 
         //storage location: posts/postid/
         String postRef = "posts/";
+
         storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference(postRef).child(postId);
+        imageReference = storage.getReference(postRef).child("images/").child(postId);
+        thumbReference = storage.getReference(postRef).child("thumbnails/").child(postId);
+
 
         Log.d(TAG, content);
         btnPost.setOnClickListener(new View.OnClickListener(){
@@ -157,7 +169,8 @@ public class ShareActivity extends AppCompatActivity {
 
     //upload photo
     private void uploadImage() {
-        if(storageReference != null)
+        //upload full images
+        if(imageReference != null)
         {
             progressBar.setVisibility(View.VISIBLE);
             //disable user interaction
@@ -165,17 +178,44 @@ public class ShareActivity extends AppCompatActivity {
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             //InputStream stream = new FileInputStream(new File(imagePath));
             Uri filepath = Uri.fromFile(new File(imagePath));
-            storageReference.putFile(filepath)
+            imageReference.putFile(filepath)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(ShareActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
-                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                            Intent i = new Intent(ShareActivity.this, MainActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(i);
-                            finish();
+                            //upload thumbnails
+                            //convert image to thumbnails
+                            Bitmap bitmap = ((BitmapDrawable)image.getDrawable()).getBitmap();
+                            thumbBitmap = Bitmap.createScaledBitmap(bitmap,300,300,false);
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            thumbBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                            thumbData = baos.toByteArray();
+
+                            //upload thumbnails
+                            if(thumbData!=null){
+                                thumbReference.putBytes(thumbData)
+                                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                progressBar.setVisibility(View.GONE);
+                                                Toast.makeText(ShareActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
+                                                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                                                Intent i = new Intent(ShareActivity.this, MainActivity.class);
+                                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                startActivity(i);
+                                                finish();
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                progressBar.setVisibility(View.GONE);
+                                                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                                                Toast.makeText(ShareActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                            }
+
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -186,7 +226,15 @@ public class ShareActivity extends AppCompatActivity {
                             Toast.makeText(ShareActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
+
         }
+        /*
+
+        */
+
+
+
+
     }
 
 

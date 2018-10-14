@@ -13,12 +13,12 @@
     <string name="tab2">this is tab 2</string>
 
     <!-- Strings related to user profile view -->
-    <string name="post_num">132</string>
-    <string name="following_num">47</string>
-    <string name="follower_num">47</string>
-    <string name="post">posts</string>
-    <string name="following">following</string>
-    <string name="follower">followers</string>
+    <string name="post_num">..</string>
+    <string name="following_num">..</string>
+    <string name="follower_num">..</string>
+    <string name="post">Posts</string>
+    <string name="following">Following</string>
+    <string name="follower">Followers</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="user_description1">Study at Melbourne Uni</string>
     <string name="user_description2">xi xi xi xi xi xi :-) </string>

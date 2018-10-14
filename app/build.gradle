@@ -41,13 +41,10 @@ dependencies {
     // Google Sign In SDK (only required for Google Sign In)
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
 
-
-
     //Exo Player
     implementation 'com.google.android.exoplayer:exoplayer:2.6.0'
     //cardview
     implementation 'com.android.support:cardview-v7:28.0.0-alpha3'
-
 
     //implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     //glide
@@ -55,6 +52,8 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
     //Universal image loader
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+    //image loader
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 
 }
 apply plugin: 'com.google.gms.google-services'

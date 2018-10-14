@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "3801539425-lqvdfiaafon8bdtmjfgfcf9tns59ha72.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mengrudaddy.instagram",
+            "certificate_hash": "df3b79e8048887503106a3f87c8db846f4e2b6e5"
+          }
+        },
+        {
           "client_id": "3801539425-vds82j58jv8hnkklhklqvcd0og83rk3b.apps.googleusercontent.com",
           "client_type": 3
         }

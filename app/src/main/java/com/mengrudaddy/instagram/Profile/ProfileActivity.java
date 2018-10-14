@@ -106,9 +106,7 @@ public class ProfileActivity extends AppCompatActivity{
                     finish();
                 }
             }});
-
-
-
+        accessUseProfile();
 
     }
 
@@ -128,10 +126,10 @@ public class ProfileActivity extends AppCompatActivity{
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        setUpBottomNavigView();
+    /*
+    Read Database
+     */
+    public void accessUseProfile(){
         //read user info
         ValueEventListener userListener = new ValueEventListener() {
             @Override
@@ -166,7 +164,17 @@ public class ProfileActivity extends AppCompatActivity{
 
                 photoAdapter adapter = new photoAdapter(getApplicationContext(), photoIds);
                 gridview.setAdapter(adapter);
-
+                gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent,
+                                            View v, int position, long id){
+                        // Send intent to SingleViewActivity
+                        String photoUrl = parent.getItemAtPosition(position).toString();
+                        Intent i = new Intent(getApplicationContext(), SinglePostActivity.class);
+                        // Pass image index
+                        i.putExtra("id", photoUrl);
+                        startActivity(i);
+                    }
+                });
 
                 progressBar.setVisibility(View.GONE);
             }
@@ -178,10 +186,17 @@ public class ProfileActivity extends AppCompatActivity{
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setUpBottomNavigView();
+
+    }
+
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroy() {
+        super.onDestroy();
         // Remove post value event listener
         if (mPostListener != null) {
             userRef.removeEventListener(mPostListener);
