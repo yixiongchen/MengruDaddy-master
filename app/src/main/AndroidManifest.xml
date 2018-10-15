@@ -83,8 +83,11 @@
         <activity
             android:name=".Login.SignupBActivity"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".Camera.ShareActivity"></activity>
-        <activity android:name=".Profile.SinglePostActivity"></activity>
+        <activity android:name=".Camera.ShareActivity" />
+        <activity android:name=".Profile.SinglePostActivity" />
+        <activity android:name=".Profile.CommentsListActivity" />
+        <activity android:name=".Profile.LikesListActivity" />
+        <activity android:name=".Profile.CommentPostActivity"></activity>
     </application>
 
 </manifest>

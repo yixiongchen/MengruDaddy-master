@@ -14,6 +14,7 @@ public class User {
     public List<String> following; //the user is following
     public List<String> followers; // follow the user
     public List<String> posts; //posts list
+    public List<String> postLikes;
 
 
     public User() {

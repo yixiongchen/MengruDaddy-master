@@ -17,8 +17,8 @@ public class Post {
     public String latitude;
     public String longitude;
     public Date date;
-    public List<String> comments;
-    public List<String> likes;
+    public List<String> comments; //list of commentId
+    public List<String> likes; //list of likeId
 
 
     public Post(){
