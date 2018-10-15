@@ -33,6 +33,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mengrudaddy.instagram.Adapter.photoAdapter;
 import com.mengrudaddy.instagram.Camera.ShareActivity;
+import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
@@ -41,6 +42,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,17 +53,27 @@ public class SinglePostActivity extends AppCompatActivity {
     private FirebaseStorage storage;
     private StorageReference imageReference;
     // friebase authentication
-    private FirebaseAuth auth;
     private FirebaseUser authUser;
+    private boolean likeBoolean = false;
+
+    //realtime database
     private FirebaseDatabase database;
-    private DatabaseReference postRef;
+    private DatabaseReference userRef, postRef;
     private final String TAG = "SinglePostActivity::";
     private ProgressBar progressBar;
     private ImageView imageView;
     private TextView userName, numComments, numLikes, description, date;
     private ImageView like, comment;
-    private ValueEventListener mPostListener;
-    private String id;
+    private String postId; //post id
+    private Post post;
+    private User user;
+
+
+    private ValueEventListener mPostListener, mUserListener;
+
+
+
+
 
     private Context context=SinglePostActivity.this;
     private static final int ACTIVITY_NUM=4;
@@ -75,11 +87,11 @@ public class SinglePostActivity extends AppCompatActivity {
         // Get intent data
         Intent i = getIntent();
         // get post id
-        id = i.getExtras().getString("id");
+        postId = i.getExtras().getString("id");
 
+        //views
         imageView = (ImageView) findViewById(R.id.image);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
-
         userName = (TextView)findViewById(R.id.username);
         //description
         description = (TextView)findViewById(R.id.photo_description);
@@ -89,7 +101,6 @@ public class SinglePostActivity extends AppCompatActivity {
         //number of comments
         numComments = (TextView)findViewById(R.id.comments);
         comment = (ImageView)findViewById(R.id.comment);
-
         //date
         date =(TextView)findViewById(R.id.date);
 
@@ -107,20 +118,21 @@ public class SinglePostActivity extends AppCompatActivity {
         });
 
 
-        authUser =auth.getInstance().getCurrentUser();
+        authUser = FirebaseAuth.getInstance().getCurrentUser();
         //load post profile
         //real time database
         database = FirebaseDatabase.getInstance();
-        //file path
-        String indexPath = "posts/"+id;
+        //the post's path
+        String indexPath = "posts/"+postId;
         postRef = database.getReference(indexPath);
-
+        //the user's path
+        userRef = database.getReference("users/"+authUser.getUid());
 
         //firebase storage
         storage = FirebaseStorage.getInstance();
         //storage location: posts/postid/
         String postRef = "posts/images/";
-        imageReference = storage.getReference(postRef).child(id);
+        imageReference = storage.getReference(postRef).child(postId);
         imageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -145,22 +157,48 @@ public class SinglePostActivity extends AppCompatActivity {
                 Log.d(TAG, "Can not download file, please check connection");
             }
         });
+        //read user info
+        accessUserProfile();
         //read post info
         accessPostProfile();
 
         //click like button
-
         like.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //DatabaseReference likeref = database.getReference("posts/"+id+"/likes");
-                //String key = likeref.push().getKey();
-                //Map<String, Object> updateValue = new HashMap<>();
-               // updateValue.put(key,authUser.getUid());
-                //likeref.updateChildren(updateValue);
-                like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_like));
-                Toast.makeText(SinglePostActivity.this, "You Liked the Post!", Toast.LENGTH_SHORT).show();
-                //record like
+                //like object reference
+                DatabaseReference likeRef  = database.getReference("likes/");
+                DatabaseReference likeListRef = database.getReference("posts/"+postId+"/"+"likes");
+                //unllike event
+                if(likeBoolean){
+                    HashMap<String, String> map =( HashMap<String, String>)post.likes;
+                    String likeId = map.get(authUser.getUid());
+                    //remove <userid, likeId> from likesList
+                    likeListRef.child(authUser.getUid()).removeValue();
+                    //remove Like object from database
+                    likeRef.child(likeId).removeValue();
+                    //set icon
+                    likeBoolean = false;
+                    like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
+                    Toast.makeText(SinglePostActivity.this, "You unliked the Post!", Toast.LENGTH_SHORT).show();
+                }
+                //like event
+                else{
+                    //create like object
+                    Like likeObject  = new Like(postId, authUser.getUid(), user.username, new Date());
+                    //write like object to database
+                    String likeId = likeRef.push().getKey();
+                    likeRef.child(likeId).setValue(likeObject);
 
+                    //add <UserId, LikeId> to the list in the post
+                    Map<String, Object> updateValue = new HashMap<>();
+                    updateValue.put(authUser.getUid(),likeId); //userId:likeId
+                    likeListRef.updateChildren(updateValue);
+
+                    //set icon
+                    likeBoolean = true;
+                    like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
+                    Toast.makeText(SinglePostActivity.this, "You Liked the Post!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -175,24 +213,18 @@ public class SinglePostActivity extends AppCompatActivity {
         //view all comments
         numComments.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //go to add a comment activity
+
 
             }
         });
 
         //view all likes
-        //view all comments
         numLikes.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //go to add a comment activity
 
             }
         });
-
-
     }
-
-
 
 
     @Override
@@ -208,6 +240,9 @@ public class SinglePostActivity extends AppCompatActivity {
         // Remove post value event listener
         if (mPostListener != null) {
             postRef.removeEventListener(mPostListener);
+        }
+        if(mUserListener != null){
+            userRef.removeEventListener(mUserListener);
         }
     }
 
@@ -228,13 +263,15 @@ public class SinglePostActivity extends AppCompatActivity {
 
     }
 
-
-    public void accessPostProfile(){
-        //read user info
+    /*
+      Read the post info from database
+     */
+    private void accessPostProfile(){
+        //read post info
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
-                Post post = dataSnapshot.getValue(Post.class);
+                post = dataSnapshot.getValue(Post.class);
                 userName.setText(post.username);
                 Date postdate = post.date;
                 DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
@@ -252,11 +289,16 @@ public class SinglePostActivity extends AppCompatActivity {
                 else{
                     numComments.setText("View all "+Integer.toString(post.comments.keySet().size())+" Comments");
                 }
+
                 if(post.likes == null){
                     numLikes.setVisibility(View.GONE);
                 }
                 else{
                     numLikes.setText(Integer.toString(post.likes.keySet().size())+" likes");
+                    if(post.likes.containsKey(authUser.getUid())){
+                        likeBoolean = true;
+                        like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_like));
+                    }
                 }
 
             }
@@ -266,6 +308,28 @@ public class SinglePostActivity extends AppCompatActivity {
         postRef.addValueEventListener(postListener);
         mPostListener = postListener;
     }
+
+     /*
+      Read the user info from database
+     */
+     private void accessUserProfile(){
+
+         //read user info
+         ValueEventListener userListener = new ValueEventListener() {
+             @Override
+             public void onDataChange(DataSnapshot dataSnapshot)  {
+                 user = dataSnapshot.getValue(User.class);
+
+             }
+             @Override
+             public void onCancelled(DatabaseError databaseError) {}
+         };
+         userRef.addValueEventListener(userListener);
+         mUserListener = userListener;
+
+     }
+
+
 
 
 

@@ -117,7 +117,7 @@ public class ShareActivity extends AppCompatActivity {
         image.setImageBitmap(bitmap);
 
         //initialize a date
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        //DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         date = new Date();
         //String strDate = dateFormat.format(date).toString();
 
@@ -126,10 +126,6 @@ public class ShareActivity extends AppCompatActivity {
         authUser =FirebaseAuth.getInstance().getCurrentUser();
         UserDatabaseRef = database.getReference("users/"+ authUser.getUid());
 
-
-        //access location
-        latitude = "80";
-        longitude = "20";
 
         //access descritipn content
         content = postContent.getText().toString();

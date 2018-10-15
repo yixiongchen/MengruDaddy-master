@@ -13,15 +13,17 @@ public class Like {
     public String username;
     public String userId;
     public String postId;
+    public Date date;
 
     public Like(){
 
     }
 
-    public Like(String postId, String userId, String username){
+    public Like(String postId, String userId, String username, Date date){
         this.postId = postId;
         this.username = username;
         this.userId =userId;
+        this.date = date;
     }
 
 
@@ -31,6 +33,7 @@ public class Like {
         result.put("postId", postId);
         result.put("username", username);
         result.put("userId", userId);
+        result.put("date", date);
 
         return result;
     }
