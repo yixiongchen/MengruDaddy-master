@@ -88,6 +88,11 @@
         <activity android:name=".Profile.CommentsListActivity" />
         <activity android:name=".Profile.LikesListActivity" />
         <activity android:name=".Profile.CommentPostActivity"></activity>
+        <activity android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"></activity>
+
     </application>
+
 
 </manifest>

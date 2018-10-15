@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,12 +23,15 @@ import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.mengrudaddy.instagram.Adapter.ViewPagerAdapter;
 import com.mengrudaddy.instagram.Home.MainActivity;
 import com.mengrudaddy.instagram.Interface.EditImageFragmentListener;
 import com.mengrudaddy.instagram.Interface.FilterListFragmentListener;
 import com.mengrudaddy.instagram.R;
+import com.mengrudaddy.instagram.utils.BitmapUtils;
+import com.yalantis.ucrop.UCrop;
 import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubFilter;
 import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubFilter;
@@ -38,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import ja.burhanrashid52.photoeditor.PhotoEditor;
 import ja.burhanrashid52.photoeditor.PhotoEditorView;
@@ -47,12 +52,14 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     public static final  String TAG = "ImageFilter";
     public  static final int PERMISSION_PICK_IMAGE = 1000;
     private Context context = ImageFilter.this;
+    private String new_path;
+    private Uri uri;
 
     //PhotoEditorView imageView;
 
     PhotoEditorView photoEditorView;
     PhotoEditor photoEditor;
-    CardView func_filters_list,func_edit;
+    CardView func_filters_list,func_edit, func_crop;
 
     private ImageView  btnCancel, btnNext;
     //private TabLayout tabLayout;
@@ -75,6 +82,9 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_filter);
+        //get image from camera
+        String path = getIntent().getStringExtra("picture");
+        new_path = path;
         /*
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -100,6 +110,15 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
 
         func_edit = (CardView) findViewById(R.id.func_edit);
         func_filters_list= (CardView) findViewById(R.id.func_filters_list);
+        func_crop= (CardView) findViewById(R.id.func_crop);
+
+        func_crop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startCrop(new_path);
+
+            }
+        });
 
         func_filters_list.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,8 +140,6 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         });
 
 
-        //get image from camera
-        String path = getIntent().getStringExtra("picture");
         Bitmap bitmap = BitmapFactory.decodeFile(path);
         //resize bitmap
         resize = Bitmap.createScaledBitmap(bitmap, 1080, 1080, true);
@@ -157,6 +174,8 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
             }
         });
     }
+
+
 
     // load image on half of the screen
     private void loadImage(Bitmap bitmap){
@@ -288,6 +307,74 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
 
         Log.d(TAG, "return to");
 
+    }
+
+    private void startCrop(String path) {
+        uri = Uri.fromFile(new File(new_path));
+        String destinationFileName = new StringBuilder(UUID.randomUUID().toString()).append(".jpg").toString();
+
+        UCrop ucrop = UCrop.of(uri,Uri.fromFile(new File(getCacheDir(),destinationFileName)));
+        ucrop.start(ImageFilter.this);
+
+
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == PERMISSION_PICK_IMAGE){
+                Bitmap bitmap = BitmapUtils.getBitmapFromGallery(this,data.getData(),800,800);
+                uri = data.getData();
+                orginal.recycle();
+                finalImg.recycle();
+                filtered.recycle();
+
+                orginal = bitmap.copy(Bitmap.Config.ARGB_8888,true);
+                finalImg = orginal.copy(Bitmap.Config.ARGB_8888,true);
+                filtered = orginal.copy(Bitmap.Config.ARGB_8888,true);
+                photoEditorView.getSource().setImageBitmap(orginal);
+                bitmap.recycle();
+
+            }
+            //else if (requestCode == PERMISSION_INSERT_IMAGE){}
+
+            else if (requestCode == UCrop.REQUEST_CROP) {
+                handleCropResult(data);
+
+            }
+        }
+        else if(resultCode == UCrop.RESULT_ERROR){
+            handleCropError(data);
+
+        }
+    }
+
+    private void handleCropResult(Intent data) {
+        final Uri resultUri = UCrop.getOutput(data);
+        if (resultUri != null){
+            photoEditorView.getSource().setImageURI(resultUri);
+            Bitmap bitmap = ((BitmapDrawable)photoEditorView.getSource().getDrawable()).getBitmap();
+            orginal = bitmap.copy(Bitmap.Config.ARGB_8888,true);
+            filtered = orginal;
+            finalImg = orginal;
+            new_path = resultUri.getPath();
+
+        }
+        else {
+            Toast.makeText(this,"cannot retrive crop image",Toast.LENGTH_SHORT).show();
+
+        }
+
+
+    }
+    private void handleCropError(Intent data) {
+        final Throwable cropError = UCrop.getError((data));
+        if (cropError != null){
+            Toast.makeText(this,cropError.getMessage(),Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(this,"Unexpected Error",Toast.LENGTH_SHORT).show();
+
+        }
     }
 
 }
