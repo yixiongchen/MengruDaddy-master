@@ -97,6 +97,7 @@ public class SinglePostActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("Post");
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -201,6 +202,15 @@ public class SinglePostActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Remove post value event listener
+        if (mPostListener != null) {
+            postRef.removeEventListener(mPostListener);
+        }
+    }
+
 
     /*
     Bottom Navigation Set up
@@ -221,34 +231,42 @@ public class SinglePostActivity extends AppCompatActivity {
 
     public void accessPostProfile(){
         //read user info
-        ValueEventListener userListener = new ValueEventListener() {
+        ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
                 Post post = dataSnapshot.getValue(Post.class);
-                description.setText(post.username + ": " +post.description);
                 userName.setText(post.username);
                 Date postdate = post.date;
                 DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
                 String todate = dateFormat.format(postdate);
                 date.setText(todate);
+                if(description == null){
+                    description.setVisibility(View.GONE);
+                }
+                else{
+                    description.setText(post.username + ": " +post.description);
+                }
                 if(post.comments == null){
                     numComments.setVisibility(View.GONE);
                 }
                 else{
-                    numComments.setText("View all "+Integer.toString(post.comments.size())+" Comments");
+                    numComments.setText("View all "+Integer.toString(post.comments.keySet().size())+" Comments");
                 }
                 if(post.likes == null){
                     numLikes.setVisibility(View.GONE);
                 }
                 else{
-                    numLikes.setText(Integer.toString(post.likes.size())+" likes");
+                    numLikes.setText(Integer.toString(post.likes.keySet().size())+" likes");
                 }
 
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        postRef.addValueEventListener(userListener);
-        mPostListener = userListener;
+        postRef.addValueEventListener(postListener);
+        mPostListener = postListener;
     }
+
+
+
 }

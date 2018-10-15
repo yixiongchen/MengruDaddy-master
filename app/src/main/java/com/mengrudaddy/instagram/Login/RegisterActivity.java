@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -178,8 +179,8 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email, new ArrayList<String>(), new ArrayList<String>(),
-                new ArrayList<String>());
+        User user = new User(name, email, new HashMap<String, String>(), new HashMap<String, String>(),
+                new HashMap<String, String>());
         mDatabase.child("users").child(userId).setValue(user);
     }
 

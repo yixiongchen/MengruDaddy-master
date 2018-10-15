@@ -48,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -103,6 +104,7 @@ public class ShareActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("Share");
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,10 +155,11 @@ public class ShareActivity extends AppCompatActivity {
                 uploadImage();
 
                 //write post info to database
-                ArrayList<String> comments = new ArrayList<String>();
-                ArrayList<String> likes = new ArrayList<String>();
+                LinkedHashMap<String, String> comments = new  LinkedHashMap<>();
+                LinkedHashMap<String, String> likes = new  LinkedHashMap<>();
+                LinkedHashMap<String, String> location = new  LinkedHashMap<>();
                 content = postContent.getText().toString();
-                writePost(postId, username, authUser.getUid(), content, latitude,longitude,
+                writePost(postId, username, authUser.getUid(), content, location,
                         date, comments, likes);
 
                 //update user profile : add a postId
@@ -240,11 +243,12 @@ public class ShareActivity extends AppCompatActivity {
 
 
     //upload post info
-    public void writePost(String postId, String username, String userId, String description, String latitude,
-                          String longitude, Date date,  ArrayList<String> comments,
-                          ArrayList<String> likes){
+    public void writePost(String postId, String username, String userId, String description,
+                          LinkedHashMap<String, String> location, Date date,
+                          LinkedHashMap<String, String> comments,
+                          LinkedHashMap<String, String> likes){
 
-        Post post = new Post(username, userId, description,latitude,longitude, date, comments , likes);
+        Post post = new Post(username, userId, description,location, date, comments,likes);
         Map<String, Object> postValues = post.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/posts/" + postId, postValues);
@@ -254,9 +258,10 @@ public class ShareActivity extends AppCompatActivity {
 
     //update user's post list
     public void updateUser(String userid, ArrayList<String> posts){
-        DatabaseReference ref = DatabaseRef.child("users/").child(userid);
-        Map<String, Object> updates = new HashMap<String,Object>();
-        updates.put("posts", posts);
+        DatabaseReference ref = DatabaseRef.child("users/").child(userid+"/posts");
+        String key = ref.push().getKey();
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(key, postId);
         ref.updateChildren(updates);
     }
 
@@ -269,14 +274,6 @@ public class ShareActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot)  {
                 User newUser = dataSnapshot.getValue(User.class);
                 username = newUser.username;
-                if(newUser.posts != null){
-                    posts = (ArrayList<String>)newUser.posts;
-                    posts.add(postId);
-                }
-                else{
-                    posts = new ArrayList<String>();
-                    posts.add(postId);
-                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
