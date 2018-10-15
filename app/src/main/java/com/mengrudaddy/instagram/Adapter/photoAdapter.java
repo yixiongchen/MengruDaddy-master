@@ -85,8 +85,19 @@ public class photoAdapter extends BaseAdapter {
             public void onSuccess(Uri uri) {
 
                 //picasso lib load remote image
-                Picasso.with(mContext).load(uri.toString()).into(viewHolder.imageViewPhoto);
-                viewHolder.progressBar.setVisibility(View.GONE);
+                Picasso.with(mContext).load(uri.toString()).into(viewHolder.imageViewPhoto,
+                        new com.squareup.picasso.Callback() {
+                            @Override
+                            public void onSuccess() {
+                                //do smth when picture is loaded successfully
+                                viewHolder.progressBar.setVisibility(View.GONE);
+                            }
+                            @Override
+                            public void onError() {
+                                //do smth when there is picture loading error
+                            }
+                        });
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

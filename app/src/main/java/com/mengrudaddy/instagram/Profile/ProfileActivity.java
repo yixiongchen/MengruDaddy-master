@@ -40,6 +40,9 @@ import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity{
     private static final String TAG = "ProfileActivity";
@@ -58,7 +61,7 @@ public class ProfileActivity extends AppCompatActivity{
     private FirebaseDatabase database;
     private DatabaseReference userRef;
     //photo storage
-    private String[] photoIds;
+    private ArrayList<String> photoIds;
 
 
     private FirebaseUser user;
@@ -107,6 +110,7 @@ public class ProfileActivity extends AppCompatActivity{
                 }
             }});
         accessUseProfile();
+        accessPostList();
 
     }
 
@@ -129,7 +133,7 @@ public class ProfileActivity extends AppCompatActivity{
     /*
     Read Database
      */
-    public void accessUseProfile(){
+    private void accessUseProfile(){
         //read user info
         ValueEventListener userListener = new ValueEventListener() {
             @Override
@@ -137,32 +141,51 @@ public class ProfileActivity extends AppCompatActivity{
                 User newUser = dataSnapshot.getValue(User.class);
                 title.setText(newUser.username);
                 username.setText(newUser.username);
+                email.setText(newUser.email);
                 if(newUser.followers == null){
                     followerNum.setText("0");
                 }
                 else{
-                    followerNum.setText(Integer.toString(newUser.followers.size()));
+                    followerNum.setText(Integer.toString(newUser.followers.keySet().size()));
                 }
                 if(newUser.following == null){
                     followingNum.setText("0");
                 }
                 else{
-                    followingNum.setText(Integer.toString(newUser.following.size()));
+                    followingNum.setText(Integer.toString(newUser.following.keySet().size()));
 
                 }
                 if(newUser.posts == null){
                     postNum.setText("0");
-                    photoIds  = new String[0];
                 }
                 else{
-                    photoIds =  new String[newUser.posts.size()];
-                    photoIds = newUser.posts.toArray(photoIds);
-
-                    postNum.setText(Integer.toString(newUser.posts.size()));
+                    postNum.setText(Integer.toString(newUser.posts.keySet().size()));
                 }
-                email.setText(newUser.email);
 
-                photoAdapter adapter = new photoAdapter(getApplicationContext(), photoIds);
+                progressBar.setVisibility(View.GONE);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+        userRef.addValueEventListener(userListener);
+        mPostListener = userListener;
+
+    }
+
+
+    private void accessPostList(){
+        ValueEventListener postsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)  {
+                photoIds = new ArrayList<>();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String postId = ds.getValue(String.class);
+                    photoIds.add(postId);
+                }
+                Object[] objNames = photoIds.toArray();
+                String[] list = Arrays.copyOf(objNames, objNames.length, String[].class);
+
+                photoAdapter adapter = new photoAdapter(getApplicationContext(), list);
                 gridview.setAdapter(adapter);
                 gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent,
@@ -176,15 +199,18 @@ public class ProfileActivity extends AppCompatActivity{
                     }
                 });
 
-                progressBar.setVisibility(View.GONE);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        userRef.addValueEventListener(userListener);
-        mPostListener = userListener;
+        DatabaseReference postListRef =  database.getReference("users/"+user.getUid()+"/posts");
+        postListRef.orderByKey().addValueEventListener(postsListener);
+
 
     }
+
+
+
 
     @Override
     protected void onStart() {

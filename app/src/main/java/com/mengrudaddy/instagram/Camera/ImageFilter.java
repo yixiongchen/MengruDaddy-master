@@ -212,7 +212,6 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         Filter filter = new Filter();
         filter.addSubFilter(new BrightnessSubFilter(brightnessFinal));
         filter.addSubFilter(new ContrastSubFilter(contrastFinal));
-
         finalImg =filter.processFilter(bitmap);
 
     }
@@ -253,14 +252,14 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
 
         File file = new File(destDir, filepath);
         try (FileOutputStream out = new FileOutputStream(file)) {
-            filtered.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+            finalImg.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
             // PNG is a lossless format, the compression factor (100) is ignored
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String filterPath = Uri.fromFile(file).getPath();
+        String finalPath = Uri.fromFile(file).getPath();
 
-        return filterPath;
+        return finalPath;
 
     }
 

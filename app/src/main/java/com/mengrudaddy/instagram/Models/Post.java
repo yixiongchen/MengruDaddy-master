@@ -14,25 +14,23 @@ public class Post {
     public String username;
     public String userId;
     public String description;
-    public String latitude;
-    public String longitude;
+    public Map<String, String> location;
     public Date date;
-    public List<String> comments; //list of commentId
-    public List<String> likes; //list of likeId
+    public Map<String, String>comments; //list of commentId
+    public Map<String, String> likes; //list of likeId
 
 
     public Post(){
 
     }
 
-    public Post(String username, String userId, String description, String latitude,
-                String longitude, Date date,  List<String> comments,
-                List<String> likes){
+    public Post(String username, String userId, String description, Map<String, String> location,
+                Date date,  Map<String, String> comments,
+                Map<String, String> likes){
         this.username = username;
         this.userId =userId;
         this.description = description;
-        this.latitude = latitude;
-        this.longitude=longitude;
+        this.location = location;
         this.date = date;
         this.comments = comments;
         this.likes = likes;
@@ -44,8 +42,7 @@ public class Post {
         result.put("username", username);
         result.put("userId", userId);
         result.put("description", description);
-        result.put("latitude", latitude);
-        result.put("longitude", longitude);
+        result.put("location", location);
         result.put("date", date);
         result.put("likes", likes);
         result.put("comments", comments);
