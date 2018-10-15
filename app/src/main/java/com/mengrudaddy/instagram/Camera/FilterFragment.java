@@ -42,6 +42,8 @@ import com.zomato.photofilters.utils.ThumbnailsManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import ja.burhanrashid52.photoeditor.PhotoEditorView;
+
 public class FilterFragment extends BottomSheetDialogFragment implements FilterListFragmentListener{
 
     RecyclerView recyclerView;
@@ -90,10 +92,10 @@ public class FilterFragment extends BottomSheetDialogFragment implements FilterL
         recyclerView.setAdapter(adapter);
 
         //retrieve image and convert it to filtered thumbnails
-        ImageView new_image = getActivity().findViewById(R.id.new_image);
+        PhotoEditorView new_image = getActivity().findViewById(R.id.new_image);
         if(new_image != null){
             Log.d(TAG, "new image is not null");
-            BitmapDrawable drawable = (BitmapDrawable) new_image.getDrawable();
+            BitmapDrawable drawable = (BitmapDrawable) new_image.getSource().getDrawable();
             bitmap = drawable.getBitmap();
         }
         displayFilterNails(bitmap);

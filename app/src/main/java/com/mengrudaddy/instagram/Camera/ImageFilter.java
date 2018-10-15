@@ -169,7 +169,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     }
 
     // set up fragment of filter and edit
-    private void setUpViewPager(ViewPager vp){
+    /*private void setUpViewPager(ViewPager vp){
         ViewPagerAdapter adpter = new ViewPagerAdapter(getSupportFragmentManager());
         filterFragment = new FilterFragment();
         editFragment = new EditFragment();
@@ -179,7 +179,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         adpter.addFragment(filterFragment,"Filter");
         adpter.addFragment(editFragment,"Edit");
         vp.setAdapter(adpter);
-    }
+    }*/
 
     // listening for brightness seekbar changing
     public void onBrightnessChanged(int brightness){
