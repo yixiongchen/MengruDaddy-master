@@ -18,6 +18,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -38,16 +39,24 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import ja.burhanrashid52.photoeditor.PhotoEditor;
+import ja.burhanrashid52.photoeditor.PhotoEditorView;
+
 public class ImageFilter extends AppCompatActivity implements FilterListFragmentListener,EditImageFragmentListener{
     public static final  String pic_name = "dad.jpg";
     public static final  String TAG = "ImageFilter";
     public  static final int PERMISSION_PICK_IMAGE = 1000;
     private Context context = ImageFilter.this;
 
+    //PhotoEditorView imageView;
 
-    private ImageView imageView, btnCancel, btnNext;
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
+    PhotoEditorView photoEditorView;
+    PhotoEditor photoEditor;
+    CardView func_filters_list,func_edit;
+
+    private ImageView  btnCancel, btnNext;
+    //private TabLayout tabLayout;
+    //private ViewPager viewPager;
     private ConstraintLayout constraintLayout;
     private Bitmap orginal, filtered, finalImg, resize;
 
@@ -73,26 +82,55 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         getSupportActionBar().setTitle("Instagram Filter");
         */
 
-
         //View
         Log.d(TAG, "Start filtering");
-        imageView = (ImageView) findViewById(R.id.new_image);
+        //imageView = (ImageView) findViewById(R.id.new_image);
+
+        photoEditorView = (PhotoEditorView) findViewById(R.id.new_image) ;
+        photoEditor = new PhotoEditor.Builder(this,photoEditorView)
+                .setPinchTextScalable(true)
+                .build();
+
+
         btnCancel = (ImageView) findViewById(R.id.icon_cancle);
         btnNext = (ImageView) findViewById(R.id.icon_next);
-        tabLayout = (TabLayout) findViewById(R.id.filter_edit_tabs);
-        viewPager = (ViewPager) findViewById(R.id.view_pager);
+        //tabLayout = (TabLayout) findViewById(R.id.filter_edit_tabs);
+        //viewPager = (ViewPager) findViewById(R.id.view_pager);
         constraintLayout = (ConstraintLayout) findViewById(R.id.coordinator);
+
+        func_edit = (CardView) findViewById(R.id.func_edit);
+        func_filters_list= (CardView) findViewById(R.id.func_filters_list);
+
+        func_filters_list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FilterFragment filterFragment = FilterFragment.getInstance();
+                filterFragment.setListener(ImageFilter.this);
+                filterFragment.show(getSupportFragmentManager(),filterFragment.getTag());
+
+            }
+        });
+
+        func_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditFragment editFragment = EditFragment.getInstance();
+                editFragment.setListener(ImageFilter.this);
+                editFragment.show(getSupportFragmentManager(),editFragment.getTag());
+            }
+        });
+
 
         //get image from camera
         String path = getIntent().getStringExtra("picture");
         Bitmap bitmap = BitmapFactory.decodeFile(path);
         //resize bitmap
         resize = Bitmap.createScaledBitmap(bitmap, 1080, 1080, true);
-        imageView.setImageBitmap(resize);
+        //imageView.setImageBitmap(resize);
         //loadImage(resize);
         loadImage(resize);
-        setUpViewPager(viewPager);
-        tabLayout.setupWithViewPager(viewPager);
+        //setUpViewPager(viewPager);
+        //tabLayout.setupWithViewPager(viewPager);
         Log.d(TAG, "show the filtered");
         //set view pager and fragments
 
@@ -126,6 +164,8 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         orginal  = bitmap;
         filtered = orginal.copy(Bitmap.Config.ARGB_8888,true);
         finalImg = orginal.copy(Bitmap.Config.ARGB_8888,true);
+        ///////
+        photoEditorView.getSource().setImageBitmap(orginal);
     }
 
     // set up fragment of filter and edit
@@ -146,7 +186,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         brightnessFinal = brightness;
         Filter flter = new Filter();
         flter.addSubFilter(new BrightnessSubFilter(brightness));
-        imageView.setImageBitmap(flter.processFilter(finalImg.copy(Bitmap.Config.ARGB_8888,true)));
+        photoEditorView.getSource().setImageBitmap(flter.processFilter(finalImg.copy(Bitmap.Config.ARGB_8888,true)));
     }
 
     // listening for contrast seekbar changing
@@ -155,7 +195,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         contrastFinal = contrast;
         Filter flter = new Filter();
         flter.addSubFilter(new ContrastSubFilter(contrast));
-        imageView.setImageBitmap(flter.processFilter(finalImg.copy(Bitmap.Config.ARGB_8888,true)));
+        photoEditorView.getSource().setImageBitmap(flter.processFilter(finalImg.copy(Bitmap.Config.ARGB_8888,true)));
     }
 
 
@@ -181,7 +221,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     public void onFilterSelected(Filter filter) {
         resetControl();
         filtered = orginal.copy(Bitmap.Config.ARGB_8888,true);
-        imageView.setImageBitmap(filter.processFilter(filtered));
+        photoEditorView.getSource().setImageBitmap(filter.processFilter(filtered));
         finalImg = filtered.copy(Bitmap.Config.ARGB_8888,true);
 
     }

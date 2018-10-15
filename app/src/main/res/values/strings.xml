@@ -37,6 +37,10 @@
     <string name="brightness">Brigtness</string>
     <string name="filter_name">Filter A</string>
     <string name="contrast">Contrast</string>
+    <string name="filters">Filters</string>
+    <string name="edit">Edit</string>
+    <string name="crop">Crop</string>
+
 
 
     <!-- Strings related to authentication -->

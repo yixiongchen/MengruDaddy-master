@@ -49,7 +49,7 @@
         android:scaleType="centerCrop"
         android:id="@+id/new_capture"
         android:background="@color/black"/>
-
+    <!--<ScrollView-->
     <GridView
         android:id="@+id/gridView"
         android:layout_width="match_parent"
@@ -60,5 +60,6 @@
         android:stretchMode="columnWidth"
         android:verticalSpacing="1dp">
     </GridView>
+
 
 </FrameLayout>

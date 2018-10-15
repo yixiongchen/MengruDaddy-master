@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,12 +42,22 @@ import com.zomato.photofilters.utils.ThumbnailsManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FilterFragment extends Fragment implements FilterListFragmentListener{
+public class FilterFragment extends BottomSheetDialogFragment implements FilterListFragmentListener{
 
     RecyclerView recyclerView;
     ThumbNailAdapter adapter;
     List<ThumbnailItem> nails;
     FilterListFragmentListener listener;
+    static FilterFragment instance;
+
+    public static FilterFragment getInstance() {
+        if (instance == null){
+            instance = new FilterFragment();
+
+        }
+        return instance;
+    }
+
     Bitmap bitmap;
     private boolean flag = false;
 

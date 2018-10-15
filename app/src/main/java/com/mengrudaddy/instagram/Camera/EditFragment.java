@@ -9,6 +9,7 @@ This class is activity for showing photo editing choices
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,10 +19,24 @@ import android.widget.SeekBar;
 import com.mengrudaddy.instagram.Interface.EditImageFragmentListener;
 import com.mengrudaddy.instagram.R;
 
-public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeListener {
+public class EditFragment extends BottomSheetDialogFragment implements SeekBar.OnSeekBarChangeListener {
 
     private EditImageFragmentListener listener;
     SeekBar seekBar_brighteness, seekbar_contrast;
+    static EditFragment instance;
+
+    public static EditFragment getInstance(){
+        if (instance == null){
+            instance = new EditFragment();
+        }
+        return instance;
+    }
+
+
+    public EditFragment(){
+
+    }
+
 
     public void setListener(EditImageFragmentListener listener1){
         this.listener = listener1;
@@ -42,15 +57,13 @@ public class EditFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
         seekbar_contrast.setMax(20);
         seekbar_contrast.setMin(-20);
         seekbar_contrast.setProgress(0);
+
         seekBar_brighteness.setOnSeekBarChangeListener(this);
         seekbar_contrast.setOnSeekBarChangeListener(this);
 
         return itemView;
     }
 
-    public EditFragment(){
-
-    }
 
     // on brightness and contrast change method
     @Override
