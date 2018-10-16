@@ -109,8 +109,6 @@ public class PhotoFragment extends Fragment{
                 startActivity(intent);
 
             }
-
-
             //Bitmap bitmap =(Bitmap)data.getExtras().get("data");
             //ByteArrayOutputStream stream = new ByteArrayOutputStream();
             //bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
@@ -123,7 +121,5 @@ public class PhotoFragment extends Fragment{
         }
 
     }
-
-
 
 }

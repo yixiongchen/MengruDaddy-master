@@ -5,16 +5,33 @@
     android:layout_height="match_parent"
     tools:context=".Camera.PhotoFragment">
 
-    <Button
-        android:id="@+id/take"
-        android:layout_marginTop="40dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginLeft="30dp"
-        android:layout_gravity="center"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Open Camera"
-        android:textSize="30sp"
-       />
+        android:orientation="vertical"
+        android:layout_gravity="center">
+
+        <Button
+            android:id="@+id/take"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/check_border"
+            android:gravity="center"
+            android:text="@string/take_a_photo"
+            />
+        <Button
+            android:id="@+id/choose_from_album"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/check_border"
+            android:gravity="center"
+            android:text="@string/choose_from_album"
+            />
+
+    </LinearLayout>
 
 </FrameLayout>

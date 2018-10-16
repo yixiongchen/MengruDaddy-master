@@ -13,6 +13,11 @@
     <string name="tab2">this is tab 2</string>
 
     <!-- Strings related to user profile view -->
+    <string name="take_a_photo">Open Camera</string>
+    <string name="choose_from_album">Choose from Album</string>
+
+
+    <!-- Strings related to user profile view -->
     <string name="post_num">..</string>
     <string name="following_num">..</string>
     <string name="follower_num">..</string>
