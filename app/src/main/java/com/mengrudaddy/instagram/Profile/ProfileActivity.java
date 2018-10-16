@@ -187,6 +187,7 @@ public class ProfileActivity extends AppCompatActivity{
 
                 photoAdapter adapter = new photoAdapter(getApplicationContext(), list);
                 gridview.setAdapter(adapter);
+
                 gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent,
                                             View v, int position, long id){

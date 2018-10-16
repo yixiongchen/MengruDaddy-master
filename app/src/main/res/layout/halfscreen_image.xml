@@ -12,7 +12,7 @@
     tools:showIn="@layout/image_filter">
     <ja.burhanrashid52.photoeditor.PhotoEditorView
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="650dp"
         android:scaleType="centerCrop"
         android:id="@+id/new_image"/>
 
@@ -47,14 +47,14 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:padding="30dp"
+            android:padding="0dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <android.support.v7.widget.CardView
                 android:id="@+id/func_filters_list"
                 android:padding="16dp"
                 app:cardBackgroundColor="@color/colorPrimaryDark"
-                android:layout_width="80dp"
+                android:layout_width="137dp"
                 android:layout_height="80dp">
                 <LinearLayout
                     android:orientation="vertical"
@@ -81,7 +81,7 @@
                 android:id="@+id/func_edit"
                 android:padding="16dp"
                 app:cardBackgroundColor="@color/colorPrimaryDark"
-                android:layout_width="80dp"
+                android:layout_width="137dp"
                 android:layout_height="80dp">
                 <LinearLayout
                     android:orientation="vertical"
@@ -108,7 +108,7 @@
                 android:id="@+id/func_crop"
                 android:padding="16dp"
                 app:cardBackgroundColor="@color/colorPrimaryDark"
-                android:layout_width="80dp"
+                android:layout_width="137dp"
                 android:layout_height="80dp">
                 <LinearLayout
                     android:orientation="vertical"

@@ -27,12 +27,15 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    // on photo edition
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.karumi:dexter:4.1.0'
     implementation 'info.androidhive:imagefilters:1.0.7'
     implementation 'ja.burhanrashid52:photoeditor:0.2.1'
     implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.github.yalantis:ucrop:2.2.2-native'
 
 
 
