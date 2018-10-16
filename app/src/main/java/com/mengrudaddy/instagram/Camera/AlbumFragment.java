@@ -45,7 +45,7 @@ public class AlbumFragment extends Fragment{
 
     public void redirectToFilter(){
         Intent getFilter = new Intent(getActivity(), ImageFilter.class);
-        //home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //bug
         startActivity(getFilter);
     }
 

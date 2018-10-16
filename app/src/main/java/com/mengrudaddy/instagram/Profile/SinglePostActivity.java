@@ -180,6 +180,7 @@ public class SinglePostActivity extends AppCompatActivity {
                     likeBoolean = false;
                     like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
                     Toast.makeText(SinglePostActivity.this, "You unliked the Post!", Toast.LENGTH_SHORT).show();
+
                 }
                 //like event
                 else{
@@ -198,6 +199,7 @@ public class SinglePostActivity extends AppCompatActivity {
                     likeBoolean = true;
                     like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
                     Toast.makeText(SinglePostActivity.this, "You Liked the Post!", Toast.LENGTH_SHORT).show();
+
                 }
             }
         });
@@ -294,6 +296,7 @@ public class SinglePostActivity extends AppCompatActivity {
                     numLikes.setVisibility(View.GONE);
                 }
                 else{
+                    numLikes.setVisibility(View.VISIBLE);
                     numLikes.setText(Integer.toString(post.likes.keySet().size())+" likes");
                     if(post.likes.containsKey(authUser.getUid())){
                         likeBoolean = true;
