@@ -1,14 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/coordinator"
-    tools:context=".Camera.UploadActivity">
+    android:background="@color/white"
+    tools:context=".Camera.PhotoFragment">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:background="@color/white"
+        android:layout_height="?attr/actionBarSize">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:id="@+id/icon_cancle"
+            android:src="@drawable/ic_action_cancle"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:contentDescription="@string/cancle"/>
+    </android.support.v7.widget.Toolbar>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center">
 
+        <Button
+            android:id="@+id/take"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/check_border"
+            android:gravity="center"
+            android:text="@string/take_a_photo"
+            />
+        <Button
+            android:id="@+id/choose_from_album"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/check_border"
+            android:gravity="center"
+            android:text="@string/choose_from_album"
+            />
 
-    <include layout = "@layout/halfscreen_capture"/>
-
-</android.support.constraint.ConstraintLayout>
+    </LinearLayout>
+</FrameLayout>
