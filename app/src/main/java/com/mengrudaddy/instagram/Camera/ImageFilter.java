@@ -7,6 +7,7 @@ This class is to edit image : crop, filter, brightness and contrast
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -14,6 +15,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
@@ -49,10 +51,10 @@ import ja.burhanrashid52.photoeditor.PhotoEditorView;
 
 public class ImageFilter extends AppCompatActivity implements FilterListFragmentListener,EditImageFragmentListener{
     public static final  String pic_name = "dad.jpg";
-    public static final  String TAG = "ImageFilter";
+    public static final  String TAG = "ImageFilter::";
     public  static final int PERMISSION_PICK_IMAGE = 1000;
     private Context context = ImageFilter.this;
-    private String new_path;
+    private String tempPath;
     private Uri uri;
 
     //PhotoEditorView imageView;
@@ -84,7 +86,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         setContentView(R.layout.image_filter);
         //get image from camera
         String path = getIntent().getStringExtra("picture");
-        new_path = path;
+        //new_path = path;
         /*
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -115,7 +117,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         func_crop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startCrop(new_path);
+                startCrop();
 
             }
         });
@@ -142,7 +144,7 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
 
         Bitmap bitmap = BitmapFactory.decodeFile(path);
         //resize bitmap
-        resize = Bitmap.createScaledBitmap(bitmap, 1080, 1080, true);
+        resize = getResizedBitmap(bitmap, 1080, 1080);
         //imageView.setImageBitmap(resize);
         //loadImage(resize);
         loadImage(resize);
@@ -203,9 +205,9 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
     // listening for brightness seekbar changing
     public void onBrightnessChanged(int brightness){
         brightnessFinal = brightness;
-        Filter flter = new Filter();
-        flter.addSubFilter(new BrightnessSubFilter(brightness));
-        photoEditorView.getSource().setImageBitmap(flter.processFilter(finalImg.copy(Bitmap.Config.ARGB_8888,true)));
+        Filter filter = new Filter();
+        filter.addSubFilter(new BrightnessSubFilter(brightness));
+        photoEditorView.getSource().setImageBitmap(filter.processFilter(finalImg.copy(Bitmap.Config.ARGB_8888,true)));
     }
 
     // listening for contrast seekbar changing
@@ -253,12 +255,10 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
         contrastFinal = 1.0f;
     }
 
-    public void goPhoto(View view) {
-        finish();
-        //Intent upload = new Intent(context, UploadActivity.class);//ACTIVITY_NUM=2
-        //context.startActivity(upload);
-    }
 
+    /*
+       store image after edition
+     */
     public String StoreFilteredImage(){
         final String path = Environment.getExternalStorageDirectory().getAbsolutePath() +
                 File.separator + "MobileIns"+File.separator+"Filtered";
@@ -309,18 +309,17 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
 
     }
 
-    private void startCrop(String path) {
-        uri = Uri.fromFile(new File(new_path));
+    private void startCrop() {
+        uri = getImageUri(this, finalImg);
+        //uri = Uri.fromFile(new File(new_path));
         String destinationFileName = new StringBuilder(UUID.randomUUID().toString()).append(".jpg").toString();
-
         //UCrop ucrop = UCrop.of(uri,Uri.fromFile(new File(getCacheDir(),destinationFileName)));
         UCrop ucrop = UCrop.of(uri,Uri.fromFile(new File(getCacheDir(),destinationFileName)));
-
         ucrop.start(ImageFilter.this);
-
-
     }
 
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == PERMISSION_PICK_IMAGE){
@@ -329,7 +328,6 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
                 orginal.recycle();
                 finalImg.recycle();
                 filtered.recycle();
-
                 orginal = bitmap.copy(Bitmap.Config.ARGB_8888,true);
                 finalImg = orginal.copy(Bitmap.Config.ARGB_8888,true);
                 filtered = orginal.copy(Bitmap.Config.ARGB_8888,true);
@@ -352,14 +350,21 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
 
     private void handleCropResult(Intent data) {
         final Uri resultUri = UCrop.getOutput(data);
+
+        File file = new File(tempPath);
+        if(file.exists()){
+            boolean deleted = file.delete();
+            Log.d(TAG, "Delete:: "+ deleted);
+            Log.d(TAG, "The temp path:: "+ tempPath);
+        }
         if (resultUri != null){
             photoEditorView.getSource().setImageURI(resultUri);
             Bitmap bitmap = ((BitmapDrawable)photoEditorView.getSource().getDrawable()).getBitmap();
             orginal = bitmap.copy(Bitmap.Config.ARGB_8888,true);
             filtered = orginal;
             finalImg = orginal;
-            new_path = resultUri.getPath();
-
+            //new_path = resultUri.getPath();
+            //begin to delete temp file
         }
         else {
             Toast.makeText(this,"cannot retrive crop image",Toast.LENGTH_SHORT).show();
@@ -374,6 +379,60 @@ public class ImageFilter extends AppCompatActivity implements FilterListFragment
             Toast.makeText(this,"Unexpected Error",Toast.LENGTH_SHORT).show();
 
         }
+    }
+
+    public Uri getImageUri(Context context, Bitmap bitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        tempPath = StoreCropImage(bitmap);
+        Log.d(TAG, "The path is:"+tempPath);
+        return Uri.fromFile(new File(tempPath));
+    }
+
+    /*
+        Get the true physical path of uri (Gallery)
+     */
+    public static String getPath( Context context, Uri uri ) {
+        String result = null;
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = context.getContentResolver( ).query( uri, proj, null, null, null );
+        if(cursor != null){
+            if ( cursor.moveToFirst( ) ) {
+                int column_index = cursor.getColumnIndexOrThrow( proj[0] );
+                result = cursor.getString( column_index );
+            }
+            cursor.close( );
+        }
+        if(result == null) {
+            result = "Not found";
+        }
+        return result;
+    }
+
+
+    /*
+     store temp image for crop
+   */
+    public String StoreCropImage(Bitmap bitmap){
+        final String path = Environment.getExternalStorageDirectory().getAbsolutePath() +
+                File.separator + "MobileIns"+File.separator+"Cropped";
+        File destDir = new File(path);
+        if (!destDir.exists()) {
+            destDir.mkdirs();
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String filepath = "Crop"+timeStamp+".jpg";
+
+        File file = new File(destDir, filepath);
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String finalPath = Uri.fromFile(file).getPath();
+
+        return finalPath;
+
     }
 
 }
