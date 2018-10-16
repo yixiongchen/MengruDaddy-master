@@ -10,6 +10,7 @@ or choose photo by taking a new one
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -48,7 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static com.mengrudaddy.instagram.Camera.ImageFilter.PERMISSION_PICK_IMAGE;
+//import static com.mengrudaddy.instagram.Camera.ImageFilter.PERMISSION_PICK_IMAGE;
 
 public class UploadActivity extends AppCompatActivity{
     private static final String TAG = "UploadActivity";
@@ -63,6 +64,8 @@ public class UploadActivity extends AppCompatActivity{
     TabLayout tabLayout;
 
     private static final int CAMERA_REQUEST_CODE = 0;
+    private static final int ALBUM_REQUEST_CODE = 1;
+
 
     private String mCurrentPhotoPath;
     private String dir;
@@ -99,6 +102,7 @@ public class UploadActivity extends AppCompatActivity{
                 finish();
             }
         });
+
 
         Button btnOpenAlbum = (Button)findViewById(R.id.choose_from_album);
         //imageView = (ImageView)view.findViewById(R.id.new_capture);
@@ -140,11 +144,10 @@ public class UploadActivity extends AppCompatActivity{
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
-
                         if (report.areAllPermissionsGranted()){
                             Intent intent = new Intent(Intent.ACTION_PICK);
                             intent.setType("image/*");
-                            startActivityForResult(intent,PERMISSION_PICK_IMAGE);
+                            startActivityForResult(intent, ALBUM_REQUEST_CODE);
                         }
                         else{
                             Toast.makeText(UploadActivity.this,"Permission denied",Toast.LENGTH_SHORT).show();
@@ -174,12 +177,12 @@ public class UploadActivity extends AppCompatActivity{
 
 
         if (photoFile != null) {
-            Uri outputUri = Uri.fromFile(photoFile);
-            imageUri = outputUri;
+            imageUri = Uri.fromFile(photoFile);
+            //imageUri = outputUri;
             Log.d(TAG, imageUri.getPath());
 
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
         }
 
@@ -190,32 +193,32 @@ public class UploadActivity extends AppCompatActivity{
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         Log.d(TAG, "show result");
         super.onActivityResult(requestCode, resultCode, data);
+
+        //camera
         if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
             if(imageUri!=null){
+
                 String path = imageUri.getPath();
                 Log.d(TAG, "Image Url is"+path);
                 //File imagefile = new File(path);
                 Intent intent = new Intent(this, ImageFilter.class);
                 intent.putExtra("picture", path);
                 startActivity(intent);
-
-            }
-            //Bitmap bitmap =(Bitmap)data.getExtras().get("data");
-            //ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            //bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-            //byte[] image = stream.toByteArray();
-            //Intent intent = new Intent(getActivity(), ImageFilter.class);
-            //intent.putExtra("picture", image);
-            //startActivity(intent);
-            //getActivity().finish();
-
-        }
-        if (resultCode == RESULT_OK) {
-            if (requestCode == PERMISSION_PICK_IMAGE) {
+                finish();
 
             }
         }
+        //gallery
+        if (requestCode ==ALBUM_REQUEST_CODE && resultCode == RESULT_OK) {
+                Uri uri = data.getData();
+                String path = getPath( this.getApplicationContext(), uri);
+                //Log.d(TAG, "Image Url is"+path);
+                Intent intent = new Intent(this, ImageFilter.class);
+                intent.putExtra("picture", path);
+                startActivity(intent);
+                finish();
 
+            }
     }
 
 
@@ -279,6 +282,26 @@ public class UploadActivity extends AppCompatActivity{
             Log.d(TAG, "checkPermissions: \n Permission was granted for: " + permission);
             return true;
         }
+    }
+
+    /*
+        Get the true physical path of uri (Gallery)
+     */
+    public static String getPath( Context context, Uri uri ) {
+        String result = null;
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = context.getContentResolver( ).query( uri, proj, null, null, null );
+        if(cursor != null){
+            if ( cursor.moveToFirst( ) ) {
+                int column_index = cursor.getColumnIndexOrThrow( proj[0] );
+                result = cursor.getString( column_index );
+            }
+            cursor.close( );
+        }
+        if(result == null) {
+            result = "Not found";
+        }
+        return result;
     }
 
 }
