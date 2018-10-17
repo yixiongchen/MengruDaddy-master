@@ -4,25 +4,20 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
-
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -86,14 +81,13 @@
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".Camera.ShareActivity" />
         <activity android:name=".Profile.SinglePostActivity" />
-        <activity android:name=".Profile.CommentsListActivity" />
-        <activity android:name=".Profile.LikesListActivity" />
-        <activity android:name=".Profile.CommentPostActivity"></activity>
-        <activity android:name="com.yalantis.ucrop.UCropActivity"
+        <activity android:name=".Comments.CommentsListActivity" />
+        <activity android:name=".Likes.LikesListActivity" />
+        <activity android:name=".Comments.CommentPostActivity" />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"></activity>
-
+            android:theme="@style/AppTheme" />
     </application>
-
 
 </manifest>

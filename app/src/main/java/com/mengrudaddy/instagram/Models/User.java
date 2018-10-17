@@ -10,6 +10,7 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class User {
 
+    public String Id;
     public String username;
     public String email;
     public Map<String, String> following; //the user is following
@@ -22,9 +23,10 @@ public class User {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String username, String email, Map<String, String> Following ,
+    public User(String Id, String username, String email, Map<String, String> Following ,
                 Map<String, String> Followers,
                 Map<String, String> Posts) {
+        this.Id = Id;
         this.username = username;
         this.email = email;
         this.following = Following;

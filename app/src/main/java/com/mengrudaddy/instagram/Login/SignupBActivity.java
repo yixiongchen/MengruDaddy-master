@@ -146,7 +146,7 @@ public class SignupBActivity extends AppCompatActivity {
     }
 
     public void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email, new HashMap<String, String>(), new HashMap<String, String>(),
+        User user = new User(userId, name, email, new HashMap<String, String>(), new HashMap<String, String>(),
                 new HashMap<String, String>());
         mDatabase.child("users").child(userId).setValue(user);
     }

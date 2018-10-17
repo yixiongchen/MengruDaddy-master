@@ -2,8 +2,6 @@ package com.mengrudaddy.instagram.Profile;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -31,8 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.mengrudaddy.instagram.Adapter.photoAdapter;
-import com.mengrudaddy.instagram.Camera.ShareActivity;
+import com.mengrudaddy.instagram.Likes.LikesListActivity;
 import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
 import com.mengrudaddy.instagram.Models.User;
@@ -42,7 +39,8 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,12 +102,12 @@ public class SinglePostActivity extends AppCompatActivity {
         //date
         date =(TextView)findViewById(R.id.date);
 
+        //set toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.title_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Post");
-
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -127,6 +125,7 @@ public class SinglePostActivity extends AppCompatActivity {
         postRef = database.getReference(indexPath);
         //the user's path
         userRef = database.getReference("users/"+authUser.getUid());
+
 
         //firebase storage
         storage = FirebaseStorage.getInstance();
@@ -223,6 +222,18 @@ public class SinglePostActivity extends AppCompatActivity {
         //view all likes
         numLikes.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                 //pass a list of likeId to LikeListActivity
+                HashMap<String, String> likesIdMap = (HashMap<String, String>) post.likes;
+                Collection<String> likesIdList = likesIdMap.values();
+                Object[] objectArray  = likesIdList.toArray();
+                String[] likeIds = Arrays.copyOf(objectArray, objectArray.length, String[].class);
+
+                Intent intent = new Intent(SinglePostActivity.this, LikesListActivity.class);
+                intent.putExtra("LikeIdList",likeIds);
+                startActivity(intent);
+
+
+
 
             }
         });
