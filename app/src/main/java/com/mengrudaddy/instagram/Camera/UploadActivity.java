@@ -54,13 +54,13 @@ public class UploadActivity extends AppCompatActivity{
     PhotoFragment photoFragment;
     TabLayout tabLayout;
 
+    private Uri imageUri;
     private static final int CAMERA_REQUEST_CODE = 0;
     private static final int ALBUM_REQUEST_CODE = 1;
 
 
     private String mCurrentPhotoPath;
     private String dir;
-    private Uri imageUri;
 
 
     protected void onCreate(Bundle savedInstanceState) {

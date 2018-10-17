@@ -27,8 +27,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mengrudaddy.instagram.Home.MainActivity;
-import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.Models.User;
+import com.mengrudaddy.instagram.R;
 
 import java.util.HashMap;
 
