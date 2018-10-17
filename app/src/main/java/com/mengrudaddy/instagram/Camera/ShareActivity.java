@@ -1,26 +1,29 @@
 package com.mengrudaddy.instagram.Camera;
 
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,18 +36,11 @@ import com.mengrudaddy.instagram.Home.MainActivity;
 import com.mengrudaddy.instagram.Models.Post;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import android.widget.ProgressBar;
+import com.mengrudaddy.instagram.utils.LocationGetter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,6 +50,7 @@ import java.util.Map;
 
 public class ShareActivity extends AppCompatActivity {
 
+    private Context context = ShareActivity.this;
     private FirebaseStorage storage;
     private DatabaseReference UserDatabaseRef;
     private DatabaseReference DatabaseRef;
@@ -64,8 +61,10 @@ public class ShareActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private EditText postContent;
     private ImageView image,btnPost;
+    private TextView btnLocation;
     private String username;
-    private String latitude, longitude, content, postId;
+    private String content, postId;
+    private Double latitude,longitude;
     private Date date;
     private ArrayList<String> posts;
 
@@ -74,6 +73,9 @@ public class ShareActivity extends AppCompatActivity {
     private InputStream thumbStream;
     private Bitmap thumbBitmap;
     private byte[] thumbData;
+
+    private static final int LOCATION_REQUEST_CODE = 1;
+
 
 
 
@@ -97,6 +99,7 @@ public class ShareActivity extends AppCompatActivity {
         postContent = (EditText) findViewById(R.id.postcontent);
         btnPost =  (ImageView)findViewById(R.id.icon_next);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        btnLocation = (TextView) findViewById(R.id.add_location);
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.title_bar);
@@ -141,6 +144,14 @@ public class ShareActivity extends AppCompatActivity {
         imageReference = storage.getReference(postRef).child("images/").child(postId);
         thumbReference = storage.getReference(postRef).child("thumbnails/").child(postId);
 
+        btnLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, LocationGetter.class);//ACTIVITY_NUM=1
+                startActivityForResult(intent,LOCATION_REQUEST_CODE);
+            }
+        });
+
 
         Log.d(TAG, content);
         btnPost.setOnClickListener(new View.OnClickListener(){
@@ -150,10 +161,12 @@ public class ShareActivity extends AppCompatActivity {
                 uploadImage();
 
                 //write post info to database
-                LinkedHashMap<String, String> comments = new  LinkedHashMap<>();
-                LinkedHashMap<String, String> likes = new  LinkedHashMap<>();
-                LinkedHashMap<String, String> location = new  LinkedHashMap<>();
+                HashMap<String, String> comments = new  HashMap<>();
+                HashMap<String, String> likes = new  HashMap<>();
+                HashMap<String, Double> location = new  HashMap<>();
                 content = postContent.getText().toString();
+                location.put("latitude" ,latitude);
+                location.put("longitude", longitude);
                 writePost(postId, username, authUser.getUid(), content, location,
                         date, comments, likes);
 
@@ -163,6 +176,24 @@ public class ShareActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode ==LOCATION_REQUEST_CODE && resultCode == RESULT_OK) {
+
+            Bundle bd = data.getExtras();
+            latitude = (double)bd.get("latitude");
+            longitude = (double)bd.get("longitude");
+            Log.d(TAG, "onActivityResult: "+longitude+"####"+latitude);
+            if (latitude == null || longitude == null) {
+                btnLocation.setText("Failed to get your location");
+            }
+            else {
+                btnLocation.setText("Your Location\nLatitude: " + latitude + "\nLogitude: " + longitude);
+
+            }
+        }
     }
 
     //upload photo
@@ -232,17 +263,19 @@ public class ShareActivity extends AppCompatActivity {
 
 
 
-
     }
 
 
 
     //upload post info
     public void writePost(String postId, String username, String userId, String description,
-                          LinkedHashMap<String, String> location, Date date,
-                          LinkedHashMap<String, String> comments,
-                          LinkedHashMap<String, String> likes){
+                          HashMap<String, Double> location, Date date,
+                          HashMap<String, String> comments,
+                          HashMap<String, String> likes){
 
+        HashMap<String, Double> locationMap = new HashMap<>();
+        locationMap.put("latitude" ,latitude);
+        locationMap.put("longitude", longitude);
         Post post = new Post(username, userId, description,location, date, comments,likes);
         Map<String, Object> postValues = post.toMap();
         Map<String, Object> childUpdates = new HashMap<>();

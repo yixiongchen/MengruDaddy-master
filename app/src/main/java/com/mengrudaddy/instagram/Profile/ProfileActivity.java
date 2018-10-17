@@ -67,7 +67,6 @@ public class ProfileActivity extends AppCompatActivity{
 
     private String profileId; //profile user id
 
-
     private FirebaseUser authUser; //auth user
     private User LogUser, ProfileUser;
 
@@ -96,10 +95,8 @@ public class ProfileActivity extends AppCompatActivity{
         gridview = (GridView) findViewById(R.id.gridView);
 
 
-
         //real time database
         database = FirebaseDatabase.getInstance();
-
         //auth
         auth = FirebaseAuth.getInstance();
         authUser = auth.getCurrentUser();
@@ -165,6 +162,20 @@ public class ProfileActivity extends AppCompatActivity{
                 else{
                     editFile.setText("Follow");
                     editFile.setEnabled(true);
+                    //click follow button
+                    editFile.setOnClickListener(new View.OnClickListener(){
+                        public void onClick(View view) {
+                            //add user id to following list
+                            DatabaseReference user_like_list = database.getReference("users/").child(authUser.getUid()).child("following");
+                            String key = user_like_list.push().getKey();
+                            HashMap<String, Object> map = new HashMap<>();
+                            map.put(key, profileId);
+                            user_like_list.updateChildren(map);
+                            editFile.setEnabled(false);
+                            editFile.setText("Followed");
+                        }
+                    });
+
                 }
             }
             @Override
@@ -251,10 +262,7 @@ public class ProfileActivity extends AppCompatActivity{
         postListRef =  database.getReference("users/"+profileId+"/posts");
         postListRef.orderByKey().addValueEventListener(postsListener);
         mPostListener = postsListener;
-
     }
-
-
 
 
     @Override
@@ -263,7 +271,6 @@ public class ProfileActivity extends AppCompatActivity{
         setUpBottomNavigView();
 
     }
-
 
     @Override
     public void onDestroy() {
@@ -277,7 +284,6 @@ public class ProfileActivity extends AppCompatActivity{
         }
     }
 
-
     /*
     Bottom Navigation Set up
      */
@@ -289,7 +295,8 @@ public class ProfileActivity extends AppCompatActivity{
         Menu menu = bottomNavigationView.getMenu();
         MenuItem mItem = menu.getItem(ACTIVITY_NUM);
         mItem.setChecked(true);
-        mItem.setEnabled(false);
-
+        if(authUser.getUid().compareTo(profileId) != 0){
+            mItem.setEnabled(false);
+        }
     }
 }

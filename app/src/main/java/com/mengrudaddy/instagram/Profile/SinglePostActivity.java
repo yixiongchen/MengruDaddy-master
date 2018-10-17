@@ -3,10 +3,10 @@ package com.mengrudaddy.instagram.Profile;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -60,12 +59,11 @@ public class SinglePostActivity extends AppCompatActivity {
     private final String TAG = "SinglePostActivity::";
     private ProgressBar progressBar;
     private ImageView imageView;
-    private TextView userName, numComments, numLikes, description, date;
+    private TextView userName, numComments, numLikes, description, date,location;
     private ImageView like, comment;
     private String postId; //post id
     private Post post;
     private User user;
-
 
     private ValueEventListener mPostListener, mUserListener;
 
@@ -101,13 +99,15 @@ public class SinglePostActivity extends AppCompatActivity {
         comment = (ImageView)findViewById(R.id.comment);
         //date
         date =(TextView)findViewById(R.id.date);
+        location = (TextView)findViewById(R.id.location);
 
-        //set toolbar
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.title_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Post");
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,7 +125,6 @@ public class SinglePostActivity extends AppCompatActivity {
         postRef = database.getReference(indexPath);
         //the user's path
         userRef = database.getReference("users/"+authUser.getUid());
-
 
         //firebase storage
         storage = FirebaseStorage.getInstance();
@@ -222,7 +221,7 @@ public class SinglePostActivity extends AppCompatActivity {
         //view all likes
         numLikes.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                 //pass a list of likeId to LikeListActivity
+                //pass a list of likeId to LikeListActivity
                 HashMap<String, String> likesIdMap = (HashMap<String, String>) post.likes;
                 Collection<String> likesIdList = likesIdMap.values();
                 Object[] objectArray  = likesIdList.toArray();
@@ -231,6 +230,7 @@ public class SinglePostActivity extends AppCompatActivity {
                 Intent intent = new Intent(SinglePostActivity.this, LikesListActivity.class);
                 intent.putExtra("LikeIdList",likeIds);
                 startActivity(intent);
+
 
 
 
@@ -281,12 +281,19 @@ public class SinglePostActivity extends AppCompatActivity {
      */
     private void accessPostProfile(){
         //read post info
-        ValueEventListener postListener = new ValueEventListener() {
+        final ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
                 post = dataSnapshot.getValue(Post.class);
                 userName.setText(post.username);
                 Date postdate = post.date;
+                Double latitude = null;
+                Double longitude = null;
+                if(post.location !=null){
+                    latitude = post.location.get("latitude");
+                    longitude = post.location.get("longitude");
+                }
+
                 DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
                 String todate = dateFormat.format(postdate);
                 date.setText(todate);
@@ -296,6 +303,12 @@ public class SinglePostActivity extends AppCompatActivity {
                 else{
                     description.setText(post.username + ": " +post.description);
                 }
+                if(latitude ==null || longitude == null){
+                    location.setVisibility(View.GONE);
+                }
+                else{
+                    location.setText("Location\nLatitude: " + latitude + "\nLogitude: " + longitude);
+                }
                 if(post.comments == null){
                     numComments.setVisibility(View.GONE);
                 }
@@ -303,8 +316,11 @@ public class SinglePostActivity extends AppCompatActivity {
                     numComments.setText("View all "+Integer.toString(post.comments.keySet().size())+" Comments");
                 }
 
-                if(post.likes == null){
+                if(post.likes == null) {
                     numLikes.setVisibility(View.GONE);
+                    likeBoolean = false;
+                    like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
+
                 }
                 else{
                     numLikes.setVisibility(View.VISIBLE);
@@ -314,7 +330,6 @@ public class SinglePostActivity extends AppCompatActivity {
                         like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_like));
                     }
                 }
-
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}

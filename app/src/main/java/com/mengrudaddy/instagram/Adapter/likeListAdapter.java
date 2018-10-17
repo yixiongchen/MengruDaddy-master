@@ -32,7 +32,6 @@ public class likeListAdapter extends BaseAdapter {
     private final String TAG ="LikeListAdapter::";
     private FirebaseDatabase database;
     private DatabaseReference likeRef;
-    private ValueEventListener mlistener;
 
     private Like like;
 
@@ -127,7 +126,7 @@ public class likeListAdapter extends BaseAdapter {
             public void onCancelled(DatabaseError databaseError) {}
         };
         likeRef.addListenerForSingleValueEvent(likeListener);
-        mlistener = likeListener;
+
         return convertView;
     }
 

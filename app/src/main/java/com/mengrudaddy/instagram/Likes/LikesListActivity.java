@@ -101,7 +101,6 @@ public class LikesListActivity extends AppCompatActivity {
         mItem.setChecked(true);
         //mItem.setCheckable(false);
         //mItem.setEnabled(false);
-
     }
 
 
