@@ -2,13 +2,11 @@ package com.mengrudaddy.instagram.Profile;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -18,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -31,8 +28,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.mengrudaddy.instagram.Adapter.photoAdapter;
-import com.mengrudaddy.instagram.Camera.ShareActivity;
 import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
 import com.mengrudaddy.instagram.Models.User;
@@ -42,7 +37,6 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,7 +56,7 @@ public class SinglePostActivity extends AppCompatActivity {
     private final String TAG = "SinglePostActivity::";
     private ProgressBar progressBar;
     private ImageView imageView;
-    private TextView userName, numComments, numLikes, description, date;
+    private TextView userName, numComments, numLikes, description, date,location;
     private ImageView like, comment;
     private String postId; //post id
     private Post post;
@@ -103,6 +97,8 @@ public class SinglePostActivity extends AppCompatActivity {
         comment = (ImageView)findViewById(R.id.comment);
         //date
         date =(TextView)findViewById(R.id.date);
+        location = (TextView)findViewById(R.id.location);
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.title_bar);
         setSupportActionBar(toolbar);
@@ -270,12 +266,14 @@ public class SinglePostActivity extends AppCompatActivity {
      */
     private void accessPostProfile(){
         //read post info
-        ValueEventListener postListener = new ValueEventListener() {
+        final ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
                 post = dataSnapshot.getValue(Post.class);
                 userName.setText(post.username);
                 Date postdate = post.date;
+                Double latitude = post.latitude;
+                Double longitude = post.longitude;
                 DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
                 String todate = dateFormat.format(postdate);
                 date.setText(todate);
@@ -285,6 +283,12 @@ public class SinglePostActivity extends AppCompatActivity {
                 else{
                     description.setText(post.username + ": " +post.description);
                 }
+                if(latitude ==null || longitude == null){
+                    location.setVisibility(View.GONE);
+                }
+                else{
+                    location.setText("Latitude - " + latitude + "\nLogitude - " + longitude);
+                }
                 if(post.comments == null){
                     numComments.setVisibility(View.GONE);
                 }
@@ -292,7 +296,7 @@ public class SinglePostActivity extends AppCompatActivity {
                     numComments.setText("View all "+Integer.toString(post.comments.keySet().size())+" Comments");
                 }
 
-                if(post.likes == null){
+                if(post.likes == null) {
                     numLikes.setVisibility(View.GONE);
                 }
                 else{

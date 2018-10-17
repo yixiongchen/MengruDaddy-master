@@ -37,6 +37,11 @@ dependencies {
     implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.github.yalantis:ucrop:2.2.2-native'
 
+    // on location services
+    implementation 'com.google.android.gms:play-services-location:15.0.1'
+    //implementation 'com.google.firebase:firebase-messaging:17.0.0'
+
+
 
 
     // Firebase Authentication
