@@ -13,7 +13,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.mengrudaddy.instagram.Home.MainActivity;
-import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.Models.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -29,6 +28,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.mengrudaddy.instagram.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -179,8 +179,9 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email, new HashMap<String, String>(), new HashMap<String, String>(),
+        User user = new User(userId, name, email, new HashMap<String, String>(), new HashMap<String, String>(),
                 new HashMap<String, String>());
+
         mDatabase.child("users").child(userId).setValue(user);
     }
 

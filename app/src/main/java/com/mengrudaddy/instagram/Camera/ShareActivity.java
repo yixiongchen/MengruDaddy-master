@@ -161,10 +161,12 @@ public class ShareActivity extends AppCompatActivity {
                 uploadImage();
 
                 //write post info to database
-                LinkedHashMap<String, String> comments = new  LinkedHashMap<>();
-                LinkedHashMap<String, String> likes = new  LinkedHashMap<>();
-                LinkedHashMap<String, String> location = new  LinkedHashMap<>();
+                HashMap<String, String> comments = new  HashMap<>();
+                HashMap<String, String> likes = new  HashMap<>();
+                HashMap<String, Double> location = new  HashMap<>();
                 content = postContent.getText().toString();
+                location.put("latitude" ,latitude);
+                location.put("longitude", longitude);
                 writePost(postId, username, authUser.getUid(), content, location,
                         date, comments, likes);
 
@@ -261,18 +263,20 @@ public class ShareActivity extends AppCompatActivity {
 
 
 
-
     }
 
 
 
     //upload post info
     public void writePost(String postId, String username, String userId, String description,
-                          LinkedHashMap<String, String> location, Date date,
-                          LinkedHashMap<String, String> comments,
-                          LinkedHashMap<String, String> likes){
+                          HashMap<String, Double> location, Date date,
+                          HashMap<String, String> comments,
+                          HashMap<String, String> likes){
 
-        Post post = new Post(username, userId, description,latitude,longitude, date, comments,likes);
+        HashMap<String, Double> locationMap = new HashMap<>();
+        locationMap.put("latitude" ,latitude);
+        locationMap.put("longitude", longitude);
+        Post post = new Post(username, userId, description,location, date, comments,likes);
         Map<String, Object> postValues = post.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/posts/" + postId, postValues);

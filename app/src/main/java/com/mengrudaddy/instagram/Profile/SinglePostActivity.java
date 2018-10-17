@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mengrudaddy.instagram.Likes.LikesListActivity;
 import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
 import com.mengrudaddy.instagram.Models.User;
@@ -37,6 +38,8 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +64,6 @@ public class SinglePostActivity extends AppCompatActivity {
     private String postId; //post id
     private Post post;
     private User user;
-
 
     private ValueEventListener mPostListener, mUserListener;
 
@@ -219,6 +221,19 @@ public class SinglePostActivity extends AppCompatActivity {
         //view all likes
         numLikes.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                //pass a list of likeId to LikeListActivity
+                HashMap<String, String> likesIdMap = (HashMap<String, String>) post.likes;
+                Collection<String> likesIdList = likesIdMap.values();
+                Object[] objectArray  = likesIdList.toArray();
+                String[] likeIds = Arrays.copyOf(objectArray, objectArray.length, String[].class);
+
+                Intent intent = new Intent(SinglePostActivity.this, LikesListActivity.class);
+                intent.putExtra("LikeIdList",likeIds);
+                startActivity(intent);
+
+
+
+
 
             }
         });
@@ -272,8 +287,13 @@ public class SinglePostActivity extends AppCompatActivity {
                 post = dataSnapshot.getValue(Post.class);
                 userName.setText(post.username);
                 Date postdate = post.date;
-                Double latitude = post.latitude;
-                Double longitude = post.longitude;
+                Double latitude = null;
+                Double longitude = null;
+                if(post.location !=null){
+                    latitude = post.location.get("latitude");
+                    longitude = post.location.get("longitude");
+                }
+
                 DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
                 String todate = dateFormat.format(postdate);
                 date.setText(todate);
@@ -298,6 +318,9 @@ public class SinglePostActivity extends AppCompatActivity {
 
                 if(post.likes == null) {
                     numLikes.setVisibility(View.GONE);
+                    likeBoolean = false;
+                    like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
+
                 }
                 else{
                     numLikes.setVisibility(View.VISIBLE);
@@ -307,7 +330,6 @@ public class SinglePostActivity extends AppCompatActivity {
                         like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_like));
                     }
                 }
-
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}

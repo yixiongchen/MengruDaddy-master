@@ -1,8 +1,6 @@
 package com.mengrudaddy.instagram.Adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -75,8 +73,6 @@ public class photoAdapter extends BaseAdapter {
         }
 
         final ViewHolder viewHolder = (ViewHolder)convertView.getTag();
-
-
         StorageReference photoRef = storage.getReference("posts/thumbnails/"+photoUrl);
 
         //final long ONE_MEGABYTE = 1024 * 1024;

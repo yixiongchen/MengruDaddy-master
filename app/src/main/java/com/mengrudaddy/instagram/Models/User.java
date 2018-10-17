@@ -15,6 +15,7 @@ public class User {
     public Map<String, String> following; //the user is following
     public Map<String, String> followers; // follow the user
     public Map<String, String> posts; //posts list
+    public String Id;
 
 
 
@@ -22,15 +23,16 @@ public class User {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String username, String email, String image, Map<String, String> Following ,
+    public User(String Id, String username, String email, Map<String, String> Following ,
                 Map<String, String> Followers,
                 Map<String, String> Posts) {
+        this.Id= Id;
         this.username = username;
         this.email = email;
         this.following = Following;
         this.followers = Followers;
         this.posts = Posts;
-        this.image = image;
+        //this.image = image;
 
     }
 
