@@ -184,11 +184,9 @@ public class UploadActivity extends AppCompatActivity{
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         Log.d(TAG, "show result");
         super.onActivityResult(requestCode, resultCode, data);
-
         //camera
         if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
             if(imageUri!=null){
-
                 String path = imageUri.getPath();
                 Log.d(TAG, "Image Url is"+path);
                 //File imagefile = new File(path);

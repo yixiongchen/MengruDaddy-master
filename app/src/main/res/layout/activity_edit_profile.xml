@@ -39,9 +39,9 @@
                 android:id="@+id/profile_pic"
                 android:orientation="vertical"
                 >
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
                     android:id="@+id/profile_image"
                     android:src="@drawable/ic_action_face"
                     android:scaleType="centerCrop"
@@ -62,46 +62,72 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/username_section"
                 android:orientation="horizontal"
-                android:layout_below="@+id/profile_pic"
-                android:layout_marginTop="50dp"
+                android:layout_below="@+id/change_image"
+                android:layout_marginTop="20dp"
+                android:paddingTop="15dp"
                 >
                 <TextView
-                    android:layout_width="75dp"
-                    android:layout_height="50dp"
+                    android:layout_width="100dp"
+                    android:layout_height="55dp"
                     android:id="@+id/name_lable"
                     android:text="Username"
                     android:layout_gravity="left"
-                    android:layout_marginLeft="50dp"/>
+                    android:textSize="16sp"
+                    android:paddingTop="30dp"
+                    android:textColor="@color/textClicked"
+                    android:layout_marginLeft="30dp"/>
+
                 <EditText
                     android:id="@+id/change_name"
                     android:layout_width="200dp"
-                    android:layout_height="23dp"
-                    android:layout_gravity="right"
-                    android:hint="Username"/>
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:hint="Username"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/textNotClicked"
+                    android:textSize="16sp" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/description_section"
                 android:orientation="horizontal"
-                android:layout_below="@+id/profile_pic"
+                android:layout_below="@+id/username_section"
                 android:layout_marginTop="10dp"
                 >
                 <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="50dp"
+                    android:layout_width="100dp"
+                    android:layout_height="55dp"
                     android:id="@+id/description_lable"
                     android:text="Description"
                     android:layout_gravity="left"
-                    android:layout_marginLeft="45dp"/>
+                    android:textSize="16sp"
+                    android:paddingTop="30dp"
+                    android:textColor="@color/textClicked"
+                    android:layout_marginLeft="30dp"/>
                 <EditText
                     android:id="@+id/change_description"
                     android:layout_width="200dp"
-                    android:layout_height="23dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="right"
                     android:hint="Your self-description"
-                    android:inputType="textMultiLine"/>
+                    android:textSize="16sp"
+                    android:inputType="textMultiLine"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/textNotClicked"
+                    />
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:visibility="gone" />
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.mengrudaddy.instagram.Profile;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,40 +12,77 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.mengrudaddy.instagram.Home.MainActivity;
+import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EditProfileActivity extends AppCompatActivity {
-    private ImageView profile_pic;
-    private EditText username,user_description;
+    private CircleImageView profile_pic;
+    private EditText changed_name,changed_description;
     private Button btn_changePic,btn_cancle,btn_ok;
     private Context context = EditProfileActivity.this;
     private static final String TAG = "EditProfileActivity";
     private Bitmap original_new_pic,resize;
+    private String new_username, new_description,username,description;
 
 
     private Uri imageUri;
     private static final int CAMERA_REQUEST_CODE = 0;
     private static final int ALBUM_REQUEST_CODE = 1;
+
+    private FirebaseStorage storage;
+    private DatabaseReference UserDatabaseRef;
+    private DatabaseReference DatabaseRef;
+    private FirebaseUser authUser;
+    private StorageReference imageReference, thumbReference;
+    private FirebaseDatabase database;
+    private ProgressBar progressBar;
+    private ValueEventListener mPostListener;
+    private InputStream thumbStream;
+    private Bitmap thumbBitmap;
+    private byte[] thumbData;
+    private String imagePath;
 
 
     @Override
@@ -53,11 +91,29 @@ public class EditProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_profile);
 
         //View initialization
-        username = (EditText) findViewById(R.id.change_name);
-        user_description = (EditText) findViewById(R.id.change_description);
+        changed_name = (EditText) findViewById(R.id.change_name);
+        profile_pic = (CircleImageView) findViewById(R.id.profile_image);
+        changed_description = (EditText) findViewById(R.id.change_description);
         btn_changePic = (Button) findViewById(R.id.change_image);
         btn_cancle = (Button) findViewById(R.id.cancle);
         btn_ok = (Button) findViewById(R.id.ok);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        // For fire base connection
+        database = FirebaseDatabase.getInstance();
+        authUser = FirebaseAuth.getInstance().getCurrentUser();
+        UserDatabaseRef = database.getReference("users/"+ authUser.getUid());
+        String uID = authUser.getUid();
+        changed_name.setText(authUser.getDisplayName());
+
+        //database location: posts/userId/postid/
+        DatabaseRef = database.getReference();
+        //database: create a postId into the firebase database
+        //storage location: profile_pic/uid/
+        String profilePicRef = "profile_pic/";
+
+        storage = FirebaseStorage.getInstance();
+        imageReference = storage.getReference(profilePicRef).child(uID);
 
         btn_changePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,11 +127,14 @@ public class EditProfileActivity extends AppCompatActivity {
                                 // of the selected item
                                 switch (which) {
                                     case 0:
-                                        Toast.makeText(context, "clicked 1", Toast.LENGTH_SHORT).show();
+                                        Log.d(TAG, "onClick: choose from album");
                                         changeImage();
+                                        break;
                                     case 1:
-                                        Toast.makeText(context, "clicked 2", Toast.LENGTH_SHORT).show();
+                                        Log.d(TAG, "onClick: take a new photo");
                                         takePicture();
+                                        break;
+
                                 }
                             }
                         });
@@ -93,16 +152,47 @@ public class EditProfileActivity extends AppCompatActivity {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //write profile info to database
+                if (imagePath != null) {
+                    uploadImage();
+                }
+                new_description= changed_description.getText().toString();
+                new_username = changed_name.getText().toString();
+                updateUser(authUser.getUid());
+                //
+
                 //uploadNewProfile();
+
             }
         });
 
     }
+    public void updateUser(String userid){
+        DatabaseReference ref = DatabaseRef.child("users/").child(userid);
+        Map<String, Object> updates = new HashMap<>();
+        if (new_description.length()>0){
+            updates.put("self_description",new_description);
+        }
+        if(new_username.length()>0) {
+            updates.put("username", new_username);
+        }
+        if (updates.size()>0) {
+            ref.updateChildren(updates)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            });
+        }
+    }
 
     private void changeImage() {
         Dexter.withActivity(this)
-                .withPermissions(android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
@@ -123,39 +213,39 @@ public class EditProfileActivity extends AppCompatActivity {
                 .check();
     }
     public void onActivityResult(int requestCode, int resultCode, Intent data){
-        Log.d(TAG, "show result");
-        super.onActivityResult(requestCode, resultCode, data);
 
         //camera
         if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
             if(imageUri!=null){
+                //String path = imageUri.getPath();
+                Log.d(TAG, "Image Url is"+imageUri);
+                try {
 
-                String path = imageUri.getPath();
-                Log.d(TAG, "Image Url is"+path);
-                //File imagefile = new File(path);
-                //Intent intent = new Intent(this, ImageFilter.class);
-                //intent.putExtra("picture", path);
-                //startActivity(intent);
-                Bitmap bitmap = BitmapFactory.decodeFile(path);
-                //resize bitmap
-                resize = getResizedBitmap(bitmap, 1080, 1080);
-                //imageView.setImageBitmap(resize);
-                //loadImage(resize);
-                loadImage(resize);
+                    InputStream ims = getContentResolver().openInputStream(imageUri);
+                    Bitmap bitmap = BitmapFactory.decodeStream(ims);
+                    Log.d(TAG, "onActivityResult: "+bitmap);
+                    //resize bitmap
+                    resize = getResizedBitmap(bitmap, 300, 300);
+                    //imageView.setImageBitmap(resize);
+                    //loadImage(resize);
+                    loadImage(resize);
+                }
+                catch (IOException e){
+                    e.printStackTrace();
+                }
             }
         }
         //gallery
         if (requestCode ==ALBUM_REQUEST_CODE && resultCode == RESULT_OK) {
-            Uri uri = data.getData();
-            String path = getPath( this.getApplicationContext(), uri);
+            imageUri = data.getData();
+            imagePath = getPath( this.getApplicationContext(), imageUri);
             //Log.d(TAG, "Image Url is"+path);
-            Bitmap bitmap = BitmapFactory.decodeFile(path);
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
             //resize bitmap
-            resize = getResizedBitmap(bitmap, 1080, 1080);
+            resize = getResizedBitmap(bitmap, 300, 300);
             //imageView.setImageBitmap(resize);
             //loadImage(resize);
             loadImage(resize);
-
         }
     }
     public static String getPath( Context context, Uri uri ) {
@@ -188,12 +278,16 @@ public class EditProfileActivity extends AppCompatActivity {
         String file = "Ins"+timeStamp+".jpg";
         File photoFile =new File(destDir,file);
 
-
         if (photoFile != null) {
-            imageUri = Uri.fromFile(photoFile);
-            //imageUri = outputUri;
-            Log.d(TAG, imageUri.getPath());
-
+            imageUri = FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".fileprovider",
+                    photoFile);
+            //imageUri = Uri.fromFile(photoFile);
+            imagePath = Uri.fromFile(photoFile).getPath();
+            Log.d(TAG, Uri.fromFile(photoFile).toString()+"####1");
+            Log.d(TAG, imagePath+"####2");
+            Log.d(TAG,  imageUri.getPath()+"####2");
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
@@ -222,4 +316,90 @@ public class EditProfileActivity extends AppCompatActivity {
         original_new_pic  = bitmap;
         profile_pic.setImageBitmap(original_new_pic);
     }
+    private void uploadImage() {
+
+        //Log.d(TAG, imagePath);
+
+        if(imageReference != null )
+        {
+            progressBar.setVisibility(View.VISIBLE);
+            //disable user interaction
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            //InputStream stream = new FileInputStream(new File(imagePath));
+            Uri filepath = Uri.fromFile(new File(imagePath));
+            Log.d(TAG, "uploadImage: @@@@@@@@@@@@@@@@@@@@@@@@@@@"+filepath);
+            imageReference.putFile(filepath)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                            Intent i = new Intent(context, MainActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(i);
+                            finish();
+
+                        }
+
+                        })
+
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressBar.setVisibility(View.GONE);
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                            Toast.makeText(EditProfileActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+        }
+        /*
+
+         */
+
+
+
+    }
+    @Override
+    public void onStart(){
+        super.onStart();
+        ValueEventListener userListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)  {
+                User newUser = dataSnapshot.getValue(User.class);
+                username = newUser.username;
+                description = newUser.description;
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+        UserDatabaseRef.addValueEventListener(userListener);
+        mPostListener = userListener;
+    }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Remove post value event listener
+        if (mPostListener != null) {
+            UserDatabaseRef.removeEventListener(mPostListener);
+        }
+    }
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { //checking
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
+    }
+
 }
