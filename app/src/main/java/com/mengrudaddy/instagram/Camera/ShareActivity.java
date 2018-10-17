@@ -188,7 +188,7 @@ public class ShareActivity extends AppCompatActivity {
                 btnLocation.setText("Failed to get your location");
             }
             else {
-                btnLocation.setText("Your location:\nLatitude - " + latitude + "\nLogitude - " + longitude);
+                btnLocation.setText("Your Location\nLatitude: " + latitude + "\nLogitude: " + longitude);
 
             }
         }

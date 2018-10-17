@@ -287,7 +287,7 @@ public class SinglePostActivity extends AppCompatActivity {
                     location.setVisibility(View.GONE);
                 }
                 else{
-                    location.setText("Latitude - " + latitude + "\nLogitude - " + longitude);
+                    location.setText("Location\nLatitude: " + latitude + "\nLogitude: " + longitude);
                 }
                 if(post.comments == null){
                     numComments.setVisibility(View.GONE);
