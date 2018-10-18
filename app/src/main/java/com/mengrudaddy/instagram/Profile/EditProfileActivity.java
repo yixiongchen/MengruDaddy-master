@@ -61,21 +61,24 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EditProfileActivity extends AppCompatActivity {
+    // about layout elements
     private CircleImageView profile_pic;
     private EditText changed_name,changed_description;
     private Button btn_changePic,btn_cancle,btn_ok;
     private Context context = EditProfileActivity.this;
     private static final String TAG = "EditProfileActivity";
     private Bitmap original_new_pic,resize;
-    private String new_username, new_description, new_profile_pic,username,description;
 
+
+    // permission code
     private static final int VERIFY_PERMISSIONS_REQUEST = 1;
 
-
+    // about activity result code
     private Uri imageUri;
     private static final int CAMERA_REQUEST_CODE = 0;
     private static final int ALBUM_REQUEST_CODE = 1;
 
+    // about database connection
     private FirebaseStorage storage;
     private DatabaseReference UserDatabaseRef;
     private DatabaseReference DatabaseRef;
@@ -88,6 +91,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private Bitmap thumbBitmap;
     private byte[] thumbData;
     private String imagePath;
+    private String new_username, new_description, new_profile_pic,username,description;
 
 
     @Override
@@ -104,7 +108,7 @@ public class EditProfileActivity extends AppCompatActivity {
         btn_ok = (Button) findViewById(R.id.ok);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-
+        //check camera and storage permission
         if(!checkPermissionsArray(Permission.PERMISSIONS)){
             verifyPermissions(Permission.PERMISSIONS);
         }
@@ -128,21 +132,23 @@ public class EditProfileActivity extends AppCompatActivity {
         btn_changePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final int activity_alum = 0;
+                final int activity_camera = 1;
+
+                // a dialog ask user the way of changing profile pic
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setItems(new CharSequence[]
                                 {"Choose from album", "Take a new photo"},
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
+                                // on click 'choose form album'
                                 switch (which) {
-                                    case 0:
+                                    case activity_alum:
                                         Log.d(TAG, "onClick: choose from album");
                                         changeImage();
                                         break;
-                                    case 1:
+                                    case activity_camera:
                                         Log.d(TAG, "onClick: take a new photo");
-
                                         takePicture();
                                         break;
 
@@ -153,6 +159,8 @@ public class EditProfileActivity extends AppCompatActivity {
                 builder.show();
             }
         });
+
+        // finish activity
         btn_cancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,6 +168,7 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         });
 
+        // upload changes
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -168,16 +177,19 @@ public class EditProfileActivity extends AppCompatActivity {
                 new_description= changed_description.getText().toString();
                 new_username = changed_name.getText().toString();
                 new_profile_pic = uID;
+                //upload updates
                 updateUser(authUser.getUid());
 
 
-
-                //uploadNewProfile();
 
             }
         });
     }
 
+
+    /*
+        Update User profile
+     */
     public void updateUser(String userid){
         DatabaseReference ref = DatabaseRef.child("users/").child(userid);
         Map<String, Object> updates = new HashMap<>();
@@ -206,6 +218,7 @@ public class EditProfileActivity extends AppCompatActivity {
             });
         }
     }
+
 
     private void changeImage() {
         Dexter.withActivity(this)

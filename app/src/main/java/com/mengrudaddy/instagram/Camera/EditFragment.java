@@ -6,11 +6,8 @@ EditFragment.java
 This class is activity for showing photo editing choices
  */
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +28,6 @@ public class EditFragment extends BottomSheetDialogFragment implements SeekBar.O
         }
         return instance;
     }
-
 
     public EditFragment(){
 

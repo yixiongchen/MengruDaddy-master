@@ -88,12 +88,11 @@ public class ProfileActivity extends AppCompatActivity{
         Intent i = getIntent();
 
 
-
         //View initialization
         title=(TextView)findViewById(R.id.toolbar_userprofile);
         username = (TextView)findViewById(R.id.username);
         email = (TextView)findViewById(R.id.email);
-        description = (TextView)findViewById(R.id.description2) ;
+        description = (TextView)findViewById(R.id.description) ;
         followerNum =  (TextView)findViewById(R.id.followers_num);
         followingNum =  (TextView)findViewById(R.id.following_num);
         postNum =  (TextView)findViewById(R.id.post_num);
@@ -225,7 +224,9 @@ public class ProfileActivity extends AppCompatActivity{
                 ProfileUser = dataSnapshot.getValue(User.class);
                 title.setText(ProfileUser.username);
                 username.setText(ProfileUser.username);
-                email.setText(ProfileUser.email);
+                if(ProfileUser.email != null){
+                    email.setText(ProfileUser.email);
+                }
                 description.setText(ProfileUser.description);
                 if(ProfileUser.followers == null){
                     followerNum.setText("0");
