@@ -218,7 +218,6 @@ public class ProfileActivity extends AppCompatActivity{
                 username.setText(ProfileUser.username);
                 email.setText(ProfileUser.email);
                 description.setText(ProfileUser.description);
-
                 if(ProfileUser.followers == null){
                     followerNum.setText("0");
                 }
