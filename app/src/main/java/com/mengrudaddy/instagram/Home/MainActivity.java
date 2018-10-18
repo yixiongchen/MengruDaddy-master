@@ -8,15 +8,16 @@ This class is activity for showing photo posting activities of following users i
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,12 +27,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mengrudaddy.instagram.Adapter.mainFeedAdapter;
-import com.mengrudaddy.instagram.Adapter.userListAdapter;
-import com.mengrudaddy.instagram.Camera.FullScreenCapture;
+import com.mengrudaddy.instagram.Bluetooth.BluetoothActivity;
 import com.mengrudaddy.instagram.Models.Post;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
-import com.mengrudaddy.instagram.Search.SearchActivity;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 import java.util.ArrayList;
@@ -59,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     //view
     private RecyclerView recyclerView;
+    private ImageView bluetooth;
 
 
 
@@ -71,6 +71,16 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView)findViewById(R.id.main_feed);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        bluetooth = (ImageView) findViewById(R.id.bluetooth);
+
+        // on click bluetooth imageview start bluetooth activity
+        bluetooth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent activity = new Intent(MainActivity.this, BluetoothActivity.class);
+                startActivity(activity);
+            }
+        });
 
         //auth
         auth = FirebaseAuth.getInstance();
@@ -181,10 +191,6 @@ public class MainActivity extends AppCompatActivity {
         mItem.setEnabled(false);
     }
 
-    public void openFullScreenCamera(View view){
-        Intent activity = new Intent(MainActivity.this, FullScreenCapture.class);
-        startActivity(activity);
-    }
 
 
     @Override

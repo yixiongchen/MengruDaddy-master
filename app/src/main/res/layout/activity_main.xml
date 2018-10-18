@@ -14,8 +14,8 @@
         android:layout_height="wrap_content">
         <ImageView
             android:layout_width="wrap_content"
-            android:id="@+id/icon_camera"
-            android:src="@drawable/ic_action_camera"
+            android:id="@+id/bluetooth"
+            android:src="@drawable/ic_action_bluetooth"
             android:layout_height="match_parent"
             android:onClick="openFullScreenCamera"
             android:contentDescription="@string/cancle"/>  <!--android:onClick="function name"-->
