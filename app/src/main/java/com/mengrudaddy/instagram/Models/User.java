@@ -24,9 +24,9 @@ public class User {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String Id, String username, String email, String description,Map<String, String> Following ,
+    public User(String Id, String username, String email, String description, Map<String, String> Following ,
                 Map<String, String> Followers,
-                Map<String, String> Posts) {
+                Map<String, String> Posts, String image) {
         this.Id= Id;
         this.username = username;
         this.email = email;
@@ -34,7 +34,7 @@ public class User {
         this.following = Following;
         this.followers = Followers;
         this.posts = Posts;
-        //this.image = image;
+        this.image = image;
 
     }
 

@@ -178,8 +178,8 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void writeNewUser(String userId, String name, String email,String description) {
-        User user = new User(userId, name, email,"",new HashMap<String, String>(), new HashMap<String, String>(),
-                new HashMap<String, String>());
+        User user = new User(userId, name, email,description,new HashMap<String, String>(), new HashMap<String, String>(),
+                new HashMap<String, String>(),null);
 
         mDatabase.child("users").child(userId).setValue(user);
     }

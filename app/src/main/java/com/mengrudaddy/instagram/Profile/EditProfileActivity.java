@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -42,8 +44,10 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.mengrudaddy.instagram.Camera.UploadActivity;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
+import com.mengrudaddy.instagram.utils.Permission;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +68,8 @@ public class EditProfileActivity extends AppCompatActivity {
     private static final String TAG = "EditProfileActivity";
     private Bitmap original_new_pic,resize;
     private String new_username, new_description, new_profile_pic,username,description;
+
+    private static final int VERIFY_PERMISSIONS_REQUEST = 1;
 
 
     private Uri imageUri;
@@ -98,6 +104,11 @@ public class EditProfileActivity extends AppCompatActivity {
         btn_ok = (Button) findViewById(R.id.ok);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
+
+        if(!checkPermissionsArray(Permission.PERMISSIONS)){
+            verifyPermissions(Permission.PERMISSIONS);
+        }
+
         // For fire base connection
         database = FirebaseDatabase.getInstance();
         authUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -131,6 +142,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                         break;
                                     case 1:
                                         Log.d(TAG, "onClick: take a new photo");
+
                                         takePicture();
                                         break;
 
@@ -152,21 +164,20 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //write profile info to database
-                if (imagePath != null) {
-                    uploadImage();
-                }
+
                 new_description= changed_description.getText().toString();
                 new_username = changed_name.getText().toString();
                 new_profile_pic = uID;
                 updateUser(authUser.getUid());
-                //
+
+
 
                 //uploadNewProfile();
 
             }
         });
-
     }
+
     public void updateUser(String userid){
         DatabaseReference ref = DatabaseRef.child("users/").child(userid);
         Map<String, Object> updates = new HashMap<>();
@@ -178,6 +189,7 @@ public class EditProfileActivity extends AppCompatActivity {
         }
         if (imagePath != null){
             updates.put("image", new_profile_pic);
+
         }
         if (updates.size()>0) {
             ref.updateChildren(updates)
@@ -187,10 +199,9 @@ public class EditProfileActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    Intent i = new Intent(context, ProfileActivity.class);
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(i);
-                    finish();
+                    if (imagePath != null) {
+                        uploadImage();
+                    }
                 }
             });
         }
@@ -274,7 +285,7 @@ public class EditProfileActivity extends AppCompatActivity {
     public void takePicture(){
         //access external storage
         final String path = Environment.getExternalStorageDirectory().getAbsolutePath() +
-                File.separator + "MobileIns";
+                File.separator + "MobileIns" + File.separator +"profile";
         File destDir = new File(path);
         if (!destDir.exists()) {
             destDir.mkdirs();
@@ -292,9 +303,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     photoFile);
             //imageUri = Uri.fromFile(photoFile);
             imagePath = Uri.fromFile(photoFile).getPath();
-            Log.d(TAG, Uri.fromFile(photoFile).toString()+"####1");
-            Log.d(TAG, imagePath+"####2");
-            Log.d(TAG,  imageUri.getPath()+"####2");
+
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
@@ -323,6 +332,7 @@ public class EditProfileActivity extends AppCompatActivity {
         original_new_pic  = bitmap;
         profile_pic.setImageBitmap(original_new_pic);
     }
+
     private void uploadImage() {
 
         //Log.d(TAG, imagePath);
@@ -344,13 +354,11 @@ public class EditProfileActivity extends AppCompatActivity {
                             Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
                             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                             Intent i = new Intent(context, ProfileActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(i);
                             finish();
-
                         }
-
-                        })
+                    })
 
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -386,7 +394,6 @@ public class EditProfileActivity extends AppCompatActivity {
         mPostListener = userListener;
     }
 
-
     @Override
     public void onStop() {
         super.onStop();
@@ -407,6 +414,58 @@ public class EditProfileActivity extends AppCompatActivity {
             cursor.close();
         }
         return result;
+    }
+
+    /**
+     * verifiy all the permissions passed to the array
+     * @param permissions
+     */
+    public void verifyPermissions(String[] permissions){
+        Log.d(TAG, "verifyPermissions: verifying permissions.");
+
+        ActivityCompat.requestPermissions(
+                EditProfileActivity.this,
+                permissions,
+                VERIFY_PERMISSIONS_REQUEST
+        );
+    }
+
+
+    /**
+     * Check an array of permissions
+     * @param permissions
+     * @return
+     */
+    public boolean checkPermissionsArray(String[] permissions){
+        Log.d(TAG, "checkPermissionsArray: checking permissions array.");
+
+        for(int i = 0; i< permissions.length; i++){
+            String check = permissions[i];
+            if(!checkPermissions(check)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check a single permission is it has been verified
+     * @param permission
+     * @return
+     */
+    public boolean checkPermissions(String permission){
+        Log.d(TAG, "checkPermissions: checking permission: " + permission);
+
+        int permissionRequest = ActivityCompat.checkSelfPermission(EditProfileActivity.this, permission);
+
+        if(permissionRequest != PackageManager.PERMISSION_GRANTED){
+            Log.d(TAG, "checkPermissions: \n Permission was not granted for: " + permission);
+            return false;
+        }
+        else{
+            Log.d(TAG, "checkPermissions: \n Permission was granted for: " + permission);
+            return true;
+        }
     }
 
 }
