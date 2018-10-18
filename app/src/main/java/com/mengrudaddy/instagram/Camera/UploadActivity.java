@@ -54,13 +54,13 @@ public class UploadActivity extends AppCompatActivity{
     PhotoFragment photoFragment;
     TabLayout tabLayout;
 
+    private Uri imageUri;
     private static final int CAMERA_REQUEST_CODE = 0;
     private static final int ALBUM_REQUEST_CODE = 1;
 
 
     private String mCurrentPhotoPath;
     private String dir;
-    private Uri imageUri;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,11 +184,9 @@ public class UploadActivity extends AppCompatActivity{
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         Log.d(TAG, "show result");
         super.onActivityResult(requestCode, resultCode, data);
-
         //camera
         if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
             if(imageUri!=null){
-
                 String path = imageUri.getPath();
                 Log.d(TAG, "Image Url is"+path);
                 //File imagefile = new File(path);

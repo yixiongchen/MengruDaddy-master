@@ -27,8 +27,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mengrudaddy.instagram.Home.MainActivity;
-import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.Models.User;
+import com.mengrudaddy.instagram.R;
 
 import java.util.HashMap;
 
@@ -241,15 +241,15 @@ public class LoginActivity extends AppCompatActivity {
     public void onAuthSuccess(String username, FirebaseUser user){
 
         // Write new user
-        writeNewUser(user.getUid(), username, user.getEmail());
+        writeNewUser(user.getUid(), username, user.getEmail(),"");
 
         // Go to MainActivity
         startActivity(new Intent(LoginActivity.this, MainActivity.class));
         finish();
     }
 
-    public void writeNewUser(String userId, String name, String email) {
-        User user = new User(userId, name, email, new HashMap<String, String>(), new HashMap<String, String>(),
+    public void writeNewUser(String userId, String name, String email,String description) {
+        User user = new User(userId, name, email,description, new HashMap<String, String>(), new HashMap<String, String>(),
                 new HashMap<String, String>());
 
         mDatabase.child("users").child(userId).setValue(user);

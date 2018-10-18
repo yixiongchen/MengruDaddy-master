@@ -44,21 +44,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 
 public class ShareActivity extends AppCompatActivity {
 
     private Context context = ShareActivity.this;
-    private FirebaseStorage storage;
-    private DatabaseReference UserDatabaseRef;
-    private DatabaseReference DatabaseRef;
-    private FirebaseUser authUser;
-    private StorageReference imageReference, thumbReference;
-    private FirebaseDatabase database;
-    private String imagePath;
-    private ProgressBar progressBar;
     private EditText postContent;
     private ImageView image,btnPost;
     private TextView btnLocation;
@@ -67,9 +58,16 @@ public class ShareActivity extends AppCompatActivity {
     private Double latitude,longitude;
     private Date date;
     private ArrayList<String> posts;
+    private String imagePath;
 
+    private FirebaseStorage storage;
+    private DatabaseReference UserDatabaseRef;
+    private DatabaseReference DatabaseRef;
+    private FirebaseUser authUser;
+    private StorageReference imageReference, thumbReference;
+    private FirebaseDatabase database;
+    private ProgressBar progressBar;
     private ValueEventListener mPostListener;
-
     private InputStream thumbStream;
     private Bitmap thumbBitmap;
     private byte[] thumbData;
