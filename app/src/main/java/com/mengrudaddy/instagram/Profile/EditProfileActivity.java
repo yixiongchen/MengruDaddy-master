@@ -204,7 +204,6 @@ public class EditProfileActivity extends AppCompatActivity {
         }
     }
 
-
     private void changeImage() {
         // check permission
         Dexter.withActivity(this)
