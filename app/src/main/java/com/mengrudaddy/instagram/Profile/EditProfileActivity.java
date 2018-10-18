@@ -22,7 +22,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -45,8 +44,6 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.mengrudaddy.instagram.Adapter.photoAdapter;
-import com.mengrudaddy.instagram.Camera.UploadActivity;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.Permission;
@@ -57,8 +54,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -125,7 +120,7 @@ public class EditProfileActivity extends AppCompatActivity {
         UserDatabaseRef = database.getReference("users/"+ authUser.getUid());
         final String uID = authUser.getUid();
         //changed_name.setText(authUser.getDisplayName());
-        //display user profile
+
         accessUseProfile();
 
         //database location: posts/userId/postid/
@@ -189,7 +184,6 @@ public class EditProfileActivity extends AppCompatActivity {
                 updateUser(authUser.getUid());
 
 
-
             }
         });
     }
@@ -207,15 +201,17 @@ public class EditProfileActivity extends AppCompatActivity {
         if(new_username.length()>0) {
             updates.put("username", new_username);
         }
-        if (resize != null){
+        if (imagePath != null){
             updates.put("image", new_profile_pic);
+
         }
         if (updates.size()>0) {
             ref.updateChildren(updates)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    //Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     if (resize != null) {
                         uploadImage();
@@ -223,31 +219,32 @@ public class EditProfileActivity extends AppCompatActivity {
                     else{
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         Intent i = new Intent(context, ProfileActivity.class);
+                        //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(i);
                         finish();
-                        progressBar.setVisibility(View.GONE);
                     }
+
 
                 }
             });
         }
     }
 
-
     private void changeImage() {
+        // check permission
         Dexter.withActivity(this)
                 .withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        if (report.areAllPermissionsGranted()){
+                        // if permission granted then we can pick a pic from album
+                        if (report.areAllPermissionsGranted()) {
                             Intent intent = new Intent(Intent.ACTION_PICK);
                             intent.setType("image/*");
                             startActivityForResult(intent, ALBUM_REQUEST_CODE);
-                        }
-                        else{
-                            Toast.makeText(context,"Permission denied",Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show();
                         }
                     }
                     @Override
@@ -257,42 +254,37 @@ public class EditProfileActivity extends AppCompatActivity {
                 })
                 .check();
     }
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         //camera
-        if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
-            if(imageUri!=null){
-                //String path = imageUri.getPath();
-                Log.d(TAG, "Image Url is"+imageUri);
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (imageUri != null) {
+                Log.d(TAG, "Image Url is" + imageUri);
                 try {
-
+                    // resolve file provider from input stream
                     InputStream ims = getContentResolver().openInputStream(imageUri);
                     Bitmap bitmap = BitmapFactory.decodeStream(ims);
-                    Log.d(TAG, "onActivityResult: "+bitmap);
-                    //resize bitmap
+                    Log.d(TAG, "onActivityResult: " + bitmap);
+                    // resize and load image on circle view
                     resize = getResizedBitmap(bitmap, 300, 300);
-                    //imageView.setImageBitmap(resize);
-                    //loadImage(resize);
                     loadImage(resize);
-                }
-                catch (IOException e){
+
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
-        //gallery
-        if (requestCode ==ALBUM_REQUEST_CODE && resultCode == RESULT_OK) {
+        // if pic is chosen from gallery
+        if (requestCode == ALBUM_REQUEST_CODE && resultCode == RESULT_OK) {
             imageUri = data.getData();
-            imagePath = getPath( this.getApplicationContext(), imageUri);
-            //Log.d(TAG, "Image Url is"+path);
+            imagePath = getPath(this.getApplicationContext(), imageUri);
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            //resize bitmap
             resize = getResizedBitmap(bitmap, 300, 300);
-            //imageView.setImageBitmap(resize);
-            //loadImage(resize);
             loadImage(resize);
         }
     }
+
+    // get path for pics chosen from gallery
     public static String getPath( Context context, Uri uri ) {
         String result = null;
         String[] proj = { MediaStore.Images.Media.DATA };
@@ -317,13 +309,13 @@ public class EditProfileActivity extends AppCompatActivity {
         if (!destDir.exists()) {
             destDir.mkdirs();
         }
-
         //create image file
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String file = "Ins"+timeStamp+".jpg";
         File photoFile =new File(destDir,file);
 
         if (photoFile != null) {
+            // using file provider to avoid expose exception
             imageUri = FileProvider.getUriForFile(
                     this,
                     getPackageName() + ".fileprovider",
@@ -347,7 +339,6 @@ public class EditProfileActivity extends AppCompatActivity {
         Matrix matrix = new Matrix();
         // RESIZE THE BIT MAP
         matrix.postScale(scaleWidth, scaleHeight);
-
         // "RECREATE" THE NEW BITMAP
         Bitmap resizedBitmap = Bitmap.createBitmap(
                 bm, 0, 0, width, height, matrix, false);
@@ -360,23 +351,17 @@ public class EditProfileActivity extends AppCompatActivity {
         profile_pic.setImageBitmap(original_new_pic);
     }
 
-
     private void uploadImage() {
-
-        //Log.d(TAG, imagePath);
-
         if(imageReference != null )
         {
             progressBar.setVisibility(View.VISIBLE);
-            //disable user interaction
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-            //InputStream stream = new FileInputStream(new File(imagePath));
-            //Uri filepath = Uri.fromFile(new File(imagePath));
-            //Log.d(TAG, "uploadImage: @@@@@@@@@@@@@@@@@@@@@@@@@@@"+filepath);
+
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             resize.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             byte[] data = baos.toByteArray();
+            //Uri filepath = Uri.fromFile(new File(imagePath));
             imageReference.putBytes(data)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
@@ -385,11 +370,11 @@ public class EditProfileActivity extends AppCompatActivity {
                             Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
                             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                             Intent i = new Intent(context, ProfileActivity.class);
+                            //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(i);
                             finish();
                         }
                     })
-
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
@@ -400,19 +385,6 @@ public class EditProfileActivity extends AppCompatActivity {
                     });
 
         }
-        else{
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-            Intent i = new Intent(context, ProfileActivity.class);
-            startActivity(i);
-            finish();
-        }
-
-        /*
-
-         */
-
-
-
     }
     @Override
     public void onStart(){
@@ -439,19 +411,6 @@ public class EditProfileActivity extends AppCompatActivity {
             UserDatabaseRef.removeEventListener(mPostListener);
         }
     }
-    private String getRealPathFromURI(Uri contentURI) {
-        String result;
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { //checking
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
-    }
 
     /**
      * verifiy all the permissions passed to the array
@@ -466,7 +425,6 @@ public class EditProfileActivity extends AppCompatActivity {
                 VERIFY_PERMISSIONS_REQUEST
         );
     }
-
 
     /**
      * Check an array of permissions
@@ -504,6 +462,7 @@ public class EditProfileActivity extends AppCompatActivity {
             return true;
         }
     }
+
 
 
     /*
@@ -546,6 +505,8 @@ public class EditProfileActivity extends AppCompatActivity {
                         new com.squareup.picasso.Callback() {
                             @Override
                             public void onSuccess() {
+
+                                progressBar.setVisibility(View.GONE);
                                 //do smth when picture is loaded successfully
 
                             }
@@ -564,7 +525,5 @@ public class EditProfileActivity extends AppCompatActivity {
         });
 
     }
-
-
 
 }

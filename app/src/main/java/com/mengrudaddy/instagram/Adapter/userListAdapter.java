@@ -5,31 +5,23 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.mengrudaddy.instagram.Home.MainActivity;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.Profile.ProfileActivity;
 import com.mengrudaddy.instagram.R;
-import com.mengrudaddy.instagram.Search.SearchActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-
-/**
- * Created by 50650 on 2018/10/17
- */
 
 public class userListAdapter extends RecyclerView.Adapter<userListAdapter.userViewHolder>{
 

@@ -120,6 +120,7 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleLarge"
@@ -129,5 +130,5 @@
 
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:visibility="gone" />
+        android:visibility="visible" />
 </RelativeLayout>
