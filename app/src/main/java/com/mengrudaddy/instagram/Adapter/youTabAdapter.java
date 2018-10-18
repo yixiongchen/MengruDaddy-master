@@ -41,9 +41,17 @@ public class youTabAdapter extends RecyclerView.Adapter<youTabAdapter.userViewHo
     @Override
     public void onBindViewHolder(@NonNull userViewHolder userViewHolder, int i) {
         final User user = userList.get(i);
+        if (i>3) {
 
-        userViewHolder.name.setText("Mack Daddy");
-        userViewHolder.action.setText("like your post/start to folowing you");
+            userViewHolder.name.setText("Mack Daddy");
+            userViewHolder.action.setText("start to folowing you");
+        }
+        else {
+            userViewHolder.name.setText("Lady Gaga");
+            userViewHolder.action.setText("like your post");
+            userViewHolder.follow.setVisibility(View.GONE);
+            userViewHolder.post.setVisibility(View.VISIBLE);
+        }
     }
 
     public int getItemCount() {
