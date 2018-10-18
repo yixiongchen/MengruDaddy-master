@@ -136,21 +136,28 @@ public class CommentsListActivity extends AppCompatActivity {
                 //initialize send button
                 send.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
+
                         DatabaseReference commentRef  = database.getReference("comments/");
                         DatabaseReference commentListRef = database.getReference("posts/"+postId+"/"+"comments");
                         String content = newComment.getText().toString();
-                        Comment commentObject  = new Comment(authUser.getUid(),user.username,content, new Date());
-                        //write like object to database
-                        String CommentId = commentRef.push().getKey();
-                        commentRef.child(CommentId).setValue( commentObject);
+                        if(content.trim().length() == 0){
+                            Toast.makeText(CommentsListActivity.this, "Can not be Empty", Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            Comment commentObject  = new Comment(authUser.getUid(),user.username,content, new Date());
+                            //write like object to database
+                            String CommentId = commentRef.push().getKey();
+                            commentRef.child(CommentId).setValue( commentObject);
 
-                        //add <UserId, LikeId> to the list in the post
-                        String key = commentListRef.push().getKey();
-                        Map<String, Object> updateValue = new HashMap<>();
-                        updateValue.put(key,CommentId); //userId:likeId
-                        commentListRef.updateChildren(updateValue);
-                        newComment.setText(" ");
-                        Toast.makeText(CommentsListActivity.this, "You successfully sent a Comment!", Toast.LENGTH_SHORT).show();
+                            //add <UserId, LikeId> to the list in the post
+                            String key = commentListRef.push().getKey();
+                            Map<String, Object> updateValue = new HashMap<>();
+                            updateValue.put(key,CommentId); //userId:likeId
+                            commentListRef.updateChildren(updateValue);
+                            newComment.setText(" ");
+                            Toast.makeText(CommentsListActivity.this, "You successfully sent a Comment!", Toast.LENGTH_SHORT).show();
+                        }
+
                     }
 
                 });
