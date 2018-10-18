@@ -4,14 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white">
-
-    <TextView
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/you_activities"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:textSize="20sp"
-        android:text="@string/tab2"
-        android:layout_marginTop="40dp"
-        android:id="@+id/tab2_text"/>
+        android:layout_above="@id/bottom_navigation">
+    </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>
