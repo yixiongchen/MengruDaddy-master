@@ -30,8 +30,8 @@ public class LocationGetter extends AppCompatActivity implements GoogleApiClient
 
     private static final int MY_PERMISSION_REQUEST_CODE = 7171;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 7172;
-    private TextView lat_txt,lon_txt;
-    private Button btnGetCoordinates, btnLocationUpdates,btn_cancle,btn_ok;
+    private TextView btn_cancle,btn_ok,lat_txt,lon_txt;
+    private Button btnGetCoordinates, btnLocationUpdates;
     private boolean mRequestingLocationUpdates = false;
     private static final String TAG = "MainActivity";
     private LocationRequest mLocationRequest;
@@ -67,8 +67,8 @@ public class LocationGetter extends AppCompatActivity implements GoogleApiClient
         lon_txt = (TextView) findViewById(R.id.longitude);
         btnGetCoordinates = (Button) findViewById(R.id.btnGetCoordinates);
         btnLocationUpdates = (Button) findViewById(R.id.btnTrackLocation);
-        btn_cancle =(Button) findViewById(R.id.cancle);
-        btn_ok =(Button) findViewById(R.id.ok);
+        btn_cancle =(TextView) findViewById(R.id.cancle);
+        btn_ok =(TextView) findViewById(R.id.ok);
 
 
 

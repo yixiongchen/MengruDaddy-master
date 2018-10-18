@@ -1,18 +1,12 @@
 package com.mengrudaddy.instagram.Comments;
 
 import android.content.Context;
-import android.content.Intent;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,21 +18,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mengrudaddy.instagram.Adapter.commentListAdapter;
-import com.mengrudaddy.instagram.Adapter.likeListAdapter;
 import com.mengrudaddy.instagram.Models.Comment;
-import com.mengrudaddy.instagram.Models.Like;
-import com.mengrudaddy.instagram.Models.Post;
 import com.mengrudaddy.instagram.Models.User;
-import com.mengrudaddy.instagram.Profile.ProfileActivity;
-import com.mengrudaddy.instagram.Profile.SinglePostActivity;
 import com.mengrudaddy.instagram.R;
-import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +43,7 @@ public class CommentsListActivity extends AppCompatActivity {
     private commentListAdapter adapter;
     private ListView listView;
     private EditText newComment;
-    private ImageButton send;
+    private ImageView send;
 
     private String[] commentIdList;
     private String postId;
@@ -76,7 +61,7 @@ public class CommentsListActivity extends AppCompatActivity {
         //access use profile and set up adpater
         listView = (ListView)findViewById(R.id.listView) ;
         newComment =(EditText)findViewById(R.id.newComment);
-        send = (ImageButton)findViewById(R.id.button);
+        send = (ImageView)findViewById(R.id.button);
 
 
         //set toolbar

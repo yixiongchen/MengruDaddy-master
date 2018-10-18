@@ -37,7 +37,7 @@
 
             <EditText
                 android:id="@+id/newComment"
-                android:layout_width="280dp"
+                android:layout_width="320dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginBottom="10dp"
                 android:layout_height="wrap_content"
@@ -46,13 +46,12 @@
                 android:textSize="16sp"
                 android:inputType="textMultiLine"/>
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/button"
                 android:layout_width="50dp"
                 android:layout_height="30dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginLeft="25dp"
-                android:background="@drawable/check_border"
+                android:layout_marginLeft="10dp"
                 android:layout_alignTop="@+id/newComment"
                 android:layout_alignBottom="@+id/newComment"
                 android:layout_alignRight="@+id/newComment"
