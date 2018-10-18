@@ -10,19 +10,22 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:background="@color/colorPrimaryDark">
-            <Button
-                android:layout_width="63dp"
-                android:layout_height="30dp"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/cancle"
-                android:background="@drawable/check_border"
-                android:text="@string/cancle"/>
-            <Button
-                android:layout_width="60dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="275dp"
+                android:text="@string/cancle"
+                android:textSize="16sp"
+                android:paddingLeft="10dp"
+                android:textColor="@color/black"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="290dp"
                 android:id="@+id/ok"
-                android:background="@drawable/check_border"
-                android:text="@string/ok"/>
+                android:text="Done"
+                android:textSize="16sp"
+                android:textColor="@color/black"/>
         </android.support.v7.widget.Toolbar>
     <ScrollView
         android:layout_width="match_parent"
@@ -120,6 +123,7 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleLarge"
@@ -129,5 +133,5 @@
 
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:visibility="gone" />
+        android:visibility="visible" />
 </RelativeLayout>

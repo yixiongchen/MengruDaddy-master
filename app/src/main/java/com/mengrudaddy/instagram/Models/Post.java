@@ -10,6 +10,7 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Post {
 
+    public String Id;
     public String username;
     public String userId;
     public String description;
@@ -18,14 +19,14 @@ public class Post {
     public Map<String, String>comments; //list of commentId
     public Map<String, String> likes; //list of likeId
 
-
     public Post(){
 
     }
 
-    public Post(String username, String userId, String description, Map<String, Double> location,
+    public Post(String Id, String username, String userId, String description, Map<String, Double> location,
                 Date date,  Map<String, String> comments,
                 Map<String, String> likes){
+        this.Id = Id;
         this.username = username;
         this.userId =userId;
         this.description = description;
@@ -38,6 +39,7 @@ public class Post {
     @Exclude
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
+        result.put("Id", Id);
         result.put("username", username);
         result.put("userId", userId);
         result.put("description", description);
@@ -45,9 +47,8 @@ public class Post {
         result.put("date", date);
         result.put("likes", likes);
         result.put("comments", comments);
-
         return result;
-
     }
+
 
 }

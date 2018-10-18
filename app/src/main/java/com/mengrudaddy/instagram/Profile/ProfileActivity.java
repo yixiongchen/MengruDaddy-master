@@ -10,7 +10,9 @@ Display all user photos uploaded
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +27,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,6 +43,7 @@ import com.mengrudaddy.instagram.Login.LoginActivity;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +65,7 @@ public class ProfileActivity extends AppCompatActivity{
 
     // friebase authentication
     private FirebaseAuth auth;
+    private FirebaseUser authUser; //auth user
     // real time database
     private FirebaseDatabase database;
     private FirebaseStorage storage;
@@ -70,7 +76,7 @@ public class ProfileActivity extends AppCompatActivity{
 
     private String profileId; //profile user id
 
-    private FirebaseUser authUser; //auth user
+
     private User LogUser, ProfileUser;
     private final int EDIT_PROFILE_REQUEST_CODE=1;
 
@@ -81,16 +87,13 @@ public class ProfileActivity extends AppCompatActivity{
 
         // Get intent data
         Intent i = getIntent();
-        // get user id
-        if(i.getExtras() != null){
-            profileId = i.getExtras().getString("id");
-        }
+
 
         //View initialization
         title=(TextView)findViewById(R.id.toolbar_userprofile);
         username = (TextView)findViewById(R.id.username);
         email = (TextView)findViewById(R.id.email);
-        description = (TextView)findViewById(R.id.description2) ;
+        description = (TextView)findViewById(R.id.description) ;
         followerNum =  (TextView)findViewById(R.id.followers_num);
         followingNum =  (TextView)findViewById(R.id.following_num);
         postNum =  (TextView)findViewById(R.id.post_num);
@@ -112,6 +115,12 @@ public class ProfileActivity extends AppCompatActivity{
 
         if (authUser == null) {
             finish();
+        }
+
+        // get user id
+        if(i.getExtras() != null
+                && authUser.getUid().compareTo(i.getExtras().getString("id"))!=0){
+            profileId = i.getExtras().getString("id");
         }
 
         //Profile userId path
@@ -216,7 +225,9 @@ public class ProfileActivity extends AppCompatActivity{
                 ProfileUser = dataSnapshot.getValue(User.class);
                 title.setText(ProfileUser.username);
                 username.setText(ProfileUser.username);
-                email.setText(ProfileUser.email);
+                if(ProfileUser.email != null){
+                    email.setText(ProfileUser.email);
+                }
                 description.setText(ProfileUser.description);
                 if(ProfileUser.followers == null){
                     followerNum.setText("0");
@@ -237,7 +248,37 @@ public class ProfileActivity extends AppCompatActivity{
                 else{
                     postNum.setText(Integer.toString(ProfileUser.posts.keySet().size()));
                 }
-                progressBar.setVisibility(View.GONE);
+                //load profile image
+                if(ProfileUser.image != null){
+                    profile_pic_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            //picasso lib load remote image
+                            Picasso.with(getApplicationContext()).load(uri.toString()).into(profile_pic,
+                                    new com.squareup.picasso.Callback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            //do smth when picture is loaded successfully
+                                            progressBar.setVisibility(View.GONE);
+                                        }
+                                        @Override
+                                        public void onError() {
+                                            //do smth when there is picture loading error
+                                        }
+                                    });
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            Log.d(TAG, "Can not download file, please check connection");
+                        }
+                    });
+
+                }
+                else{
+                    progressBar.setVisibility(View.GONE);
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
@@ -269,7 +310,8 @@ public class ProfileActivity extends AppCompatActivity{
                         String photoUrl = parent.getItemAtPosition(position).toString();
                         Intent i = new Intent(getApplicationContext(), SinglePostActivity.class);
                         // Pass image index
-                        i.putExtra("id", photoUrl);
+                        i.putExtra("postId", photoUrl);
+                        i.putExtra("userId", profileId);
                         startActivity(i);
                     }
                 });
@@ -314,7 +356,7 @@ public class ProfileActivity extends AppCompatActivity{
         Menu menu = bottomNavigationView.getMenu();
         MenuItem mItem = menu.getItem(ACTIVITY_NUM);
         mItem.setChecked(true);
-        if(authUser.getUid().compareTo(profileId) != 0){
+        if(authUser.getUid().compareTo(profileId) == 0){
             mItem.setEnabled(false);
         }
     }

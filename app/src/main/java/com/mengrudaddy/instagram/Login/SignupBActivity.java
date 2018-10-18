@@ -138,7 +138,7 @@ public class SignupBActivity extends AppCompatActivity {
 
     public void onAuthSuccess(String username, FirebaseUser user){
         // Write new user
-        writeNewUser(user.getUid(), username, user.getEmail(),"");
+        writeNewUser(user.getUid(), username, user.getEmail(),null);
         // Go to MainActivity
         startActivity(new Intent(SignupBActivity.this, MainActivity.class));
         finish();
@@ -146,7 +146,7 @@ public class SignupBActivity extends AppCompatActivity {
 
     public void writeNewUser(String userId, String name, String email,String description) {
         User user = new User(userId, name, email, description,new HashMap<String, String>(), new HashMap<String, String>(),
-                new HashMap<String, String>());
+                new HashMap<String, String>(), null);
         mDatabase.child("users").child(userId).setValue(user);
     }
 

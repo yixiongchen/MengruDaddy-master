@@ -23,7 +23,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.mengrudaddy.instagram.Adapter.userListAdapter;
 import com.mengrudaddy.instagram.Models.User;
@@ -63,7 +62,7 @@ public class SearchActivity extends AppCompatActivity{
         //setUpBottomNavigView();
 
         hideSoftKeyboard();
-        setUpBottomNavigView();
+        //setUpBottomNavigView();
 
         userList = new ArrayList<>();
 
@@ -71,13 +70,12 @@ public class SearchActivity extends AppCompatActivity{
         mResultList.setHasFixedSize(true);
         mResultList.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new userListAdapter(this, R.layout.list_layout, userList);
-        mResultList.setAdapter(adapter);
+        //adapter = new userListAdapter(this, R.layout.list_layout, userList);
+        //mResultList.setAdapter(adapter);
 
         editTextName = (EditText) findViewById(R.id.search_field);
         buttonSearch = (ImageButton) findViewById(R.id.search_btn);
 
-        mResultList = (RecyclerView) findViewById(R.id.result_list);
 
         buttonSearch.setOnClickListener(new View.OnClickListener() {
             @Override

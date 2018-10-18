@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mengrudaddy.instagram.Comments.CommentsListActivity;
 import com.mengrudaddy.instagram.Likes.LikesListActivity;
 import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
@@ -48,7 +49,7 @@ import java.util.Map;
 public class SinglePostActivity extends AppCompatActivity {
 
     private FirebaseStorage storage;
-    private StorageReference imageReference;
+    private StorageReference imageReference,profile_pic_ref;
     // friebase authentication
     private FirebaseUser authUser;
     private boolean likeBoolean = false;
@@ -58,12 +59,13 @@ public class SinglePostActivity extends AppCompatActivity {
     private DatabaseReference userRef, postRef;
     private final String TAG = "SinglePostActivity::";
     private ProgressBar progressBar;
-    private ImageView imageView;
+    private ImageView imageView, profileImage;
     private TextView userName, numComments, numLikes, description, date,location;
     private ImageView like, comment;
     private String postId; //post id
     private Post post;
     private User user;
+    private String userId;
 
     private ValueEventListener mPostListener, mUserListener;
 
@@ -83,10 +85,12 @@ public class SinglePostActivity extends AppCompatActivity {
         // Get intent data
         Intent i = getIntent();
         // get post id
-        postId = i.getExtras().getString("id");
+        postId = i.getExtras().getString("postId");
+        userId = i.getExtras().getString("userId");
 
         //views
         imageView = (ImageView) findViewById(R.id.image);
+        profileImage = (ImageView)findViewById(R.id.profile_image);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
         userName = (TextView)findViewById(R.id.username);
         //description
@@ -115,16 +119,18 @@ public class SinglePostActivity extends AppCompatActivity {
             }
         });
 
-
+        //the auth user
         authUser = FirebaseAuth.getInstance().getCurrentUser();
+
         //load post profile
         //real time database
         database = FirebaseDatabase.getInstance();
         //the post's path
         String indexPath = "posts/"+postId;
         postRef = database.getReference(indexPath);
+
         //the user's path
-        userRef = database.getReference("users/"+authUser.getUid());
+        userRef = database.getReference("users/"+userId);
 
         //firebase storage
         storage = FirebaseStorage.getInstance();
@@ -162,6 +168,7 @@ public class SinglePostActivity extends AppCompatActivity {
 
         //click like button
         like.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 //like object reference
                 DatabaseReference likeRef  = database.getReference("likes/");
@@ -202,38 +209,37 @@ public class SinglePostActivity extends AppCompatActivity {
             }
         });
 
+
         //click comment button
         comment.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-                //go to add a comment activity
+                Intent intent = new Intent(SinglePostActivity.this, CommentsListActivity.class);
+                intent.putExtra("postId",postId);
+                startActivity(intent);
 
             }
         });
 
         //view all comments
         numComments.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(SinglePostActivity.this, CommentsListActivity.class);
+                intent.putExtra("postId",postId);
+                startActivity(intent);
 
             }
         });
 
         //view all likes
         numLikes.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-                //pass a list of likeId to LikeListActivity
-                HashMap<String, String> likesIdMap = (HashMap<String, String>) post.likes;
-                Collection<String> likesIdList = likesIdMap.values();
-                Object[] objectArray  = likesIdList.toArray();
-                String[] likeIds = Arrays.copyOf(objectArray, objectArray.length, String[].class);
-
+                //postId to LikeListActivity
                 Intent intent = new Intent(SinglePostActivity.this, LikesListActivity.class);
-                intent.putExtra("LikeIdList",likeIds);
+                intent.putExtra("postId",postId);
                 startActivity(intent);
-
-
-
-
 
             }
         });
@@ -271,8 +277,13 @@ public class SinglePostActivity extends AppCompatActivity {
         Menu menu = bottomNavigationView.getMenu();
         MenuItem mItem = menu.getItem(ACTIVITY_NUM);
         mItem.setChecked(true);
-        //mItem.setCheckable(false);
-        mItem.setEnabled(false);
+        if(authUser.getUid().compareTo(userId) == 0){
+            mItem.setEnabled(false);
+        }
+        else{
+            mItem.setEnabled(true);
+        }
+
 
     }
 
@@ -285,7 +296,7 @@ public class SinglePostActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
                 post = dataSnapshot.getValue(Post.class);
-                userName.setText(post.username);
+
                 Date postdate = post.date;
                 Double latitude = null;
                 Double longitude = null;
@@ -303,16 +314,19 @@ public class SinglePostActivity extends AppCompatActivity {
                 else{
                     description.setText(post.username + ": " +post.description);
                 }
+
                 if(latitude ==null || longitude == null){
                     location.setVisibility(View.GONE);
                 }
                 else{
                     location.setText("Location\nLatitude: " + latitude + "\nLogitude: " + longitude);
                 }
+
                 if(post.comments == null){
                     numComments.setVisibility(View.GONE);
                 }
                 else{
+                    numComments.setVisibility(View.VISIBLE);
                     numComments.setText("View all "+Integer.toString(post.comments.keySet().size())+" Comments");
                 }
 
@@ -330,6 +344,40 @@ public class SinglePostActivity extends AppCompatActivity {
                         like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_like));
                     }
                 }
+                //load image
+                //load profile image
+                //access Profile user
+                profile_pic_ref = storage.getReference().child("profile_pic/"+post.userId);
+                if(user.image != null){
+                    profile_pic_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            //picasso lib load remote image
+                            Picasso.with(getApplicationContext()).load(uri.toString()).into(profileImage,
+                                    new com.squareup.picasso.Callback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            //do smth when picture is loaded successfully
+                                            progressBar.setVisibility(View.GONE);
+                                        }
+                                        @Override
+                                        public void onError() {
+                                            progressBar.setVisibility(View.GONE);
+                                            //do smth when there is picture loading error
+                                        }
+                                    });
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            progressBar.setVisibility(View.GONE);
+                            Log.d(TAG, "Can not download file, please check connection");
+                        }
+                    });
+
+                }
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
@@ -348,6 +396,7 @@ public class SinglePostActivity extends AppCompatActivity {
              @Override
              public void onDataChange(DataSnapshot dataSnapshot)  {
                  user = dataSnapshot.getValue(User.class);
+                 userName.setText(user.username);
 
              }
              @Override

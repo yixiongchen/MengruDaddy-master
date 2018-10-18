@@ -59,8 +59,6 @@ public class UploadActivity extends AppCompatActivity{
     private static final int ALBUM_REQUEST_CODE = 1;
 
 
-    private String mCurrentPhotoPath;
-    private String dir;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,7 +192,6 @@ public class UploadActivity extends AppCompatActivity{
                 intent.putExtra("picture", path);
                 startActivity(intent);
                 finish();
-
             }
         }
         //gallery
