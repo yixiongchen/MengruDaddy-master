@@ -169,9 +169,7 @@ public class LikesListActivity extends AppCompatActivity {
                 ArrayList<String> likes = new ArrayList<>();
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     String likeId = ds.getValue(String.class);
-                    if(ds.getKey().compareTo(authUser.getUid())!= 0){
-                        likes.add(likeId);
-                    }
+                    likes.add(likeId);
                 }
                 Object[] objNames = likes.toArray();
                 String[] list = Arrays.copyOf(objNames, objNames.length, String[].class);
@@ -185,6 +183,8 @@ public class LikesListActivity extends AppCompatActivity {
         postRef.orderByKey().addValueEventListener(postListener);
         mPostListener = postListener;
     }
+
+
 
 
 
