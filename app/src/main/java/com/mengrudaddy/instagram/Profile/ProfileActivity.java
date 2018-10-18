@@ -65,6 +65,7 @@ public class ProfileActivity extends AppCompatActivity{
 
     // friebase authentication
     private FirebaseAuth auth;
+    private FirebaseUser authUser; //auth user
     // real time database
     private FirebaseDatabase database;
     private FirebaseStorage storage;
@@ -75,7 +76,7 @@ public class ProfileActivity extends AppCompatActivity{
 
     private String profileId; //profile user id
 
-    private FirebaseUser authUser; //auth user
+
     private User LogUser, ProfileUser;
     private final int EDIT_PROFILE_REQUEST_CODE=1;
 

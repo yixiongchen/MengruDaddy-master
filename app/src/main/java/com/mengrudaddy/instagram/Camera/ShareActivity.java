@@ -274,7 +274,7 @@ public class ShareActivity extends AppCompatActivity {
         HashMap<String, Double> locationMap = new HashMap<>();
         locationMap.put("latitude" ,latitude);
         locationMap.put("longitude", longitude);
-        Post post = new Post(username, userId, description,location, date, comments,likes);
+        Post post = new Post(postId, username, userId, description,location, date, comments,likes);
         Map<String, Object> postValues = post.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/posts/" + postId, postValues);
