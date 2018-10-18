@@ -13,6 +13,15 @@
     <string name="tab1">this is tab 1</string>
     <string name="tab2">this is tab 2</string>
 
+    <!-- String about activity_location>-->
+    <string name="current">Your current location</string>
+    <string name="get">Get location</string>
+    <string name="update">Start location updates</string>
+
+
+
+
+
     <!-- Strings related to user profile view -->
     <string name="take_a_photo">Open Camera</string>
     <string name="choose_from_album">Choose from Album</string>

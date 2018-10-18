@@ -61,6 +61,8 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.view.View.GONE;
+
 public class EditProfileActivity extends AppCompatActivity {
     // about layout elements
     private CircleImageView profile_pic;
@@ -210,7 +212,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    progressBar.setVisibility(View.GONE);
+                    progressBar.setVisibility(GONE);
                     Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     if (resize != null) {
@@ -366,7 +368,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            progressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(GONE);
                             Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
                             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                             Intent i = new Intent(context, ProfileActivity.class);
@@ -378,7 +380,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            progressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(GONE);
                             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                             Toast.makeText(EditProfileActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -506,7 +508,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess() {
 
-                                progressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(GONE);
                                 //do smth when picture is loaded successfully
 
                             }
@@ -520,7 +522,7 @@ public class EditProfileActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                progressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(GONE);
                 Log.d(TAG, "Can not download file, please check connection");
             }
         });
