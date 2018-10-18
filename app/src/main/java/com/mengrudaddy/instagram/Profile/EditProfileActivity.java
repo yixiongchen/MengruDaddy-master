@@ -22,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -44,15 +45,20 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.mengrudaddy.instagram.Adapter.photoAdapter;
 import com.mengrudaddy.instagram.Camera.UploadActivity;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.Permission;
+import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -118,7 +124,9 @@ public class EditProfileActivity extends AppCompatActivity {
         authUser = FirebaseAuth.getInstance().getCurrentUser();
         UserDatabaseRef = database.getReference("users/"+ authUser.getUid());
         final String uID = authUser.getUid();
-        changed_name.setText(authUser.getDisplayName());
+        //changed_name.setText(authUser.getDisplayName());
+        //display user profile
+        accessUseProfile();
 
         //database location: posts/userId/postid/
         DatabaseRef = database.getReference();
@@ -199,21 +207,27 @@ public class EditProfileActivity extends AppCompatActivity {
         if(new_username.length()>0) {
             updates.put("username", new_username);
         }
-        if (imagePath != null){
+        if (resize != null){
             updates.put("image", new_profile_pic);
-
         }
         if (updates.size()>0) {
             ref.updateChildren(updates)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    if (imagePath != null) {
+                    if (resize != null) {
                         uploadImage();
                     }
+                    else{
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        Intent i = new Intent(context, ProfileActivity.class);
+                        startActivity(i);
+                        finish();
+                        progressBar.setVisibility(View.GONE);
+                    }
+
                 }
             });
         }
@@ -346,6 +360,7 @@ public class EditProfileActivity extends AppCompatActivity {
         profile_pic.setImageBitmap(original_new_pic);
     }
 
+
     private void uploadImage() {
 
         //Log.d(TAG, imagePath);
@@ -357,9 +372,12 @@ public class EditProfileActivity extends AppCompatActivity {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             //InputStream stream = new FileInputStream(new File(imagePath));
-            Uri filepath = Uri.fromFile(new File(imagePath));
-            Log.d(TAG, "uploadImage: @@@@@@@@@@@@@@@@@@@@@@@@@@@"+filepath);
-            imageReference.putFile(filepath)
+            //Uri filepath = Uri.fromFile(new File(imagePath));
+            //Log.d(TAG, "uploadImage: @@@@@@@@@@@@@@@@@@@@@@@@@@@"+filepath);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            resize.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data = baos.toByteArray();
+            imageReference.putBytes(data)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -367,7 +385,6 @@ public class EditProfileActivity extends AppCompatActivity {
                             Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
                             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                             Intent i = new Intent(context, ProfileActivity.class);
-                            //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(i);
                             finish();
                         }
@@ -383,6 +400,13 @@ public class EditProfileActivity extends AppCompatActivity {
                     });
 
         }
+        else{
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            Intent i = new Intent(context, ProfileActivity.class);
+            startActivity(i);
+            finish();
+        }
+
         /*
 
          */
@@ -480,5 +504,67 @@ public class EditProfileActivity extends AppCompatActivity {
             return true;
         }
     }
+
+
+    /*
+    Access Personal File
+    */
+    public void accessUseProfile(){
+        DatabaseReference userRef = database.getReference("users/"+authUser.getUid());
+        ValueEventListener userListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)  {
+                User user  = dataSnapshot.getValue(User.class);
+                changed_name.setText(user.username);
+                if(user.description != null){
+                    changed_description.setText(user.description);
+                }
+                changed_description.setText(user.description);
+                //access profile image
+                accessProfileImage();
+
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+        userRef.addListenerForSingleValueEvent(userListener);
+    }
+
+
+    /*
+        Access profile image
+     */
+    public void accessProfileImage(){
+        StorageReference profile_pic_ref = storage.getReference("profile_pic/"+authUser.getUid());
+
+        profile_pic_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                //picasso lib load remote image
+                Picasso.with(getApplicationContext()).load(uri.toString()).into(profile_pic,
+                        new com.squareup.picasso.Callback() {
+                            @Override
+                            public void onSuccess() {
+                                //do smth when picture is loaded successfully
+
+                            }
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.d(TAG, "Can not download file, please check connection");
+            }
+        });
+
+    }
+
+
 
 }
