@@ -17,10 +17,6 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-/**
- * Created by 50650 on 2018/10/17
- */
-
 public class youTabAdapter extends RecyclerView.Adapter<youTabAdapter.userViewHolder>{
     private Context mCtx;
     private List<User> userList;
