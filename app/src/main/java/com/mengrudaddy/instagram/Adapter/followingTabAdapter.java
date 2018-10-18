@@ -41,6 +41,7 @@ public class followingTabAdapter extends RecyclerView.Adapter<followingTabAdapte
     public void onBindViewHolder(@NonNull userViewHolder userViewHolder, int i) {
         final User user = userList.get(i);
 
+        // for testing layout, can be deleted
         userViewHolder.name.setText("Mack Daddy");
         userViewHolder.action.setText("liked Jack's post/start to folowing Jack ");
     }
@@ -49,6 +50,7 @@ public class followingTabAdapter extends RecyclerView.Adapter<followingTabAdapte
         return userList.size();
     }
 
+    // for view initialize
     public class userViewHolder extends RecyclerView.ViewHolder {
 
         CircleImageView profile_pic;

@@ -57,19 +57,20 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EditProfileActivity extends AppCompatActivity {
+    // about layout elements
     private CircleImageView profile_pic;
-    private EditText changed_name,changed_description;
-    private Button btn_changePic,btn_cancle,btn_ok;
+    private EditText changed_name, changed_description;
+    private Button btn_changePic, btn_cancle, btn_ok;
     private Context context = EditProfileActivity.this;
     private static final String TAG = "EditProfileActivity";
-    private Bitmap original_new_pic,resize;
-    private String new_username, new_description, new_profile_pic,username,description;
+    private Bitmap original_new_pic, resize;
 
-
+    // about activity result code
     private Uri imageUri;
     private static final int CAMERA_REQUEST_CODE = 0;
     private static final int ALBUM_REQUEST_CODE = 1;
 
+    // about database and storage connection
     private FirebaseStorage storage;
     private DatabaseReference UserDatabaseRef;
     private DatabaseReference DatabaseRef;
@@ -82,6 +83,8 @@ public class EditProfileActivity extends AppCompatActivity {
     private Bitmap thumbBitmap;
     private byte[] thumbData;
     private String imagePath;
+    private String new_username, new_description, new_profile_pic, username, description;
+
 
 
     @Override
@@ -101,14 +104,11 @@ public class EditProfileActivity extends AppCompatActivity {
         // For fire base connection
         database = FirebaseDatabase.getInstance();
         authUser = FirebaseAuth.getInstance().getCurrentUser();
-        UserDatabaseRef = database.getReference("users/"+ authUser.getUid());
+        UserDatabaseRef = database.getReference("users/" + authUser.getUid());
         final String uID = authUser.getUid();
         changed_name.setText(authUser.getDisplayName());
 
-        //database location: posts/userId/postid/
         DatabaseRef = database.getReference();
-        //database: create a postId into the firebase database
-        //storage location: profile_pic/uid/
         String profilePicRef = "profile_pic/";
 
         storage = FirebaseStorage.getInstance();
@@ -117,23 +117,27 @@ public class EditProfileActivity extends AppCompatActivity {
         btn_changePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final int activity_alum = 0;
+                final int activity_camera = 1;
+
+                // a dialog ask user the way of changing profile pic
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setItems(new CharSequence[]
                                 {"Choose from album", "Take a new photo"},
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // The 'which' argument contains the index position
-                                // of the selected item
                                 switch (which) {
-                                    case 0:
+                                        // on click 'choose form album'
+                                    case activity_alum:
                                         Log.d(TAG, "onClick: choose from album");
                                         changeImage();
                                         break;
-                                    case 1:
+                                        // on click take a new photo by opening camera
+                                    case activity_camera:
                                         Log.d(TAG, "onClick: take a new photo");
                                         takePicture();
                                         break;
-
                                 }
                             }
                         });
@@ -141,6 +145,8 @@ public class EditProfileActivity extends AppCompatActivity {
                 builder.show();
             }
         });
+
+        // finish activity
         btn_cancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,68 +154,72 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         });
 
+        // upload changes
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 //write profile info to database
                 if (imagePath != null) {
                     uploadImage();
                 }
-                new_description= changed_description.getText().toString();
+                new_description = changed_description.getText().toString();
                 new_username = changed_name.getText().toString();
                 new_profile_pic = uID;
                 updateUser(authUser.getUid());
-                //
-
-                //uploadNewProfile();
 
             }
         });
 
     }
-    public void updateUser(String userid){
+
+    public void updateUser(String userid) {
         DatabaseReference ref = DatabaseRef.child("users/").child(userid);
         Map<String, Object> updates = new HashMap<>();
-        if (new_description.length()>0){
-            updates.put("description",new_description);
+        if (new_description.length() > 0) {
+            updates.put("description", new_description);
         }
-        if(new_username.length()>0) {
+        if (new_username.length() > 0) {
             updates.put("username", new_username);
         }
-        if (imagePath != null){
+        if (imagePath != null) {
             updates.put("image", new_profile_pic);
         }
-        if (updates.size()>0) {
+
+        // if updates size > 0 then we start update user info on database
+        if (updates.size() > 0) {
             ref.updateChildren(updates)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    Intent i = new Intent(context, ProfileActivity.class);
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(i);
-                    finish();
-                }
-            });
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(context, "Your user information updated", Toast.LENGTH_SHORT).show();
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                            Intent i = new Intent(context, ProfileActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(i);
+                            finish();
+                        }
+                    });
         }
     }
 
+
     private void changeImage() {
+        // check permission
         Dexter.withActivity(this)
                 .withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        if (report.areAllPermissionsGranted()){
+                        // if permission granted then we can pick a pic from album
+                        if (report.areAllPermissionsGranted()) {
                             Intent intent = new Intent(Intent.ACTION_PICK);
                             intent.setType("image/*");
                             startActivityForResult(intent, ALBUM_REQUEST_CODE);
-                        }
-                        else{
-                            Toast.makeText(context,"Permission denied",Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show();
                         }
                     }
                     @Override
@@ -219,59 +229,56 @@ public class EditProfileActivity extends AppCompatActivity {
                 })
                 .check();
     }
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         //camera
-        if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
-            if(imageUri!=null){
-                //String path = imageUri.getPath();
-                Log.d(TAG, "Image Url is"+imageUri);
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (imageUri != null) {
+                Log.d(TAG, "Image Url is" + imageUri);
                 try {
-
+                    // resolve file provider from input stream
                     InputStream ims = getContentResolver().openInputStream(imageUri);
                     Bitmap bitmap = BitmapFactory.decodeStream(ims);
-                    Log.d(TAG, "onActivityResult: "+bitmap);
-                    //resize bitmap
+                    Log.d(TAG, "onActivityResult: " + bitmap);
+                    // load image on circle view
                     resize = getResizedBitmap(bitmap, 300, 300);
-                    //imageView.setImageBitmap(resize);
-                    //loadImage(resize);
                     loadImage(resize);
-                }
-                catch (IOException e){
+
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
-        //gallery
-        if (requestCode ==ALBUM_REQUEST_CODE && resultCode == RESULT_OK) {
+        // if pic is chosen from gallery
+        if (requestCode == ALBUM_REQUEST_CODE && resultCode == RESULT_OK) {
             imageUri = data.getData();
-            imagePath = getPath( this.getApplicationContext(), imageUri);
-            //Log.d(TAG, "Image Url is"+path);
+            imagePath = getPath(this.getApplicationContext(), imageUri);
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            //resize bitmap
             resize = getResizedBitmap(bitmap, 300, 300);
-            //imageView.setImageBitmap(resize);
-            //loadImage(resize);
             loadImage(resize);
         }
     }
-    public static String getPath( Context context, Uri uri ) {
+
+    // get path for pics chosen from gallery
+    public static String getPath(Context context, Uri uri) {
         String result = null;
-        String[] proj = { MediaStore.Images.Media.DATA };
-        Cursor cursor = context.getContentResolver( ).query( uri, proj, null, null, null );
-        if(cursor != null){
-            if ( cursor.moveToFirst( ) ) {
-                int column_index = cursor.getColumnIndexOrThrow( proj[0] );
-                result = cursor.getString( column_index );
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int column_index = cursor.getColumnIndexOrThrow(proj[0]);
+                result = cursor.getString(column_index);
             }
-            cursor.close( );
+            cursor.close();
         }
-        if(result == null) {
+        if (result == null) {
             result = "Not found";
         }
         return result;
     }
-    public void takePicture(){
+
+    public void takePicture() {
         //access external storage
         final String path = Environment.getExternalStorageDirectory().getAbsolutePath() +
                 File.separator + "MobileIns";
@@ -279,11 +286,10 @@ public class EditProfileActivity extends AppCompatActivity {
         if (!destDir.exists()) {
             destDir.mkdirs();
         }
-
         //create image file
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String file = "Ins"+timeStamp+".jpg";
-        File photoFile =new File(destDir,file);
+        String file = "Ins" + timeStamp + ".jpg";
+        File photoFile = new File(destDir, file);
 
         if (photoFile != null) {
             imageUri = FileProvider.getUriForFile(
@@ -292,15 +298,13 @@ public class EditProfileActivity extends AppCompatActivity {
                     photoFile);
             //imageUri = Uri.fromFile(photoFile);
             imagePath = Uri.fromFile(photoFile).getPath();
-            Log.d(TAG, Uri.fromFile(photoFile).toString()+"####1");
-            Log.d(TAG, imagePath+"####2");
-            Log.d(TAG,  imageUri.getPath()+"####2");
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
         }
 
     }
+
     //resize bitmap
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
         int width = bm.getWidth();
@@ -311,53 +315,47 @@ public class EditProfileActivity extends AppCompatActivity {
         Matrix matrix = new Matrix();
         // RESIZE THE BIT MAP
         matrix.postScale(scaleWidth, scaleHeight);
-
         // "RECREATE" THE NEW BITMAP
         Bitmap resizedBitmap = Bitmap.createBitmap(
                 bm, 0, 0, width, height, matrix, false);
         bm.recycle();
         return resizedBitmap;
     }
-    private void loadImage(Bitmap bitmap){
+
+    private void loadImage(Bitmap bitmap) {
         //orginal = BitmapUtils.getBitmapFromAssets(this,pic_name,300,30);
-        original_new_pic  = bitmap;
+        original_new_pic = bitmap;
         profile_pic.setImageBitmap(original_new_pic);
     }
+
     private void uploadImage() {
-
-        //Log.d(TAG, imagePath);
-
-        if(imageReference != null )
-        {
+        if (imageReference != null) {
             progressBar.setVisibility(View.VISIBLE);
             //disable user interaction
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             //InputStream stream = new FileInputStream(new File(imagePath));
             Uri filepath = Uri.fromFile(new File(imagePath));
-            Log.d(TAG, "uploadImage: @@@@@@@@@@@@@@@@@@@@@@@@@@@"+filepath);
             imageReference.putFile(filepath)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressBar.setVisibility(View.GONE);
-                            Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Your profile image updated", Toast.LENGTH_SHORT).show();
                             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                             Intent i = new Intent(context, ProfileActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(i);
                             finish();
-
                         }
 
-                        })
-
+                    })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             progressBar.setVisibility(View.GONE);
                             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                            Toast.makeText(EditProfileActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditProfileActivity.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -367,25 +365,25 @@ public class EditProfileActivity extends AppCompatActivity {
          */
 
 
-
     }
+
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         ValueEventListener userListener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)  {
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 User newUser = dataSnapshot.getValue(User.class);
                 username = newUser.username;
                 description = newUser.description;
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+            }
         };
         UserDatabaseRef.addValueEventListener(userListener);
         mPostListener = userListener;
     }
-
 
     @Override
     public void onStop() {
@@ -394,19 +392,6 @@ public class EditProfileActivity extends AppCompatActivity {
         if (mPostListener != null) {
             UserDatabaseRef.removeEventListener(mPostListener);
         }
-    }
-    private String getRealPathFromURI(Uri contentURI) {
-        String result;
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { //checking
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
     }
 
 }

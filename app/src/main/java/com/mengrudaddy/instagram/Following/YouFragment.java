@@ -16,8 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -32,15 +30,14 @@ public class YouFragment extends Fragment{
 
     private static final String TAG = "YouFragment";
 
-    EditText editTextName;
-    ImageButton buttonSearch;
+    // element about layout
+    private RecyclerView mResultList;
+    private youTabAdapter adapter;
 
-    RecyclerView mResultList;
-    youTabAdapter adapter;
-    final FirebaseDatabase database =  FirebaseDatabase.getInstance();
-
-    DatabaseReference databaseUsers;
-    List<User> testList;
+    // element about database
+    private DatabaseReference databaseUsers;
+    private final FirebaseDatabase database =  FirebaseDatabase.getInstance();
+    private List<User> testList;
 
 
     @Nullable
@@ -57,9 +54,9 @@ public class YouFragment extends Fragment{
         }
 
         adapter = new youTabAdapter(getContext(),R.layout.list_following,testList);
-        // 4. set adapter
+        // set adapter
         mResultList.setAdapter(adapter);
-        // 5. set item animator to DefaultAnimator
+        // set item animator to DefaultAnimator
         mResultList.setItemAnimator(new DefaultItemAnimator());
         return view;
     }

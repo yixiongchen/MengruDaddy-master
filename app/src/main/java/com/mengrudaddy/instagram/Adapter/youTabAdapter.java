@@ -41,6 +41,8 @@ public class youTabAdapter extends RecyclerView.Adapter<youTabAdapter.userViewHo
     @Override
     public void onBindViewHolder(@NonNull userViewHolder userViewHolder, int i) {
         final User user = userList.get(i);
+
+        // from testing layout, can be deleted
         if (i>3) {
 
             userViewHolder.name.setText("Mack Daddy");
@@ -58,8 +60,8 @@ public class youTabAdapter extends RecyclerView.Adapter<youTabAdapter.userViewHo
         return userList.size();
     }
 
+    // on view initialize
     public class userViewHolder extends RecyclerView.ViewHolder {
-
         CircleImageView profile_pic;
         ImageView post;
         TextView name, action;
