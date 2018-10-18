@@ -28,7 +28,6 @@ public class followingTabAdapter extends RecyclerView.Adapter<followingTabAdapte
         this.mCtx = mCtx;
         this.userList = userList;
     }
-
     @NonNull
     @Override
     public userViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -36,7 +35,6 @@ public class followingTabAdapter extends RecyclerView.Adapter<followingTabAdapte
         View view = inflater.inflate(R.layout.list_following, null);
         return new userViewHolder(view);
     }
-
     @Override
     public void onBindViewHolder(@NonNull userViewHolder userViewHolder, int i) {
         final User user = userList.get(i);
