@@ -25,6 +25,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -67,7 +68,8 @@ public class EditProfileActivity extends AppCompatActivity {
     // about layout elements
     private CircleImageView profile_pic;
     private EditText changed_name,changed_description;
-    private Button btn_changePic,btn_cancle,btn_ok;
+    private TextView btn_cancle,btn_ok;
+    private Button btn_changePic;
     private Context context = EditProfileActivity.this;
     private static final String TAG = "EditProfileActivity";
     private Bitmap original_new_pic,resize;
@@ -107,8 +109,8 @@ public class EditProfileActivity extends AppCompatActivity {
         profile_pic = (CircleImageView) findViewById(R.id.profile_image);
         changed_description = (EditText) findViewById(R.id.change_description);
         btn_changePic = (Button) findViewById(R.id.change_image);
-        btn_cancle = (Button) findViewById(R.id.cancle);
-        btn_ok = (Button) findViewById(R.id.ok);
+        btn_cancle = (TextView) findViewById(R.id.cancle);
+        btn_ok = (TextView) findViewById(R.id.ok);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         //check camera and storage permission
