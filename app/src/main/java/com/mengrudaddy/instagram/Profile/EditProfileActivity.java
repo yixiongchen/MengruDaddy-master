@@ -42,7 +42,6 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.mengrudaddy.instagram.Home.MainActivity;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 
@@ -64,7 +63,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private Context context = EditProfileActivity.this;
     private static final String TAG = "EditProfileActivity";
     private Bitmap original_new_pic,resize;
-    private String new_username, new_description,username,description;
+    private String new_username, new_description, new_profile_pic,username,description;
 
 
     private Uri imageUri;
@@ -103,7 +102,7 @@ public class EditProfileActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         authUser = FirebaseAuth.getInstance().getCurrentUser();
         UserDatabaseRef = database.getReference("users/"+ authUser.getUid());
-        String uID = authUser.getUid();
+        final String uID = authUser.getUid();
         changed_name.setText(authUser.getDisplayName());
 
         //database location: posts/userId/postid/
@@ -158,6 +157,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
                 new_description= changed_description.getText().toString();
                 new_username = changed_name.getText().toString();
+                new_profile_pic = uID;
                 updateUser(authUser.getUid());
                 //
 
@@ -171,10 +171,13 @@ public class EditProfileActivity extends AppCompatActivity {
         DatabaseReference ref = DatabaseRef.child("users/").child(userid);
         Map<String, Object> updates = new HashMap<>();
         if (new_description.length()>0){
-            updates.put("self_description",new_description);
+            updates.put("description",new_description);
         }
         if(new_username.length()>0) {
             updates.put("username", new_username);
+        }
+        if (imagePath != null){
+            updates.put("image", new_profile_pic);
         }
         if (updates.size()>0) {
             ref.updateChildren(updates)
@@ -183,6 +186,10 @@ public class EditProfileActivity extends AppCompatActivity {
                 public void onSuccess(Void aVoid) {
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    Intent i = new Intent(context, ProfileActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(i);
                     finish();
                 }
             });
@@ -336,7 +343,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             progressBar.setVisibility(View.GONE);
                             Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
                             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                            Intent i = new Intent(context, MainActivity.class);
+                            Intent i = new Intent(context, ProfileActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(i);
                             finish();

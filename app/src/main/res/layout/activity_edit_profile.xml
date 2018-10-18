@@ -19,7 +19,7 @@
             <Button
                 android:layout_width="60dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="248dp"
+                android:layout_marginLeft="275dp"
                 android:id="@+id/ok"
                 android:background="@drawable/check_border"
                 android:text="@string/ok"/>
