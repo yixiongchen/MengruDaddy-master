@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     //view
     private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipe;
     private ImageView bluetooth;
 
 
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         bluetooth = (ImageView) findViewById(R.id.bluetooth);
+        swipe=(SwipeRefreshLayout)findViewById(R.id.swiperefresh);
 
         // on click bluetooth imageview start bluetooth activity
         bluetooth.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +84,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(activity);
             }
         });
+
+        swipe.setEnabled(false);
+        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                setAdpater();
+            }
+        });
+
+
+
+
 
         //auth
         auth = FirebaseAuth.getInstance();
@@ -99,25 +114,9 @@ public class MainActivity extends AppCompatActivity {
         // 1. load user profile from database
         // 2. load posts by date from database, and then do some filters
         // 3. setting adpater for recycle view
-
         //read user info
+        setAdpater();
 
-
-
-        ValueEventListener userListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)  {
-                user = dataSnapshot.getValue(User.class);
-                //access posts
-                accessPosts();
-                //setting recycleView for adapter
-
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        };
-        userRef.addListenerForSingleValueEvent(userListener);
-        mUserListener = userListener;
 
     }
 
@@ -149,12 +148,37 @@ public class MainActivity extends AppCompatActivity {
                 Collections.reverse(posts);
                 mainFeedAdapter adapter = new mainFeedAdapter(MainActivity.this, posts, user);
                 recyclerView.setAdapter(adapter);
+                swipe.setRefreshing(false);
+                swipe.setEnabled(true);
+                //start refresh
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
         postsRef.orderByChild("date").addListenerForSingleValueEvent(postListener);
         mPostsListener = postListener;
+
+    }
+
+    /*
+        Set adapter for posts
+     */
+    public void setAdpater(){
+        ValueEventListener userListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)  {
+                user = dataSnapshot.getValue(User.class);
+                //access posts
+                accessPosts();
+                //setting recycleView for adapter
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+        userRef.addListenerForSingleValueEvent(userListener);
+        mUserListener = userListener;
 
     }
 

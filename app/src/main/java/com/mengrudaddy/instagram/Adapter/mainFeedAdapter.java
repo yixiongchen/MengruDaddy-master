@@ -376,6 +376,7 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
 
         //comments
         if(post.comments != null){
+            postViewHolder.comments.setVisibility(View.VISIBLE);
             postViewHolder.comments.setText("View all " +Integer.toString(post.comments.keySet().size()) +" comments");
         }
         else{

@@ -17,7 +17,6 @@
             android:id="@+id/bluetooth"
             android:src="@drawable/ic_action_bluetooth"
             android:layout_height="match_parent"
-            android:onClick="openFullScreenCamera"
             android:contentDescription="@string/cancle"/>  <!--android:onClick="function name"-->
         <TextView
             android:layout_width="wrap_content"
@@ -31,14 +30,20 @@
             android:id="@+id/toolbar_title" />
     </android.support.v7.widget.Toolbar>
 
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swiperefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/title_bar"
+        android:layout_above="@id/bottom_navigation">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/main_feed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/title_bar"
-        android:layout_above="@id/bottom_navigation">
+        >
     </android.support.v7.widget.RecyclerView>
-
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_navigation"
