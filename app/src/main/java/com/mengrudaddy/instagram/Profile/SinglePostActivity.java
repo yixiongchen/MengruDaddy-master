@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mengrudaddy.instagram.Comments.CommentsListActivity;
 import com.mengrudaddy.instagram.Likes.LikesListActivity;
 import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
@@ -202,10 +203,13 @@ public class SinglePostActivity extends AppCompatActivity {
             }
         });
 
+
         //click comment button
         comment.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //go to add a comment activity
+                Intent intent = new Intent(SinglePostActivity.this, CommentsListActivity.class);
+                intent.putExtra("postId",postId);
+                startActivity(intent);
 
             }
         });
@@ -213,7 +217,9 @@ public class SinglePostActivity extends AppCompatActivity {
         //view all comments
         numComments.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
+                Intent intent = new Intent(SinglePostActivity.this, CommentsListActivity.class);
+                intent.putExtra("postId",postId);
+                startActivity(intent);
 
             }
         });
@@ -221,19 +227,10 @@ public class SinglePostActivity extends AppCompatActivity {
         //view all likes
         numLikes.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //pass a list of likeId to LikeListActivity
-                HashMap<String, String> likesIdMap = (HashMap<String, String>) post.likes;
-                Collection<String> likesIdList = likesIdMap.values();
-                Object[] objectArray  = likesIdList.toArray();
-                String[] likeIds = Arrays.copyOf(objectArray, objectArray.length, String[].class);
-
+                //postId to LikeListActivity
                 Intent intent = new Intent(SinglePostActivity.this, LikesListActivity.class);
-                intent.putExtra("LikeIdList",likeIds);
+                intent.putExtra("postId",postId);
                 startActivity(intent);
-
-
-
-
 
             }
         });
@@ -271,7 +268,6 @@ public class SinglePostActivity extends AppCompatActivity {
         Menu menu = bottomNavigationView.getMenu();
         MenuItem mItem = menu.getItem(ACTIVITY_NUM);
         mItem.setChecked(true);
-        //mItem.setCheckable(false);
         mItem.setEnabled(false);
 
     }

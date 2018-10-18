@@ -27,6 +27,7 @@ public class Comment {
         this.date =date;
     }
 
+
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();

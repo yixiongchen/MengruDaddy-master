@@ -20,11 +20,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.mengrudaddy.instagram.Adapter.commentListAdapter;
 import com.mengrudaddy.instagram.Adapter.likeListAdapter;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.Profile.ProfileActivity;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class LikesListActivity extends AppCompatActivity {
@@ -36,11 +40,12 @@ public class LikesListActivity extends AppCompatActivity {
     private FirebaseUser authUser;
     private FirebaseAuth auth;
     private FirebaseDatabase database;
-    private DatabaseReference userRef;
-    private ValueEventListener mUserListener;
+    private DatabaseReference userRef,postRef;
+    private ValueEventListener mUserListener, mPostListener;
     private likeListAdapter adapter;
     private ListView listView;
     private String[] likeIdList;
+    private String postId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +53,8 @@ public class LikesListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_likes_list);
 
         //receive likeId list
-        likeIdList = getIntent().getStringArrayExtra("LikeIdList");
+        //likeIdList = getIntent().getStringArrayExtra("LikeIdList");
+        postId = getIntent().getStringExtra("postId");
 
         //set toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.title_bar);
@@ -108,8 +114,8 @@ public class LikesListActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         // Remove post value event listener
-        if (mUserListener != null) {
-            userRef.removeEventListener(mUserListener);
+        if ( mPostListener != null) {
+            postRef.removeEventListener( mPostListener);
         }
 
     }
@@ -130,8 +136,7 @@ public class LikesListActivity extends AppCompatActivity {
 
                 listView = (ListView)findViewById(R.id.listView) ;
                 //set user list adapter
-                adapter = new likeListAdapter(getApplicationContext(), likeIdList, user);
-                listView.setAdapter(adapter);
+                accessPostProfile();
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent,
                                             View v, int position, long id){
@@ -142,16 +147,43 @@ public class LikesListActivity extends AppCompatActivity {
                         // Pass id
                         i.putExtra("id", userId);
                         startActivity(i);
-
                     }
                 });
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        userRef.addValueEventListener(userListener);
-        mUserListener = userListener;
+        userRef.addListenerForSingleValueEvent(userListener);
+        //mUserListener = userListener;
+    }
 
+    /*
+      Read the post info from database
+     */
+    private void accessPostProfile(){
+        //read post info
+        postRef = database.getReference("posts/"+postId+"/likes");
+        final ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)  {
+                ArrayList<String> likes = new ArrayList<>();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String likeId = ds.getValue(String.class);
+                    if(ds.getKey().compareTo(authUser.getUid())!= 0){
+                        likes.add(likeId);
+                    }
+                }
+                Object[] objNames = likes.toArray();
+                String[] list = Arrays.copyOf(objNames, objNames.length, String[].class);
+                adapter = new likeListAdapter(getApplicationContext(), list, user);
+                listView.setAdapter(adapter);
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+        postRef.orderByKey().addValueEventListener(postListener);
+        mPostListener = postListener;
     }
 
 
