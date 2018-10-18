@@ -46,6 +46,7 @@ public class SearchActivity extends AppCompatActivity{
 
     RecyclerView mResultList;
     userListAdapter adapter;
+    final FirebaseDatabase database =  FirebaseDatabase.getInstance();
 
     DatabaseReference databaseUsers;
 
@@ -83,7 +84,6 @@ public class SearchActivity extends AppCompatActivity{
             public void onClick(View v) {
                 String username = editTextName.getText().toString().toLowerCase(Locale.getDefault());
                 searchForMatch(username);
-
             }
         });
 
@@ -99,10 +99,11 @@ public class SearchActivity extends AppCompatActivity{
             Log.d(TAG,"null input");
 
         }else{
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-            Query query = reference.child("user")
-                    .orderByChild("username").equalTo(keyword);
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
+            DatabaseReference reference = database.getReference("users");
+//            Query query = reference
+//                    .orderByChild("username").equalTo(keyword);
+            Log.d(TAG,"Search for the text");
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
