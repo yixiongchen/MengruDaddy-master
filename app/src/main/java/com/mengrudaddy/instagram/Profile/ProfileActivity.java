@@ -32,6 +32,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.mengrudaddy.instagram.Adapter.photoAdapter;
 import com.mengrudaddy.instagram.Login.LoginActivity;
 import com.mengrudaddy.instagram.Models.User;
@@ -42,22 +44,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ProfileActivity extends AppCompatActivity{
     private static final String TAG = "ProfileActivity::";
     private Context context=ProfileActivity.this;
     private static final int ACTIVITY_NUM=4;
-    private TextView title, username, email, followerNum, followingNum, postNum;
+    private TextView title, username, email, followerNum, followingNum, postNum,description;
     private Button editFile;
     private ProgressBar progressBar;
     private ImageView logout;
     private GridView gridview;
+    private CircleImageView profile_pic;
     private ValueEventListener mUserListener, mPostListener;
 
     // friebase authentication
     private FirebaseAuth auth;
     // real time database
     private FirebaseDatabase database;
-    private DatabaseReference authUserRef, userRef, postListRef ;
+    private FirebaseStorage storage;
+    private DatabaseReference authUserRef, userRef, postListRef;
+    private StorageReference profile_pic_ref;
     //photo storage
     private ArrayList<String> photoIds;
 
@@ -83,6 +90,7 @@ public class ProfileActivity extends AppCompatActivity{
         title=(TextView)findViewById(R.id.toolbar_userprofile);
         username = (TextView)findViewById(R.id.username);
         email = (TextView)findViewById(R.id.email);
+        description = (TextView)findViewById(R.id.description2) ;
         followerNum =  (TextView)findViewById(R.id.followers_num);
         followingNum =  (TextView)findViewById(R.id.following_num);
         postNum =  (TextView)findViewById(R.id.post_num);
@@ -90,13 +98,18 @@ public class ProfileActivity extends AppCompatActivity{
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         editFile = (Button)findViewById(R.id.textEditProfile);
         gridview = (GridView) findViewById(R.id.gridView);
+        profile_pic = (CircleImageView) findViewById(R.id.profile_image) ;
 
 
         //real time database
         database = FirebaseDatabase.getInstance();
+        // get storage
+        storage = FirebaseStorage.getInstance();
         //auth
         auth = FirebaseAuth.getInstance();
         authUser = auth.getCurrentUser();
+
+
         if (authUser == null) {
             finish();
         }
@@ -132,6 +145,7 @@ public class ProfileActivity extends AppCompatActivity{
         }
 
         //access Profile user
+        profile_pic_ref = storage.getReference().child("profile_pic/"+profileId);
         accessUserProfile();
 
         //access post info
@@ -203,6 +217,7 @@ public class ProfileActivity extends AppCompatActivity{
                 title.setText(ProfileUser.username);
                 username.setText(ProfileUser.username);
                 email.setText(ProfileUser.email);
+                description.setText(ProfileUser.description);
                 if(ProfileUser.followers == null){
                     followerNum.setText("0");
                 }
