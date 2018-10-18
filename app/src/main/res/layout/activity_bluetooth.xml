@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context="com.mengrudaddy.instagram.utils.LocationGetter">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimaryDark">
+        <Button
+            android:layout_width="63dp"
+            android:layout_height="30dp"
+            android:id="@+id/cancle"
+            android:background="@drawable/check_border"
+            android:text="@string/cancle"/>
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="275dp"
+            android:id="@+id/ok"
+            android:background="@drawable/check_border"
+            android:text="@string/ok"/>
+    </android.support.v7.widget.Toolbar>
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="300dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_action_bluetooth"
+        />
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp"
+        android:text="Transfer photos via bluetooth"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+    <Button
+        android:id="@+id/discover"
+        android:text="@string/on"
+        android:layout_marginTop="40dp"
+        android:layout_width="300dp"
+        android:layout_gravity="center"
+        android:layout_height="30dp"
+        android:background="@drawable/check_border"
+        />
+
+    <Button
+        android:id="@+id/on"
+        android:text="@string/dicover"
+        android:layout_marginTop="20dp"
+        android:layout_width="300dp"
+        android:layout_gravity="center"
+        android:layout_height="30dp"
+        android:background="@drawable/check_border"
+        />
+    <Button
+        android:id="@+id/choose"
+        android:text="@string/choose_from_album"
+        android:layout_marginTop="20dp"
+        android:layout_width="300dp"
+        android:layout_gravity="center"
+        android:layout_height="30dp"
+        android:background="@drawable/check_border"
+        />
+
+
+</LinearLayout>
