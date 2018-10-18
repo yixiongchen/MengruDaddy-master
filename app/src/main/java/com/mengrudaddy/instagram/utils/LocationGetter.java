@@ -30,7 +30,7 @@ public class LocationGetter extends AppCompatActivity implements GoogleApiClient
 
     private static final int MY_PERMISSION_REQUEST_CODE = 7171;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 7172;
-    private TextView txtCoordinates;
+    private TextView lat_txt,lon_txt;
     private Button btnGetCoordinates, btnLocationUpdates,btn_cancle,btn_ok;
     private boolean mRequestingLocationUpdates = false;
     private static final String TAG = "MainActivity";
@@ -63,7 +63,8 @@ public class LocationGetter extends AppCompatActivity implements GoogleApiClient
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
 
-        txtCoordinates = (TextView) findViewById(R.id.coordinates);
+        lat_txt = (TextView) findViewById(R.id.latitude);
+        lon_txt = (TextView) findViewById(R.id.longitude);
         btnGetCoordinates = (Button) findViewById(R.id.btnGetCoordinates);
         btnLocationUpdates = (Button) findViewById(R.id.btnTrackLocation);
         btn_cancle =(Button) findViewById(R.id.cancle);
@@ -191,12 +192,15 @@ public class LocationGetter extends AppCompatActivity implements GoogleApiClient
             latitude = mLastLocation.getLatitude();
             longitude = mLastLocation.getLongitude();
 
-            txtCoordinates.setText(latitude + " / " + longitude);
+            lat_txt.setText("Latitude: "+latitude);
+            lon_txt.setText("Longitude: "+longitude);
+
 
         }
-        else
-            txtCoordinates.setText("Couldn't get the location. Make sure location is enable on the device");
-
+        else {
+            lat_txt.setText("Failed to get your location.");
+            lon_txt.setText("Make sure location is allowed on your device");
+        }
     }
 
     private void createLocationRequest() {

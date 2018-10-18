@@ -31,25 +31,34 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/newComment"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:hint="Leave your comment"
-            android:inputType="textMultiLine"/>
+            <EditText
+                android:id="@+id/newComment"
+                android:layout_width="280dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:hint="Leave your comment"
+                android:textSize="16sp"
+                android:inputType="textMultiLine"/>
 
-        <ImageButton
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:layout_alignTop="@+id/newComment"
-            android:layout_alignBottom="@+id/newComment"
-            android:layout_alignRight="@+id/newComment"
-            android:src="@drawable/ic_action_send"
-            android:text="Button" />
+            <ImageButton
+                android:id="@+id/button"
+                android:layout_width="50dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="25dp"
+                android:background="@drawable/check_border"
+                android:layout_alignTop="@+id/newComment"
+                android:layout_alignBottom="@+id/newComment"
+                android:layout_alignRight="@+id/newComment"
+                android:src="@drawable/ic_action_send"
+                android:text="Button" />
+        </LinearLayout>
 
     </RelativeLayout>
 
