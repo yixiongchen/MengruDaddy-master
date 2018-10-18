@@ -104,7 +104,6 @@
         <activity android:name=".Profile.SinglePostActivity" />
         <activity android:name=".Comments.CommentsListActivity" />
         <activity android:name=".Likes.LikesListActivity" />
-        <activity android:name=".Comments.CommentPostActivity" />
         <activity android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"></activity>

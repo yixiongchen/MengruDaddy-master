@@ -314,7 +314,7 @@ public class ProfileActivity extends AppCompatActivity{
         Menu menu = bottomNavigationView.getMenu();
         MenuItem mItem = menu.getItem(ACTIVITY_NUM);
         mItem.setChecked(true);
-        if(authUser.getUid().compareTo(profileId) != 0){
+        if(authUser.getUid().compareTo(profileId) == 0){
             mItem.setEnabled(false);
         }
     }
