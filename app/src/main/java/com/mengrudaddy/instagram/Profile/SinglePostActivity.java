@@ -163,6 +163,7 @@ public class SinglePostActivity extends AppCompatActivity {
 
         //click like button
         like.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 //like object reference
                 DatabaseReference likeRef  = database.getReference("likes/");
@@ -206,6 +207,7 @@ public class SinglePostActivity extends AppCompatActivity {
 
         //click comment button
         comment.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SinglePostActivity.this, CommentsListActivity.class);
                 intent.putExtra("postId",postId);
@@ -216,6 +218,7 @@ public class SinglePostActivity extends AppCompatActivity {
 
         //view all comments
         numComments.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SinglePostActivity.this, CommentsListActivity.class);
                 intent.putExtra("postId",postId);
@@ -226,6 +229,7 @@ public class SinglePostActivity extends AppCompatActivity {
 
         //view all likes
         numLikes.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 //postId to LikeListActivity
                 Intent intent = new Intent(SinglePostActivity.this, LikesListActivity.class);

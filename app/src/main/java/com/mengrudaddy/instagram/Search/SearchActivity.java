@@ -83,8 +83,10 @@ public class SearchActivity extends AppCompatActivity{
             public void onClick(View v) {
                 String username = editTextName.getText().toString().toLowerCase(Locale.getDefault());
                 searchForMatch(username);
+
             }
         });
+
     }
 
 
