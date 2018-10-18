@@ -35,6 +35,7 @@ import com.mengrudaddy.instagram.Search.SearchActivity;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     //auth user object
     private User user;
-    private ArrayList<Post> posts;
+    private ArrayList<String> posts;
 
     //view
     private RecyclerView recyclerView;
@@ -123,21 +124,29 @@ public class MainActivity extends AppCompatActivity {
                 posts = new ArrayList<>();
                 for(DataSnapshot postShot :  dataSnapshot.getChildren()){
                     Post post  = postShot.getValue(Post.class);
-                    Log.d(TAG, post.username);
-                    posts.add(post);
-
+                    //your posts
+                    if(post.userId.compareTo(user.Id)==0){
+                        posts.add(post.Id);
+                    }
+                    //posts of your followings
+                    else if(user.following.containsValue(post.userId)){
+                        posts.add(post.Id);
+                    }
+                    else{
+                        continue;
+                    }
                 }
+                Collections.reverse(posts);
                 mainFeedAdapter adapter = new mainFeedAdapter(MainActivity.this, posts, user);
                 recyclerView.setAdapter(adapter);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        postsRef.addValueEventListener(postListener);
+        postsRef.orderByChild("date").addListenerForSingleValueEvent(postListener);
         mPostsListener = postListener;
 
     }
-
 
 
 
@@ -154,10 +163,6 @@ public class MainActivity extends AppCompatActivity {
             userRef.removeEventListener(mUserListener);
         }
     }
-
-
-
-
 
 
 

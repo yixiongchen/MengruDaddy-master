@@ -121,7 +121,7 @@ public class commentListAdapter extends BaseAdapter {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        commentRef.addListenerForSingleValueEvent(CommentListener);
+        commentRef.addValueEventListener(CommentListener);
 
         return convertView;
     }
