@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                         posts.add(post.Id);
                     }
                     //posts of your followings
-                    else if(user.following.containsValue(post.userId)){
+                    else if(user.following !=null && user.following.containsValue(post.userId)){
                         posts.add(post.Id);
                     }
                     else{
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        postsRef.orderByChild("date").addListenerForSingleValueEvent(postListener);
+        postsRef.orderByChild("date").addValueEventListener(postListener);
         mPostsListener = postListener;
 
     }
