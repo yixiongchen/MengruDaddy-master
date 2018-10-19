@@ -86,6 +86,58 @@ public class SearchActivity extends AppCompatActivity{
         });
 
     }
+    
+    private void initTextListener(){
+        Log.d(TAG, "initTextListener: initializing");
+
+        userList = new ArrayList<>();
+
+        editTextName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+
+
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+    private void RecommandUsers(){
+        Log.d(TAG,"start to show recommandations");
+        userList.clear();
+
+        DatabaseReference reference = database.getReference("users");
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        final String uId = currentUser.getUid();
+
+        Log.d(TAG, "start to search");
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot singleDataSnapshot: dataSnapshot.getChildren()){
+//                    singleDataSnapshot;
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
 
     private void searchForMatch(String keyword){
@@ -106,8 +158,11 @@ public class SearchActivity extends AppCompatActivity{
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
                         Log.d(TAG, "onDataChange: found user:" + singleSnapshot.getValue(User.class).toString());
+                        String name = singleSnapshot.getValue(User.class).username;
 
-                        userList.add(singleSnapshot.getValue(User.class));
+                        if (name.equals(keyword)){
+                            userList.add(singleSnapshot.getValue(User.class));
+                        }
                         //update the users list view
                         updateUsersList();
                     }
