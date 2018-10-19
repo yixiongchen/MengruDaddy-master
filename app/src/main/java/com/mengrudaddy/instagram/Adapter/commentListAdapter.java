@@ -162,12 +162,12 @@ public class commentListAdapter extends BaseAdapter {
                             @Override
                             public void onSuccess() {
                                 //do smth when picture is loaded successfully
-                                viewHolder.progressBar.setVisibility(View.GONE);
+                                //viewHolder.progressBar.setVisibility(View.GONE);
                             }
                             @Override
                             public void onError() {
                                 //do smth when there is picture loading error
-                                viewHolder.progressBar.setVisibility(View.GONE);
+                                //viewHolder.progressBar.setVisibility(View.GONE);
                             }
                         });
 
@@ -175,7 +175,7 @@ public class commentListAdapter extends BaseAdapter {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                viewHolder.progressBar.setVisibility(View.GONE);
+                //viewHolder.progressBar.setVisibility(View.GONE);
                 Log.d(TAG, "Can not download file, please check connection");
             }
         });

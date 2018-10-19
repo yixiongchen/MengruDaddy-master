@@ -2,9 +2,12 @@ package com.mengrudaddy.instagram.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,11 +38,14 @@ import com.mengrudaddy.instagram.Profile.SinglePostActivity;
 import com.mengrudaddy.instagram.R;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postViewHolder> {
@@ -390,8 +396,9 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
 
         //location
         if(post.location != null){
-            postViewHolder.location.setText(Double.toString(post.location.get("latitude"))+", "
-                    +Double.toString(post.location.get("longitude")));
+
+            String address = getAddress(post.location.get("latitude"),post.location.get("longitude"));
+            postViewHolder.location.setText(address);
         }
         else{
             postViewHolder.location.setVisibility(View.GONE);
@@ -410,6 +417,28 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
         viewUserProfile(postViewHolder, post);
 
 
+    }
+
+
+    /*
+        Return the address by coordinates
+     */
+    private String getAddress(double latitude, double longitude) {
+        StringBuilder result = new StringBuilder();
+        try {
+            Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses.size() > 0) {
+                Address address = addresses.get(0);
+                result.append(address.getLocality()).append("\n");
+                result.append(address.getCountryName());
+                //result.append(address.get)
+            }
+        } catch (IOException e) {
+            Log.e("tag", e.getMessage());
+        }
+
+        return result.toString();
     }
 
 

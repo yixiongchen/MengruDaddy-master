@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,6 +45,7 @@ public class CommentsListActivity extends AppCompatActivity {
     private ListView listView;
     private EditText newComment;
     private ImageView send;
+    private ProgressBar progressBar;
 
     private String[] commentIdList;
     private String postId;
@@ -62,6 +64,8 @@ public class CommentsListActivity extends AppCompatActivity {
         listView = (ListView)findViewById(R.id.listView) ;
         newComment =(EditText)findViewById(R.id.newComment);
         send = (ImageView)findViewById(R.id.button);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+
 
 
         //set toolbar
@@ -175,6 +179,8 @@ public class CommentsListActivity extends AppCompatActivity {
                 String[] list = Arrays.copyOf(objNames, objNames.length, String[].class);
                 adapter = new commentListAdapter(getApplicationContext(), list);
                 listView.setAdapter(adapter);
+                progressBar.setVisibility(View.GONE);
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
