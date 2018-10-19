@@ -160,6 +160,24 @@ public class ProfileActivity extends AppCompatActivity{
         //access post info
         accessPostList();
 
+        // show following users
+        followingNum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, FollowingListActivity.class);
+                intent.putExtra("uId",authUser.getUid());
+                startActivity(intent);
+            }
+        });
+        followerNum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, FollowerListActivity.class);
+                intent.putExtra("uId",authUser.getUid());
+                startActivity(intent);
+            }
+        });
+
         //logout
         logout.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
