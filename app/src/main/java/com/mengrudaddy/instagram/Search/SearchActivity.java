@@ -15,12 +15,14 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -41,6 +43,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class SearchActivity extends AppCompatActivity{
@@ -69,6 +73,8 @@ public class SearchActivity extends AppCompatActivity{
 
 
 
+
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
@@ -88,7 +94,6 @@ public class SearchActivity extends AppCompatActivity{
         mResultList.setHasFixedSize(true);
         mResultList.setLayoutManager(new LinearLayoutManager(this));
 
-        //必须在 userList , recycle初始化后才能call adpter
         RecommandUsers();
 
         //adapter = new userListAdapter(this, R.layout.list_layout, userList);
@@ -115,7 +120,6 @@ public class SearchActivity extends AppCompatActivity{
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         final String uId = currentUser.getUid();
 
-
         Log.d(TAG, "start to recommend");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -128,19 +132,29 @@ public class SearchActivity extends AppCompatActivity{
                     }
                 }
 
+                if(current.following != null){
+
 
                 List<String> currentFollow = getListByMap(current.following, false);
 
                 for(int i=0; i< allUsers.size()-1; i++){
-                    if (allUsers.get(i).following != null){
+                    if (allUsers.get(i).following != null&current.following != null){
                     List<String> follow = getListByMap(allUsers.get(i).following, false);
                     follow.retainAll(currentFollow);
                     int num = follow.size();
-                    if (num>=2&&!allUsers.get(i).Id.equals(current.Id)){
+                    if ((num>=2&!allUsers.get(i).username.equals(current.username))&
+                            !allUsers.get(i).following.containsValue(current.Id)){
                         userList.add(allUsers.get(i));
                     }}
                 }
                 updateUsersList();
+                }else{
+
+                    Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
+                                    " for you. Please make more friends!",
+                            Toast.LENGTH_LONG).show();
+
+                }
             }
 
             @Override
@@ -156,6 +170,8 @@ public class SearchActivity extends AppCompatActivity{
         if(keyword.length() ==0){
 
             Log.d(TAG,"null input");
+            Toast.makeText(getApplicationContext(), "The search field should not be empty"
+                    ,Toast.LENGTH_LONG).show();
 
         }else{
             DatabaseReference reference = database.getReference("users");
@@ -173,8 +189,16 @@ public class SearchActivity extends AppCompatActivity{
                         if (name.equals(keyword)){
                             userList.add(singleSnapshot.getValue(User.class));
                         }
+
                         //update the users list view
-                        updateUsersList();
+                        updateUsersList();}
+ {
+
+
+                    }
+                    if(userList == null){
+                        Toast.makeText(getApplicationContext(), "Sorry, there is no username \"" + keyword + "\"",
+                                Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -211,6 +235,24 @@ public class SearchActivity extends AppCompatActivity{
         mResultList.setAdapter(adapter);
 
     }
+
+    public void showMyToast(final Toast toast, final int cnt) {
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                toast.show();
+            }
+        }, 0, 3000);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                toast.cancel();
+                timer.cancel();
+            }
+        }, cnt );
+    }
+
 
     private void hideSoftKeyboard(){
         if(getCurrentFocus() != null){
