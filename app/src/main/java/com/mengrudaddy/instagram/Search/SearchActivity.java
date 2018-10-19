@@ -184,7 +184,7 @@ public class SearchActivity extends AppCompatActivity{
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
                         Log.d(TAG, "onDataChange: found user:" + singleSnapshot.getValue(User.class).toString());
-                        String name = singleSnapshot.getValue(User.class).username;
+                        String name = singleSnapshot.getValue(User.class).username.toLowerCase();
 
                         if (name.equals(keyword)){
                             userList.add(singleSnapshot.getValue(User.class));
