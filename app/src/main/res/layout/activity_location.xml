@@ -36,7 +36,6 @@
         android:layout_gravity="center"
         android:src="@drawable/ic_func_location"
         />
-
     <TextView
         android:id="@+id/label"
         android:layout_marginTop="20dp"
