@@ -7,10 +7,13 @@ This class is activity to search users
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +22,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,8 +35,12 @@ import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 
 public class SearchActivity extends AppCompatActivity{
@@ -46,11 +55,13 @@ public class SearchActivity extends AppCompatActivity{
     RecyclerView mResultList;
     userListAdapter adapter;
     final FirebaseDatabase database =  FirebaseDatabase.getInstance();
+    FirebaseUser currentUser;
 
     DatabaseReference databaseUsers;
 
 
     List<User> userList;
+    List<User> allUsers;
 
 
 
@@ -62,7 +73,7 @@ public class SearchActivity extends AppCompatActivity{
         //setUpBottomNavigView();
 
         hideSoftKeyboard();
-        //setUpBottomNavigView();
+        setUpBottomNavigView();
 
         userList = new ArrayList<>();
 
@@ -70,12 +81,13 @@ public class SearchActivity extends AppCompatActivity{
         mResultList.setHasFixedSize(true);
         mResultList.setLayoutManager(new LinearLayoutManager(this));
 
-        //adapter = new userListAdapter(this, R.layout.list_layout, userList);
-        //mResultList.setAdapter(adapter);
+        adapter = new userListAdapter(this, R.layout.list_layout, userList);
+        mResultList.setAdapter(adapter);
 
         editTextName = (EditText) findViewById(R.id.search_field);
         buttonSearch = (ImageButton) findViewById(R.id.search_btn);
 
+        mResultList = (RecyclerView) findViewById(R.id.result_list);
 
         buttonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,7 +98,7 @@ public class SearchActivity extends AppCompatActivity{
         });
 
     }
-    
+
     private void initTextListener(){
         Log.d(TAG, "initTextListener: initializing");
 
@@ -95,10 +107,7 @@ public class SearchActivity extends AppCompatActivity{
         editTextName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-
-
-
+                RecommandUsers();
             }
 
             @Override
@@ -116,31 +125,51 @@ public class SearchActivity extends AppCompatActivity{
     private void RecommandUsers(){
         Log.d(TAG,"start to show recommandations");
         userList.clear();
+        allUsers.clear();
 
         DatabaseReference reference = database.getReference("users");
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         final String uId = currentUser.getUid();
+        final User[] current = new User[1];
 
         Log.d(TAG, "start to search");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot singleDataSnapshot: dataSnapshot.getChildren()){
-//                    singleDataSnapshot;
-
+                    allUsers.add(singleDataSnapshot.getValue(User.class));
+                    if (singleDataSnapshot.getValue(User.class).Id.equals(uId)) {
+                        current[0] = new User(singleDataSnapshot.getValue(User.class).Id,
+                                singleDataSnapshot.getValue(User.class).username,
+                                singleDataSnapshot.getValue(User.class).email,
+                                singleDataSnapshot.getValue(User.class).description,
+                                singleDataSnapshot.getValue(User.class).following,
+                                singleDataSnapshot.getValue(User.class).followers,
+                                singleDataSnapshot.getValue(User.class).posts,
+                                singleDataSnapshot.getValue(User.class).image);
+                    }
                 }
 
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
+
+        List<String> currentFollow = getListByMap(current[0].following, false);
+
+        for(int i=0; i< allUsers.size()-1; i++){
+                List<String> follow = getListByMap(allUsers.get(i).following, false);
+                follow.retainAll(currentFollow);
+                int num = follow.size();
+                if (num>=2&&!allUsers.get(i).Id.equals(current[0].Id)){
+                    userList.add(allUsers.get(i));
+                }
+        }
     }
 
-
-    private void searchForMatch(String keyword){
+    private void searchForMatch(final String keyword){
         Log.d(TAG, "searchForMatch: searching for a match: " + keyword);
         userList.clear();
         //update the users list view
@@ -150,6 +179,7 @@ public class SearchActivity extends AppCompatActivity{
 
         }else{
             DatabaseReference reference = database.getReference("users");
+
 //            Query query = reference
 //                    .orderByChild("username").equalTo(keyword);
             Log.d(TAG,"Search for the text");
@@ -174,6 +204,23 @@ public class SearchActivity extends AppCompatActivity{
                 }
             });
         }
+    }
+
+    public static List<String> getListByMap(Map<String, String> map,
+                                            boolean isKey) {
+        List<String> list = new ArrayList<String>();
+
+        Iterator<String> it = map.keySet().iterator();
+        while (it.hasNext()) {
+            String key = it.next().toString();
+            if (isKey) {
+                list.add(key);
+            } else {
+                list.add(map.get(key));
+            }
+        }
+
+        return list;
     }
 
     private void updateUsersList(){
