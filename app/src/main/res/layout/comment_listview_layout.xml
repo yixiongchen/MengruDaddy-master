@@ -17,7 +17,7 @@
             android:layout_height="50dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
             android:src="@drawable/ic_action_face"/>
@@ -44,7 +44,7 @@
 
             <TextView
                 android:id="@+id/content"
-                android:layout_width="260dp"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="15dp"
@@ -60,8 +60,8 @@
             android:id="@+id/date"
             android:layout_width="56dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="50dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="60dp"
             android:textSize="10sp" />
     </LinearLayout>
 

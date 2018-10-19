@@ -374,6 +374,7 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
 
         //likes
         if(post.likes != null){
+            postViewHolder.likes.setVisibility(View.VISIBLE);
             postViewHolder.likes.setText(Integer.toString(post.likes.keySet().size())+" likes");
         }
         else{

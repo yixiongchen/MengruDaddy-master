@@ -18,7 +18,6 @@
             android:id="@+id/cancle"
             android:text="@string/cancle"
             android:textSize="16sp"
-            android:paddingLeft="10dp"
             android:textColor="@color/black"/>
         <TextView
             android:layout_width="wrap_content"

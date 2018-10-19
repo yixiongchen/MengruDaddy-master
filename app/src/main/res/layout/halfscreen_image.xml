@@ -47,7 +47,6 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:padding="0dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <android.support.v7.widget.CardView
@@ -70,7 +69,6 @@
                         android:textAlignment="center"
                         android:textSize="18sp"
                         android:textColor="@color/textClicked"
-                        android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/filters"/>
@@ -97,7 +95,6 @@
                         android:textAlignment="center"
                         android:textSize="18sp"
                         android:textColor="@color/textClicked"
-                        android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/edit"/>
@@ -124,7 +121,6 @@
                         android:textAlignment="center"
                         android:textSize="18sp"
                         android:textColor="@color/textClicked"
-                        android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/crop"/>
