@@ -96,9 +96,13 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
             public void onDataChange(DataSnapshot dataSnapshot)  {
                 Post post = dataSnapshot.getValue(Post.class);
                 if(post != null){
+                    accesssPostUser(postViewHolder, post.userId);
                     renderPost(postViewHolder, post, i);
                 }
             }
+
+
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -360,7 +364,6 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
         //load post image
         accessPostImage(postViewHolder, post);
 
-
         //username
         postViewHolder.username.setText(post.username);
 
@@ -440,6 +443,32 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
         }
 
         return result.toString();
+    }
+
+
+    /*
+        access the user of the post
+     */
+    private void accesssPostUser(final mainFeedAdapter.postViewHolder postViewHolder, final String userId){
+        //read post from firebase database
+        DatabaseReference postUserRef = database.getReference("users").child(userId);
+
+        //read post info
+        ValueEventListener userListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)  {
+                User user = dataSnapshot.getValue(User.class);
+                postViewHolder.username.setText(user.username);
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        postUserRef.addValueEventListener(userListener);
+
+
     }
 
 

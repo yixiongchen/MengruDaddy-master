@@ -192,12 +192,19 @@ public class ProfileActivity extends AppCompatActivity{
                     //click follow button
                     editFile.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view) {
-                            //add user id to following list
-                            DatabaseReference user_like_list = database.getReference("users/").child(authUser.getUid()).child("following");
-                            String key = user_like_list.push().getKey();
+                            //add user id to following list for authUser
+                            DatabaseReference user_following_list = database.getReference("users/").child(authUser.getUid()).child("following");
+                            String key = user_following_list.push().getKey();
                             HashMap<String, Object> map = new HashMap<>();
                             map.put(key, profileId);
-                            user_like_list.updateChildren(map);
+                            user_following_list.updateChildren(map);
+                            //add user id to follower list for profile user;
+                            DatabaseReference user_follower_list = database.getReference("users/").child(profileId).child("followers");
+                            String followerKey = user_follower_list.push().getKey();
+                            HashMap<String, Object> followermap = new HashMap<>();
+                            followermap.put(followerKey, authUser.getUid());
+                            user_follower_list.updateChildren(followermap);
+
                             editFile.setEnabled(false);
                             editFile.setText("Followed");
                         }

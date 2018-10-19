@@ -133,11 +133,19 @@ public class likeListAdapter extends BaseAdapter {
                     viewHolder.follow.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view) {
                             //add user id to following list
-                            DatabaseReference user_like_list = database.getReference("users/").child(user.Id).child("following");
-                            String key = user_like_list.push().getKey();
+                            DatabaseReference user_following_list = database.getReference("users/").child(user.Id).child("following");
+                            String key = user_following_list.push().getKey();
                             HashMap<String, Object> map = new HashMap<>();
                             map.put(key, like.userId);
-                            user_like_list.updateChildren(map);
+                            user_following_list.updateChildren(map);
+
+                            //add user id to follower list for profile user;
+                            DatabaseReference user_follower_list = database.getReference("users/").child(like.userId).child("followers");
+                            String followerKey = user_follower_list.push().getKey();
+                            HashMap<String, Object> followermap = new HashMap<>();
+                            followermap.put(followerKey, user.Id);
+                            user_follower_list.updateChildren(followermap);
+
                             viewHolder.follow.setEnabled(false);
                             viewHolder.follow.setText("Followed");
                         }});
