@@ -185,7 +185,4 @@ public class LikesListActivity extends AppCompatActivity {
     }
 
 
-
-
-
 }

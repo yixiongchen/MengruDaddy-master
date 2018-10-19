@@ -63,6 +63,9 @@ public class SearchActivity extends AppCompatActivity{
     List<User> userList;
     List<User> allUsers;
 
+    //current user
+    User current = null;
+
 
 
 
@@ -70,24 +73,28 @@ public class SearchActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         Log.d("Search:", "Created Search Activity");
-        //setUpBottomNavigView();
 
         hideSoftKeyboard();
         setUpBottomNavigView();
 
+
         userList = new ArrayList<>();
+
+
+        editTextName = (EditText) findViewById(R.id.search_field);
+        buttonSearch = (ImageButton) findViewById(R.id.search_btn);
 
         mResultList = (RecyclerView)findViewById(R.id.result_list);
         mResultList.setHasFixedSize(true);
         mResultList.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new userListAdapter(this, R.layout.list_layout, userList);
-        mResultList.setAdapter(adapter);
+        //必须在 userList , recycle初始化后才能call adpter
+        RecommandUsers();
 
-        editTextName = (EditText) findViewById(R.id.search_field);
-        buttonSearch = (ImageButton) findViewById(R.id.search_btn);
-
-        mResultList = (RecyclerView) findViewById(R.id.result_list);
+        //adapter = new userListAdapter(this, R.layout.list_layout, userList);
+        //mResultList.setAdapter(adapter);
+        
+        //mResultList = (RecyclerView) findViewById(R.id.result_list);
 
         buttonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,74 +106,47 @@ public class SearchActivity extends AppCompatActivity{
 
     }
 
-    private void initTextListener(){
-        Log.d(TAG, "initTextListener: initializing");
-
-        userList = new ArrayList<>();
-
-        editTextName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                RecommandUsers();
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-    }
 
     private void RecommandUsers(){
         Log.d(TAG,"start to show recommandations");
-        userList.clear();
-        allUsers.clear();
+        final List<User>  allUsers = new ArrayList<>();
 
         DatabaseReference reference = database.getReference("users");
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         final String uId = currentUser.getUid();
-        final User[] current = new User[1];
 
-        Log.d(TAG, "start to search");
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        Log.d(TAG, "start to recommend");
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot singleDataSnapshot: dataSnapshot.getChildren()){
-                    allUsers.add(singleDataSnapshot.getValue(User.class));
-                    if (singleDataSnapshot.getValue(User.class).Id.equals(uId)) {
-                        current[0] = new User(singleDataSnapshot.getValue(User.class).Id,
-                                singleDataSnapshot.getValue(User.class).username,
-                                singleDataSnapshot.getValue(User.class).email,
-                                singleDataSnapshot.getValue(User.class).description,
-                                singleDataSnapshot.getValue(User.class).following,
-                                singleDataSnapshot.getValue(User.class).followers,
-                                singleDataSnapshot.getValue(User.class).posts,
-                                singleDataSnapshot.getValue(User.class).image);
+                    User user = singleDataSnapshot.getValue(User.class);
+                    allUsers.add(user);
+                    if (user.Id.compareTo(uId) == 0) {
+                        current = user;
                     }
                 }
 
+
+                List<String> currentFollow = getListByMap(current.following, false);
+
+                for(int i=0; i< allUsers.size()-1; i++){
+                    if (allUsers.get(i).following != null){
+                    List<String> follow = getListByMap(allUsers.get(i).following, false);
+                    follow.retainAll(currentFollow);
+                    int num = follow.size();
+                    if (num>=2&&!allUsers.get(i).Id.equals(current.Id)){
+                        userList.add(allUsers.get(i));
+                    }}
+                }
+                updateUsersList();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
-
-        List<String> currentFollow = getListByMap(current[0].following, false);
-
-        for(int i=0; i< allUsers.size()-1; i++){
-                List<String> follow = getListByMap(allUsers.get(i).following, false);
-                follow.retainAll(currentFollow);
-                int num = follow.size();
-                if (num>=2&&!allUsers.get(i).Id.equals(current[0].Id)){
-                    userList.add(allUsers.get(i));
-                }
-        }
     }
 
     private void searchForMatch(final String keyword){
