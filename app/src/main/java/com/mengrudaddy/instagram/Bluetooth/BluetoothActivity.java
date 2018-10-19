@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mengrudaddy.instagram.Adapter.DeviceListAdapter;
 import com.mengrudaddy.instagram.Home.MainActivity;
@@ -96,20 +97,39 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: enabling/disabling bluetooth.");
-                enableDisableBT();
+                try {
+                    enableDisableBT();
+                }
+                catch (Exception e){
+                    Toast.makeText(BluetoothActivity.this, "Make sure your device has bluetooth feature.", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         enable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnEnableDisable_Discoverable(v);
+                try {
+                    btnEnableDisable_Discoverable(v);
+                }
+                catch (Exception e){
+                    Toast.makeText(BluetoothActivity.this, "Make sure your device has bluetooth feature.", Toast.LENGTH_SHORT).show();
+
+                }
 
             }
         });
         discover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnDiscover(v);
+                try {
+                    btnDiscover(v);
+
+                }
+                catch (Exception e){
+                    Toast.makeText(BluetoothActivity.this, "Make sure your device has bluetooth feature.", Toast.LENGTH_SHORT).show();
+
+                }
             }
         });
 
@@ -287,7 +307,12 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
         if(mBluetoothAdapter.isEnabled()){
             Log.d(TAG, "enableDisableBT: disabling BT.");
             mBluetoothAdapter.disable();
+            count.setText("Bluetooth switched off.");
+            notify.setText("");
+            mBTDevices.clear();
 
+            mDeviceListAdapter = new DeviceListAdapter(context, R.layout.list_device, mBTDevices);
+            device_list.setAdapter(mDeviceListAdapter);
             IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
             registerReceiver(mBroadcastReceiver1, BTIntent);
         }

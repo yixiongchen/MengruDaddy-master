@@ -33,8 +33,8 @@
     <TextView
         android:id="@+id/label"
         android:layout_marginTop="20dp"
-        android:textSize="20sp"
-        android:text="Transfer photos via bluetooth"
+        android:textSize="16sp"
+        android:text="@string/bluetooth_label"
         android:layout_gravity="center_horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
