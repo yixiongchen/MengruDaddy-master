@@ -192,11 +192,8 @@ public class SearchActivity extends AppCompatActivity{
 
                         //update the users list view
                         updateUsersList();}
- {
 
-
-                    }
-                    if(userList == null){
+                    if(userList.size()==0){
                         Toast.makeText(getApplicationContext(), "Sorry, there is no username \"" + keyword + "\"",
                                 Toast.LENGTH_LONG).show();
                     }
