@@ -198,8 +198,8 @@ public class LocationGetter extends AppCompatActivity implements GoogleApiClient
 
         }
         else {
-            lat_txt.setText("Failed to get your location.");
-            lon_txt.setText("Make sure location is allowed on your device");
+            lat_txt.setText("Try click loaction update button.");
+            lon_txt.setText("Or make sure location is allowed on your device");
         }
     }
 

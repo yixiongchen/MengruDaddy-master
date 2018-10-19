@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                         posts.add(post.Id);
                     }
                     //posts of your followings
-                    else if(user.following.containsValue(post.userId)){
+                    else if(user.following !=null && user.following.containsValue(post.userId)){
                         posts.add(post.Id);
                     }
                     else{
