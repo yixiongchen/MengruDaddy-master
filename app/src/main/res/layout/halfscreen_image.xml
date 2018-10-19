@@ -105,7 +105,7 @@
                 android:id="@+id/func_crop"
                 android:padding="16dp"
                 app:cardBackgroundColor="@color/colorPrimaryDark"
-                android:layout_width="128dp"
+                android:layout_width="137dp"
                 android:layout_height="80dp">
                 <LinearLayout
                     android:orientation="vertical"

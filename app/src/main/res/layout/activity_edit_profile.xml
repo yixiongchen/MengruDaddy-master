@@ -4,28 +4,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
         <!-- toolbar -->
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/title_bar"
-            android:layout_width="match_parent"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimaryDark">
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:background="@color/colorPrimaryDark">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/cancle"
-                android:text="@string/cancle"
-                android:textSize="16sp"
-                android:textColor="@color/black"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="260dp"
-                android:id="@+id/ok"
-                android:text="Done"
-                android:textSize="16sp"
-                android:textColor="@color/black"/>
-        </android.support.v7.widget.Toolbar>
+            android:id="@+id/cancle"
+            android:text="@string/cancle"
+            android:textSize="16sp"
+            android:textColor="@color/black"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="290dp"
+            android:id="@+id/ok"
+            android:text="Done"
+            android:textSize="16sp"
+            android:textColor="@color/black"/>
+    </android.support.v7.widget.Toolbar>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
