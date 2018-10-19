@@ -191,7 +191,7 @@ public class UploadActivity extends AppCompatActivity{
                 Intent intent = new Intent(this, ImageFilter.class);
                 intent.putExtra("picture", path);
                 startActivity(intent);
-                finish();
+                //finish();
             }
         }
         //gallery
@@ -202,7 +202,7 @@ public class UploadActivity extends AppCompatActivity{
                 Intent intent = new Intent(this, ImageFilter.class);
                 intent.putExtra("picture", path);
                 startActivity(intent);
-                finish();
+                //finish();
 
             }
     }

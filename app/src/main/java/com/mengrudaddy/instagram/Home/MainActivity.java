@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                setAdpater();
+                setAdapater();
             }
         });
 
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         // 2. load posts by date from database, and then do some filters
         // 3. setting adpater for recycle view
         //read user info
-        setAdpater();
+        setAdapater();
 
 
     }
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        postsRef.orderByChild("date").addValueEventListener(postListener);
+        postsRef.orderByChild("date").addListenerForSingleValueEvent(postListener);
         mPostsListener = postListener;
 
     }
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
     /*
         Set adapter for posts
      */
-    public void setAdpater(){
+    public void setAdapater(){
         ValueEventListener userListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        userRef.addListenerForSingleValueEvent(userListener);
+        userRef.addValueEventListener(userListener);
         mUserListener = userListener;
 
     }
