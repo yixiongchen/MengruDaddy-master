@@ -6,7 +6,6 @@
     android:layout_gravity="center_horizontal"
     android:orientation="vertical"
     tools:context="com.mengrudaddy.instagram.utils.LocationGetter">
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/title_bar"
         android:layout_width="match_parent"
@@ -24,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="290dp"
+            android:layout_marginLeft="260dp"
             android:id="@+id/ok"
             android:text="Done"
             android:textSize="16sp"
@@ -51,22 +50,24 @@
 
 
     <Button
-        android:id="@+id/buttonOff"
-        android:layout_width="300dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center"
+        android:id="@+id/discover"
+        android:text="@string/on"
         android:layout_marginTop="40dp"
+        android:layout_width="300dp"
+        android:layout_gravity="center"
+        android:layout_height="30dp"
         android:background="@drawable/check_border"
-        android:text="@string/on" />
+        />
 
     <Button
-        android:id="@+id/findDiscoverableDevices"
-        android:layout_width="300dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center"
+        android:id="@+id/on"
+        android:text="@string/dicover"
         android:layout_marginTop="20dp"
+        android:layout_width="300dp"
+        android:layout_gravity="center"
+        android:layout_height="30dp"
         android:background="@drawable/check_border"
-        android:text="find discoverable devices" />
+        />
     <Button
         android:id="@+id/choose"
         android:text="@string/choose_from_album"
@@ -77,19 +78,5 @@
         android:background="@drawable/check_border"
         />
 
-    <Button
-        android:id="@+id/viewPairedDevices"
-        android:layout_width="300dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/check_border"
-        android:text="View Paired Devices" />
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/pairedDevicesListView"
-        android:layout_below="@+id/viewPairedDevices"
-        android:layout_alignParentStart="true" />
 </LinearLayout>

@@ -86,7 +86,7 @@ public class SearchActivity extends AppCompatActivity{
         });
 
     }
-    
+
     private void initTextListener(){
         Log.d(TAG, "initTextListener: initializing");
 
