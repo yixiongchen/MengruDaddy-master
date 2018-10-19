@@ -20,7 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.mengrudaddy.instagram.Adapter.likeListAdapter;
+import com.mengrudaddy.instagram.Adapter.followerUserAdapter;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
@@ -40,7 +40,7 @@ public class FollowerListActivity extends AppCompatActivity {
     private FirebaseDatabase database;
     private DatabaseReference userRef,followingRef;
     private ValueEventListener mUserListener, mFollowingListener;
-    private likeListAdapter adapter;
+    private followerUserAdapter adapter;
     private ListView listView;
     private String[] likeIdList;
     private String uID;
@@ -76,7 +76,6 @@ public class FollowerListActivity extends AppCompatActivity {
             finish();
         }
         //userId path
-        uID = authUser.getUid();
         String indexPath = "users/"+authUser.getUid();
         userRef = database.getReference(indexPath);
         //access use profile and set up adpater
@@ -161,18 +160,18 @@ public class FollowerListActivity extends AppCompatActivity {
      */
     private void accessPostProfile(){
         //read post info
-        followingRef = database.getReference("users/"+uID+"/follower");
+        followingRef = database.getReference("users/"+uID+"/followers");
         final ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
-                ArrayList<String> likes = new ArrayList<>();
+                ArrayList<String> follower = new ArrayList<>();
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    String likeId = ds.getValue(String.class);
-                    likes.add(likeId);
+                    String uid = ds.getValue(String.class);
+                    follower.add(uid);
                 }
-                Object[] objNames = likes.toArray();
+                Object[] objNames = follower.toArray();
                 String[] list = Arrays.copyOf(objNames, objNames.length, String[].class);
-                adapter = new likeListAdapter(getApplicationContext(), list, user);
+                adapter = new followerUserAdapter(getApplicationContext(), list, user);
                 listView.setAdapter(adapter);
 
             }

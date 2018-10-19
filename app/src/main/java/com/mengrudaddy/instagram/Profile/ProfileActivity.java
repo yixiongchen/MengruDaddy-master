@@ -165,7 +165,7 @@ public class ProfileActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, FollowingListActivity.class);
-                intent.putExtra("uId",authUser.getUid());
+                intent.putExtra("uId",profileId);
                 startActivity(intent);
             }
         });
@@ -173,7 +173,7 @@ public class ProfileActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, FollowerListActivity.class);
-                intent.putExtra("uId",authUser.getUid());
+                intent.putExtra("uId",profileId);
                 startActivity(intent);
             }
         });

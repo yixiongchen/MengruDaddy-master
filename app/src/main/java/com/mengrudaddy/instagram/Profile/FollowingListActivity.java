@@ -20,7 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.mengrudaddy.instagram.Adapter.likeListAdapter;
+import com.mengrudaddy.instagram.Adapter.followingUserAdapter;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
@@ -40,7 +40,7 @@ public class FollowingListActivity extends AppCompatActivity {
     private FirebaseDatabase database;
     private DatabaseReference userRef,followingRef;
     private ValueEventListener mUserListener, mFollowingListener;
-    private likeListAdapter adapter;
+    private followingUserAdapter adapter;
     private ListView listView;
     private String[] likeIdList;
     private String uID;
@@ -76,7 +76,7 @@ public class FollowingListActivity extends AppCompatActivity {
             finish();
         }
         //userId path
-        uID = authUser.getUid();
+
         String indexPath = "users/"+authUser.getUid();
         userRef = database.getReference(indexPath);
         //access use profile and set up adpater
@@ -165,14 +165,14 @@ public class FollowingListActivity extends AppCompatActivity {
         final ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
-                ArrayList<String> likes = new ArrayList<>();
+                ArrayList<String> following = new ArrayList<>();
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    String likeId = ds.getValue(String.class);
-                    likes.add(likeId);
+                    String uid = ds.getValue(String.class);
+                    following.add(uid);
                 }
-                Object[] objNames = likes.toArray();
+                Object[] objNames = following.toArray();
                 String[] list = Arrays.copyOf(objNames, objNames.length, String[].class);
-                adapter = new likeListAdapter(getApplicationContext(), list, user);
+                adapter = new followingUserAdapter(getApplicationContext(), list, user);
                 listView.setAdapter(adapter);
 
             }
