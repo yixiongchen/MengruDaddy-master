@@ -15,10 +15,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -31,7 +29,6 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.mengrudaddy.instagram.Adapter.ViewPagerAdapter;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.Permission;
 
@@ -48,10 +45,6 @@ public class UploadActivity extends AppCompatActivity{
 
     private static final int VERIFY_PERMISSIONS_REQUEST = 1;
 
-    private ViewPager viewPager;
-    ConstraintLayout constraintLayout;
-    AlbumFragment albumFragment;
-    PhotoFragment photoFragment;
     TabLayout tabLayout;
 
     private Uri imageUri;
@@ -207,15 +200,6 @@ public class UploadActivity extends AppCompatActivity{
             }
     }
 
-
-    private void setUpViewPager(ViewPager vp){
-        ViewPagerAdapter adpter = new ViewPagerAdapter(getSupportFragmentManager());
-        albumFragment = new AlbumFragment();
-        photoFragment = new PhotoFragment();
-        adpter.addFragment(albumFragment,"Library");
-        adpter.addFragment(photoFragment,"Photo");
-        vp.setAdapter(adpter);
-    }
 
 
     /**
