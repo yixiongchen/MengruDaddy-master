@@ -27,7 +27,7 @@ import java.util.UUID;
 
 public class BluetoothActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private static final String TAG = "BluetoothActivity";
-    private TextView btn_cancle,btn_ok,count;
+    private TextView btn_cancle,btn_ok,count,notify;
     private Context context = BluetoothActivity.this;
 
     private BluetoothAdapter mBluetoothAdapter;
@@ -74,6 +74,8 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
         enable = (Button) findViewById(R.id.enable_discovered);
         discover = (Button) findViewById(R.id.discover) ;
         count = (TextView)findViewById(R.id.count) ;
+        notify = (TextView)findViewById(R.id.notification) ;
+
         device_list = (ListView) findViewById(R.id.devices_list);
         mBTDevices = new ArrayList<>();
 
@@ -203,6 +205,7 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
                     mBTDevices.add(device);
                 }
                 count.setText("Total "+mBTDevices.size()+" devices found.");
+                notify.setText("Click device item to pair.");
                 Log.d(TAG, "onReceive: " + device.getName() + ": " + device.getAddress());
                 mDeviceListAdapter = new DeviceListAdapter(context, R.layout.list_device, mBTDevices);
                 device_list.setAdapter(mDeviceListAdapter);
