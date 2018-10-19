@@ -137,17 +137,27 @@ public class SearchActivity extends AppCompatActivity{
 
                 List<String> currentFollow = getListByMap(current.following, false);
 
-                for(int i=0; i< allUsers.size()-1; i++){
+                for(int i=0; i< allUsers.size(); i++){
                     if (allUsers.get(i).following != null&current.following != null){
                     List<String> follow = getListByMap(allUsers.get(i).following, false);
                     follow.retainAll(currentFollow);
                     int num = follow.size();
+                    //for debug test
+//                    String n = allUsers.get(i).username;
+//                    String m = current.username;
+//                    String iid = current.Id;
                     if ((num>=2&!allUsers.get(i).username.equals(current.username))&
                             !allUsers.get(i).following.containsValue(current.Id)){
                         userList.add(allUsers.get(i));
                     }}
                 }
                 updateUsersList();
+
+                if (userList.size()==0){
+                    Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
+                                    " for you.",
+                            Toast.LENGTH_LONG).show();
+                }
                 }else{
 
                     Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
