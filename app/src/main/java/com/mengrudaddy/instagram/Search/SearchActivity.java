@@ -79,11 +79,6 @@ public class SearchActivity extends AppCompatActivity{
     //current user
     User current = null;
 
-
-
-
-
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
@@ -152,27 +147,63 @@ public class SearchActivity extends AppCompatActivity{
                     List<String> follow = getListByMap(allUsers.get(i).following, false);
                     follow.retainAll(currentFollow);
                     int num = follow.size();
-                    //for debug test
-//                    String n = allUsers.get(i).username;
-//                    String m = current.username;
-//                    String iid = current.Id;
                     if ((num>=2 && !allUsers.get(i).username.equals(current.username)) &&
                             !allUsers.get(i).following.containsValue(current.Id)){
                         userList.add(allUsers.get(i));
                     }}
                 }
+
                 updateUsersList();
 
                 if (userList.size()==0){
-                    Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
-                                    " for you.",
-                            Toast.LENGTH_LONG).show();
+                    Log.d(TAG,"recommend popular users for new users");
+                    userList.clear();
+                    DatabaseReference reference = database.getReference("users");
+                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            HashMap<User, Integer> suggested = new HashMap<>();
+                            for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
+
+                                User user = singleSnapshot.getValue(User.class);
+                                if(user.followers!=null){
+                                    suggested.put(user, user.followers.keySet().size());
+                                }
+                                else{
+                                    suggested.put(user, 0);
+                                }
+                            }
+                            HashMap<User, Integer> sortedMap = sortByValue(suggested);
+
+
+                            userList = new ArrayList<>(sortedMap.keySet());
+                            Collections.reverse(userList);
+
+                            for(int i =0 ; i<userList.size(); i++) {
+                                if(userList.get(i).username.equals(current.username)){
+                                    userList.remove(i);
+                                }
+                            }
+
+
+                            //update the users list view
+                            updateUsersList();
+                            headtitle.setText("Popular users");
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
                 }else{
 
                     Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
-                                    " for you. Please make more friends!",
-                            Toast.LENGTH_LONG).show();
+                                    " for you. You can make                    some friends from the popular list!",
+                    Toast.LENGTH_LONG).show();
 
                 }
             }
@@ -188,42 +219,15 @@ public class SearchActivity extends AppCompatActivity{
         userList.clear();
 
         DatabaseReference reference = database.getReference("users");
-        //if keywords is empty, show the most popular users by number of followers
-        if(keyword.length() ==0){
 
-            Log.d(TAG,"null input");
-            reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    HashMap<User, Integer> suggested = new HashMap<>();
-                    for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
+        if(keyword.isEmpty()) {
 
-                        User user = singleSnapshot.getValue(User.class);
-                        if(user.followers!=null){
-                            suggested.put(user, user.followers.keySet().size());
-                        }
-                        else{
-                            suggested.put(user, 0);
-                        }
-                    }
-                    HashMap<User, Integer> sortedMap = sortByValue(suggested);
+            Log.d(TAG, "null input");
+            Toast.makeText(getApplicationContext(), "The search bar should not be empty", Toast.LENGTH_LONG).show();
 
-                    userList = new ArrayList<>(sortedMap.keySet());
-                    Collections.reverse(userList);
-                    //update the users list view
-                    updateUsersList();
-                    headtitle.setText("Popular users");
+            //search key is not empty
 
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-        //search key is not empty
-        else{
+        }else{
 
             Log.d(TAG,"Search for the text");
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -277,23 +281,6 @@ public class SearchActivity extends AppCompatActivity{
         headtitle.setText("Search result");
 
 
-    }
-
-    public void showMyToast(final Toast toast, final int cnt) {
-        final Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                toast.show();
-            }
-        }, 0, 3000);
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                toast.cancel();
-                timer.cancel();
-            }
-        }, cnt );
     }
 
 

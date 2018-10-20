@@ -22,34 +22,26 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="290dp"
+            android:layout_marginLeft="285dp"
             android:id="@+id/ok"
             android:text="Done"
             android:textSize="16sp"
             android:textColor="@color/black"/>
     </android.support.v7.widget.Toolbar>
 
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="300dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_action_bluetooth"
-        />
 
     <TextView
         android:id="@+id/label"
         android:layout_marginTop="20dp"
-        android:textSize="20sp"
-        android:text="Transfer photos via bluetooth"
+        android:textSize="16sp"
+        android:text="@string/bluetooth_label"
         android:layout_gravity="center_horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
 
     <Button
-        android:id="@+id/discover"
+        android:id="@+id/on"
         android:text="@string/on"
         android:layout_marginTop="40dp"
         android:layout_width="300dp"
@@ -57,16 +49,59 @@
         android:layout_height="30dp"
         android:background="@drawable/check_border"
         />
-
-    <Button
-        android:id="@+id/on"
-        android:text="@string/dicover"
-        android:layout_marginTop="20dp"
+    <LinearLayout
         android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_gravity="center"
-        android:layout_height="30dp"
-        android:background="@drawable/check_border"
-        />
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:id="@+id/discover"
+            android:text="@string/dicover"
+            android:layout_width="130dp"
+            android:layout_gravity="center"
+            android:layout_height="30dp"
+            android:textSize="12sp"
+            android:background="@drawable/check_border" />
+        <Button
+            android:id="@+id/enable_discovered"
+            android:text="@string/enable"
+            android:layout_marginLeft="40dp"
+            android:layout_width="130dp"
+            android:layout_gravity="center"
+            android:layout_height="30dp"
+            android:textSize="12sp"
+            android:background="@drawable/check_border"
+            />
+    </LinearLayout>
+    <ListView
+        android:layout_marginTop="30dp"
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:id="@+id/devices_list"/>
+    <TextView
+        android:id="@+id/count"
+        android:layout_marginTop="3dp"
+        android:textSize="12sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No deviced found"
+        android:textColor="@color/textClicked"
+        android:gravity="center"/>
+    <TextView
+        android:id="@+id/notification"
+        android:layout_marginTop="3dp"
+        android:textSize="12sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/textClicked"
+        android:gravity="center"/>
+    <!--
     <Button
         android:id="@+id/choose"
         android:text="@string/choose_from_album"
@@ -76,6 +111,7 @@
         android:layout_height="30dp"
         android:background="@drawable/check_border"
         />
+        -->
 
 
 </LinearLayout>

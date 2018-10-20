@@ -21,6 +21,8 @@
     <!-- String about activity_bluetooth>-->
     <string name="dicover">Discover Nearby</string>
     <string name="on">On/Off</string>
+    <string name="enable">Enable Discoverd</string>
+    <string name="bluetooth_label">Bluetooth Discover and Pair</string>
 
     <!-- String about activity_search>-->
     <string name="nofriends">Sorry, we cannot recommend friends for you. Please make more friends!</string>

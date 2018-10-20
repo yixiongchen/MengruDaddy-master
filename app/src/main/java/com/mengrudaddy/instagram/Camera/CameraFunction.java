@@ -5,10 +5,9 @@ package com.mengrudaddy.instagram.Camera;
  */
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -61,4 +60,5 @@ public class CameraFunction extends AppCompatActivity {
         Bitmap bitmap =(Bitmap)data.getExtras().get("data");
         imageView.setImageBitmap(bitmap);
     }
+
 }

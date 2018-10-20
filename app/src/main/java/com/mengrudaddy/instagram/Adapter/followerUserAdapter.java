@@ -22,38 +22,32 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.mengrudaddy.instagram.Models.Event;
-import com.mengrudaddy.instagram.Models.Like;
-import com.mengrudaddy.instagram.Models.Reminder;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.squareup.picasso.Picasso;
 
-
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 
-public class likeListAdapter extends BaseAdapter {
+public class followerUserAdapter extends BaseAdapter {
 
 
-    private String[] likeIds,userIds;
+    private String[] followerIds,userIds;
     private final Context mContext;
-    private User user, likeUser;
-    private final String TAG ="LikeListAdapter::";
+    private User user, followerUser;
+    private static final String TAG = "followerUserAdapter";
     private FirebaseDatabase database;
-    private Like like;
-
+    private DatabaseReference followerRef,userRef;
     private FirebaseStorage storage;
 
+    private User itemUser;
 
 
-    public likeListAdapter (Context context, String[] likeIds, User user){
-        this.likeIds = likeIds;
+    public followerUserAdapter (Context context, String[] followerIds, User user){
+        this.followerIds = followerIds;
         this.mContext = context;
         this.user = user;
-        userIds = new String[this.likeIds.length];
+        userIds = new String[this.followerIds.length];
         storage = FirebaseStorage.getInstance();
     }
 
@@ -61,7 +55,7 @@ public class likeListAdapter extends BaseAdapter {
     // 2
     @Override
     public int getCount() {
-        return likeIds.length;
+        return followerIds.length;
     }
 
     // 3
@@ -81,9 +75,11 @@ public class likeListAdapter extends BaseAdapter {
     // 5
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final String id = this.likeIds[position];
+        final String id = this.followerIds[position];
 
         final int index = position;
+
+
 
 
         //2
@@ -96,39 +92,37 @@ public class likeListAdapter extends BaseAdapter {
             final Button follow = (Button)convertView.findViewById(R.id.follow);
             final ProgressBar progressBar = (ProgressBar)convertView.findViewById(R.id.progressBar);
 
-            final likeListAdapter.ViewHolder viewHolder = new likeListAdapter.ViewHolder(imageView,username, follow,progressBar);
+            final followerUserAdapter.ViewHolder viewHolder = new followerUserAdapter.ViewHolder(imageView,username, follow,progressBar);
             convertView.setTag(viewHolder);
         }
-        final likeListAdapter.ViewHolder viewHolder = (likeListAdapter.ViewHolder)convertView.getTag();
+        final followerUserAdapter.ViewHolder viewHolder = (followerUserAdapter.ViewHolder)convertView.getTag();
 
         //load likeId object
         //real time database
         database = FirebaseDatabase.getInstance();
-        DatabaseReference likeRef = database.getReference("likes").child(id);
+        followerRef = database.getReference("users").child(id);
 
 
         //read user info
         ValueEventListener likeListener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)  {
-                like = dataSnapshot.getValue(Like.class);
-                //access username
-                accessUsername(viewHolder, like.userId);
-                //access profile image
-                accessProfileImage(viewHolder, like.userId);
-                userIds[index] = like.userId;
+            public void onDataChange(final DataSnapshot dataSnapshot)  {
+                itemUser = dataSnapshot.getValue(User.class);
 
-                //set views
+                //access username
+                accessUsername(viewHolder);
+                //access profile image
+                accessProfileImage(viewHolder);
+                userIds[index] = itemUser.Id;
+
                 //user is AuthUser
-                if(user.Id.compareTo(like.userId)==0){
+                if(user.Id.compareTo(itemUser.Id)==0){
                     viewHolder.follow.setVisibility(View.GONE);
                 }
-
                 // user is not in the following
-                if(user.following != null && user.following.containsValue(like.userId)){
+                if(user.following != null && user.following.containsValue(itemUser.Id)){
                     viewHolder.follow.setEnabled(false);
                     viewHolder.follow.setText("Followed");
-
                 }
                 // user is not in the following
                 else{
@@ -142,22 +136,14 @@ public class likeListAdapter extends BaseAdapter {
                             String key = user_following_list.push().getKey();
                             HashMap<String, Object> map = new HashMap<>();
                             map.put(key,userIds[Integer.parseInt(viewHolder.follow.getTag().toString())]);
-                            //map.put(key, like.userId);
                             user_following_list.updateChildren(map);
 
                             //add user id to follower list for profile user;
-                            DatabaseReference user_follower_list = database.getReference("users/").child(like.userId).child("followers");
+                            DatabaseReference user_follower_list = database.getReference("users/").child(itemUser.Id).child("followers");
                             String followerKey = user_follower_list.push().getKey();
                             HashMap<String, Object> followermap = new HashMap<>();
                             followermap.put(followerKey, user.Id);
                             user_follower_list.updateChildren(followermap);
-
-
-                            //update event notification
-                            updateEvent(user, like);
-
-                            //update reminder notification
-
 
                             viewHolder.follow.setEnabled(false);
                             viewHolder.follow.setText("Followed");
@@ -168,7 +154,7 @@ public class likeListAdapter extends BaseAdapter {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        likeRef.addListenerForSingleValueEvent(likeListener);
+        followerRef.addListenerForSingleValueEvent(likeListener);
 
         return convertView;
     }
@@ -197,14 +183,14 @@ public class likeListAdapter extends BaseAdapter {
     /*
         read username from user profile
      */
-    public void accessUsername(final likeListAdapter.ViewHolder viewHolder, final String userId){
-        DatabaseReference userRef = database.getReference("users").child(userId);
+    public void accessUsername(final followerUserAdapter.ViewHolder viewHolder){
+        userRef = database.getReference("users").child(itemUser.Id);
         //read user info
         ValueEventListener userListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
-                likeUser = dataSnapshot.getValue(User.class);
-                viewHolder.username.setText(likeUser.username);
+                followerUser = dataSnapshot.getValue(User.class);
+                viewHolder.username.setText(followerUser.username);
 
             }
             @Override
@@ -217,8 +203,8 @@ public class likeListAdapter extends BaseAdapter {
     /*
        load profile image
     */
-    public void accessProfileImage(final likeListAdapter.ViewHolder viewHolder, final String userId){
-        StorageReference profile_pic_ref = storage.getReference("profile_pic/"+userId);
+    public void accessProfileImage(final followerUserAdapter.ViewHolder viewHolder){
+        StorageReference profile_pic_ref = storage.getReference("profile_pic/"+itemUser.Id);
 
         profile_pic_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -243,62 +229,10 @@ public class likeListAdapter extends BaseAdapter {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 viewHolder.progressBar.setVisibility(View.GONE);
-                viewHolder.imageViewPhoto.setImageResource(R.drawable.ic_action_face);
                 Log.d(TAG, "Can not download file, please check connection");
             }
         });
     }
-
-
-
-    private void updateEvent(final User user,  final Like like ){
-        //event notification updates
-        Date date = new Date();
-        DatabaseReference eventRef  = database.getReference("events/");
-        String eventId = eventRef.push().getKey();
-        HashMap<String, String> action = new HashMap<>();
-        action.put("userId", user.Id);
-        action.put("type", "follow");
-        Event eventObject  = new Event(eventId, action, date);
-        eventRef.child(eventId).setValue(eventObject);
-        //add eventId to the list of target user
-        DatabaseReference eventListRef = database.getReference("users/"+like.userId+"/"+"events");
-        String event_list_key = eventListRef.push().getKey();
-        Map<String, Object> updateEventList = new HashMap<>();
-        updateEventList.put(event_list_key,eventId);
-        eventListRef.updateChildren(updateEventList);
-    }
-
-    /*
-        Activity Feed: update reminder for all the followers
-     */
-    public void updateReminder(final User user, final Like like){
-        Date date = new Date();
-        //update a like notification for reminder
-        //create a new Reminder
-        DatabaseReference reminderRef = database.getReference("reminders/");
-        final String reminderId = reminderRef.push().getKey();
-        HashMap<String, String> action = new HashMap<>();
-        action.put("actionUserId", user.Id); //who
-        action.put("targetUserId", like.userId); //on whom
-        action.put("type", "follow");
-        //action.put("content", content);
-        Reminder reminder = new Reminder(reminderId, action, date);
-        reminderRef.child(reminderId).setValue(reminder);
-        if(user.followers != null){
-            //for each follower, update it reminder list
-            for(String follower_key : user.followers.keySet()){
-                String follower_id = user.followers.get(follower_key);
-                DatabaseReference reminderListRef = database.getReference("users/"+follower_id+"/"+"reminders");
-                String reminder_key = reminderListRef.push().getKey();
-                Map<String, Object> updateReminderList = new HashMap<>();
-                updateReminderList.put(reminder_key, reminderId);
-                reminderListRef.updateChildren(updateReminderList);
-            }
-        }
-    }
-
-
 
 
 

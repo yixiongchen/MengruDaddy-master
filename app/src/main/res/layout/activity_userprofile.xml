@@ -104,19 +104,23 @@
                 android:id="@+id/relLayout3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
                 android:layout_below="@+id/description_container"
                 android:layout_marginBottom="50dp"
                 android:layout_marginTop="20dp">
+
                 <GridView
                     android:id="@+id/gridView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
                     android:gravity="center"
-                    android:numColumns="3"
-                    android:horizontalSpacing="5dp"
+                    android:horizontalSpacing="2dp"
+                    android:numColumns="4"
                     android:stretchMode="columnWidth"
-                    android:verticalSpacing="10dp">
-                </GridView>
+                    android:verticalSpacing="3dp"></GridView>
             </RelativeLayout>
             <ProgressBar
                 android:id="@+id/progressBar"
