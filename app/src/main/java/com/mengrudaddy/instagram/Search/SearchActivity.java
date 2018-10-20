@@ -142,22 +142,24 @@ public class SearchActivity extends AppCompatActivity{
 
                 List<String> currentFollow = getListByMap(current.following, false);
 
-                for(int i=0; i< allUsers.size(); i++){
+                    for(int i=0; i< allUsers.size(); i++){
                     if (allUsers.get(i).following != null && current.following != null){
-                    List<String> follow = getListByMap(allUsers.get(i).following, false);
-                    follow.retainAll(currentFollow);
-                    int num = follow.size();
-                    if ((num>=2 && !allUsers.get(i).username.equals(current.username)) &&
-                            !allUsers.get(i).following.containsValue(current.Id)){
-                        userList.add(allUsers.get(i));
-                    }}
+                        List<String> follow = getListByMap(allUsers.get(i).following, false);
+                        follow.retainAll(currentFollow);
+                        int num = follow.size();
+                        if ((num>=2 && !allUsers.get(i).username.equals(current.username)) &&
+                                !current.following.containsValue(allUsers.get(i).Id)){
+                            userList.add(allUsers.get(i));
+                        }
+                    }
                 }
 
                 updateUsersList();
 
                 if (userList.size()==0){
                     Log.d(TAG,"recommend popular users for new users");
-                    userList.clear();
+                    headtitle.setText("Popular users");
+                    //userList.clear();
                     DatabaseReference reference = database.getReference("users");
                     reference.addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -165,8 +167,8 @@ public class SearchActivity extends AppCompatActivity{
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             HashMap<User, Integer> suggested = new HashMap<>();
                             for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
-
                                 User user = singleSnapshot.getValue(User.class);
+
                                 if(user.followers!=null){
                                     suggested.put(user, user.followers.keySet().size());
                                 }
@@ -189,7 +191,6 @@ public class SearchActivity extends AppCompatActivity{
 
                             //update the users list view
                             updateUsersList();
-                            headtitle.setText("Popular users");
 
                         }
 
@@ -236,15 +237,25 @@ public class SearchActivity extends AppCompatActivity{
                     for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
                         Log.d(TAG, "onDataChange: found user:" + singleSnapshot.getValue(User.class).toString());
                         String name = singleSnapshot.getValue(User.class).username.toLowerCase();
-
+                        String email = singleSnapshot.getValue(User.class).email.toLowerCase();
+                        //check for usernames
                         if(name.toLowerCase().contains(keyword) || keyword.contains(name)
                                 || name.equals(keyword)){
                             userList.add(singleSnapshot.getValue(User.class));
+                        }
+                        //check for email
+                        else if(email.contains(keyword) || keyword.contains(email) || email.equals(keyword)){
+                            userList.add(singleSnapshot.getValue(User.class));
+                        }
+
+                        else{
+                            //do nothing
                         }
 
                     }
                     //update the users list view
                     updateUsersList();
+                    headtitle.setText("Search result");
                 }
 
                 @Override
@@ -278,7 +289,7 @@ public class SearchActivity extends AppCompatActivity{
         adapter = new userListAdapter(SearchActivity.this, R.layout.list_layout, userList);
 
         mResultList.setAdapter(adapter);
-        headtitle.setText("Search result");
+
 
 
     }

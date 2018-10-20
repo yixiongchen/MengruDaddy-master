@@ -49,12 +49,17 @@ public class userListAdapter extends RecyclerView.Adapter<userListAdapter.userVi
     public void onBindViewHolder(@NonNull userViewHolder userViewHolder, final int i) {
         final User user = userList.get(i);
 
+        if(i <= 2){
+            userViewHolder.popularView.setVisibility(View.VISIBLE);
+        }
+
         userViewHolder.textViewUsername.setText(user.username);
         userViewHolder.textViewEmail.setText(user.email);
 //        Glide.with(mCtx).load(user.image).into(userViewHolder.imageView);
 
         //load profile image
         accessProfileImage(userViewHolder, user);
+
         userViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,7 +79,7 @@ public class userListAdapter extends RecyclerView.Adapter<userListAdapter.userVi
 
     public class userViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView imageView;
+        ImageView imageView, popularView;
         TextView textViewUsername, textViewEmail;
         ProgressBar progressBar;
 
@@ -85,6 +90,9 @@ public class userListAdapter extends RecyclerView.Adapter<userListAdapter.userVi
             textViewUsername = itemView.findViewById(R.id.name_text);
             textViewEmail = itemView.findViewById(R.id.email_text);
             progressBar = itemView.findViewById(R.id.progressBar);
+            popularView = itemView.findViewById(R.id.popularView);
+
+            popularView.setVisibility(View.GONE);
 
         }
     }
@@ -94,35 +102,41 @@ public class userListAdapter extends RecyclerView.Adapter<userListAdapter.userVi
     */
     public void accessProfileImage(final userListAdapter.userViewHolder viewHolder, User user){
         StorageReference profile_pic_ref = storage.getReference("profile_pic/"+user.Id);
+        if (user.image != null) {
+            profile_pic_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    //picasso lib load remote image
+                    Picasso.with(mCtx).load(uri.toString()).into(viewHolder.imageView,
+                            new com.squareup.picasso.Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    viewHolder.progressBar.setVisibility(View.GONE);
+                                    //do smth when picture is loaded successfully
+                                    //viewHolder.progressBar.setVisibility(View.GONE);
+                                }
+                                @Override
+                                public void onError() {
+                                    viewHolder.progressBar.setVisibility(View.GONE);
+                                    //do smth when there is picture loading error
+                                    //viewHolder.progressBar.setVisibility(View.GONE);
+                                }
+                            });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    viewHolder.progressBar.setVisibility(View.GONE);
+                    //viewHolder.progressBar.setVisibility(View.GONE);
+                    //Log.d(TAG, "Can not download file, please check connection");
+                }
+            });
 
-        profile_pic_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                //picasso lib load remote image
-                Picasso.with(mCtx).load(uri.toString()).into(viewHolder.imageView,
-                        new com.squareup.picasso.Callback() {
-                            @Override
-                            public void onSuccess() {
-                                viewHolder.progressBar.setVisibility(View.GONE);
-                                //do smth when picture is loaded successfully
-                                //viewHolder.progressBar.setVisibility(View.GONE);
-                            }
-                            @Override
-                            public void onError() {
-                                viewHolder.progressBar.setVisibility(View.GONE);
-                                //do smth when there is picture loading error
-                                //viewHolder.progressBar.setVisibility(View.GONE);
-                            }
-                        });
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                viewHolder.progressBar.setVisibility(View.GONE);
-                //viewHolder.progressBar.setVisibility(View.GONE);
-                //Log.d(TAG, "Can not download file, please check connection");
-            }
-        });
+        }
+        else{
+            viewHolder.progressBar.setVisibility(View.GONE);
+        }
+
     }
 
 }

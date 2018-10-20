@@ -36,6 +36,7 @@ import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -61,6 +62,12 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipe;
     private ImageView bluetooth;
+
+    private static final int requestDate = 0;
+    private static final int requestLocation = 1;
+
+    private int FeedType = requestDate;
+
 
 
 
@@ -124,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
     /*
         load posts from database
      */
-    public void accessPosts(){
+    public void accessPostsByDate(){
 
         //read user info
         ValueEventListener postListener = new ValueEventListener() {
@@ -158,8 +165,65 @@ public class MainActivity extends AppCompatActivity {
         };
         postsRef.orderByChild("date").addListenerForSingleValueEvent(postListener);
         mPostsListener = postListener;
-
     }
+
+
+    /*
+        load posts from database
+     */
+    public void accessPostsByLocation(){
+
+        //read user info
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)  {
+                posts = new ArrayList<>();
+                HashMap<String, Integer> locationMap = new HashMap<>();
+                for(DataSnapshot postShot :  dataSnapshot.getChildren()){
+                    Post post  = postShot.getValue(Post.class);
+                    //your posts
+                    if(post.userId.compareTo(user.Id)==0){
+                        posts.add(post.Id);
+                        if(post.location == null){
+
+                        }
+                        else{
+                            Double latitude = post.location.get("latitude");
+                            Double longitude = post.location.get("longitude");
+
+
+                        }
+                    }
+                    //posts of your followings
+                    else if(user.following !=null && user.following.containsValue(post.userId)){
+                        posts.add(post.Id);
+                    }
+                    else{
+                        continue;
+                    }
+                }
+                //sort by the nearest date;
+
+
+
+                mainFeedAdapter adapter = new mainFeedAdapter(MainActivity.this, posts, user);
+                recyclerView.setAdapter(adapter);
+                swipe.setRefreshing(false);
+                swipe.setEnabled(true);
+                //start refresh
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+        postsRef.orderByChild("date").addListenerForSingleValueEvent(postListener);
+        mPostsListener = postListener;
+    }
+
+
+
+
+
 
     /*
         Set adapter for posts
@@ -170,7 +234,13 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot)  {
                 user = dataSnapshot.getValue(User.class);
                 //access posts
-                accessPosts();
+                if(FeedType == requestDate){
+                    accessPostsByDate();
+                }
+                else{
+                    accessPostsByLocation();
+                }
+
                 //setting recycleView for adapter
 
             }

@@ -40,7 +40,7 @@
         android:layout_toStartOf="@+id/search_btn"
         android:ems="10"
         android:fontFamily="@font/nunito_semibold"
-        android:hint="Search username here"
+        android:hint="Search user here"
         android:inputType="textPersonName"
         android:paddingBottom="10dp"
         android:paddingLeft="20dp"
