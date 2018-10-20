@@ -238,7 +238,7 @@ public class youTabAdapter extends RecyclerView.Adapter<youTabAdapter.userViewHo
     private void handleFollow(final youTabAdapter.userViewHolder viewHolder, final String userId,
                               final User user){
         //in following list
-        if(user.following.containsValue(userId)){
+        if(user.following!=null && user.following.containsValue(userId)){
             viewHolder.follow.setText("followed");
             viewHolder.follow.setEnabled(false);
         }
