@@ -225,6 +225,7 @@ public class CommentsListActivity extends AppCompatActivity {
                         updateEventList.put(event_list_key,eventId);
                         eventListRef.updateChildren(updateEventList);
                     }
+
                     //update a comment notification for reminder
                     //create a new Reminder
                     DatabaseReference reminderRef = database.getReference("reminders/");
@@ -238,13 +239,15 @@ public class CommentsListActivity extends AppCompatActivity {
                     Reminder reminder = new Reminder(reminderId, action, date);
                     reminderRef.child(reminderId).setValue(reminder);
                     //for each follower, update it reminder list
-                    for(String follower_key : user.followers.keySet()){
-                        String follower_id = user.followers.get(follower_key);
-                        DatabaseReference reminderListRef = database.getReference("users/"+follower_id+"/"+"reminders");
-                        String reminder_key = reminderListRef.push().getKey();
-                        Map<String, Object> updateReminderList = new HashMap<>();
-                        updateReminderList.put(reminder_key, reminderId);
-                        reminderListRef.updateChildren(updateReminderList);
+                    if(user.followers != null){
+                        for(String follower_key : user.followers.keySet()){
+                            String follower_id = user.followers.get(follower_key);
+                            DatabaseReference reminderListRef = database.getReference("users/"+follower_id+"/"+"reminders");
+                            String reminder_key = reminderListRef.push().getKey();
+                            Map<String, Object> updateReminderList = new HashMap<>();
+                            updateReminderList.put(reminder_key, reminderId);
+                            reminderListRef.updateChildren(updateReminderList);
+                        }
                     }
                     newComment.setText(" ");
                     Toast.makeText(CommentsListActivity.this, "You successfully sent a Comment!", Toast.LENGTH_SHORT).show();

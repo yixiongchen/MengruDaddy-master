@@ -35,6 +35,7 @@ import com.mengrudaddy.instagram.Likes.LikesListActivity;
 import com.mengrudaddy.instagram.Models.Event;
 import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
+import com.mengrudaddy.instagram.Models.Reminder;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
@@ -382,7 +383,7 @@ public class SinglePostActivity extends AppCompatActivity {
                              likeListRef.updateChildren(updateValue);
 
 
-                             //if like other user's post, update a like notification event
+                             //if like other user's post, update a like notification for event
                              if(post.userId.compareTo(authUser.getUid())!=0){
                                  DatabaseReference eventRef  = database.getReference("events/");
                                  String eventId = eventRef.push().getKey();
@@ -398,15 +399,52 @@ public class SinglePostActivity extends AppCompatActivity {
                                  Map<String, Object> updateEventList = new HashMap<>();
                                  updateEventList.put(event_list_key,eventId);
                                  eventListRef.updateChildren(updateEventList);
-
                              }
+
+                             //update a like notification for reminder
+                             //create a new Reminder
+                             DatabaseReference reminderRef = database.getReference("reminders/");
+                             final String reminderId = reminderRef.push().getKey();
+                             HashMap<String, String> action = new HashMap<>();
+                             action.put("actionUserId", authUser.getUid()); //who
+                             action.put("targetUserId", post.userId);                           //on whom
+                             action.put("type", "like");
+                             action.put("typeId", postId);
+                             //action.put("content", content);
+                             Reminder reminder = new Reminder(reminderId, action, date);
+                             reminderRef.child(reminderId).setValue(reminder);
+
+                             //retrieve authenticate user's follower list
+                             //user listener
+                             ValueEventListener authUserListener = new ValueEventListener() {
+                                 @Override
+                                 public void onDataChange(DataSnapshot dataSnapshot) {
+                                     User user = dataSnapshot.getValue(User.class);
+                                     if(user.followers != null){
+                                         //for each follower, update it reminder list
+                                         for(String follower_key : user.followers.keySet()){
+                                             String follower_id = user.followers.get(follower_key);
+                                             DatabaseReference reminderListRef = database.getReference("users/"+follower_id+"/"+"reminders");
+                                             String reminder_key = reminderListRef.push().getKey();
+                                             Map<String, Object> updateReminderList = new HashMap<>();
+                                             updateReminderList.put(reminder_key, reminderId);
+                                             reminderListRef.updateChildren(updateReminderList);
+                                         }
+                                     }
+                                 }
+                                 @Override
+                                 public void onCancelled(DatabaseError databaseError) {
+                                 }
+                             };
+                             DatabaseReference authUserRef = database.getReference("users").child(authUser.getUid());
+                             authUserRef.addListenerForSingleValueEvent(authUserListener);
+
+
                              //set icon
                              likeBoolean = true;
                              like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
                              Toast.makeText(SinglePostActivity.this, "You Liked the Post!", Toast.LENGTH_SHORT).show();
-
                          }
-
                      }
                  });
 

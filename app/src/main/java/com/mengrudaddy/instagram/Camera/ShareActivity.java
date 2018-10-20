@@ -33,7 +33,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.mengrudaddy.instagram.Home.MainActivity;
+import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
+import com.mengrudaddy.instagram.Models.Reminder;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.LocationGetter;
@@ -163,6 +165,7 @@ public class ShareActivity extends AppCompatActivity {
                 HashMap<String, String> likes = new  HashMap<>();
                 HashMap<String, Double> location = new  HashMap<>();
                 content = postContent.getText().toString();
+
                 location.put("latitude" ,latitude);
                 location.put("longitude", longitude);
                 writePost(postId, username, authUser.getUid(), content, location,
@@ -170,6 +173,10 @@ public class ShareActivity extends AppCompatActivity {
 
                 //update user profile : add a postId
                 updateUser(authUser.getUid(), posts);
+
+                //update reminder for followers
+                updateReminder(postId);
+
 
             }
         });
@@ -282,6 +289,7 @@ public class ShareActivity extends AppCompatActivity {
 
     }
 
+
     //update user's post list
     public void updateUser(String userid, ArrayList<String> posts){
         DatabaseReference ref = DatabaseRef.child("users/").child(userid+"/posts");
@@ -318,7 +326,51 @@ public class ShareActivity extends AppCompatActivity {
         }
     }
 
+    /*
+        Activity Feed: update reminder for all the followers
+     */
+    public void updateReminder(String postId){
+        Date date = new Date();
+        //update a like notification for reminder
+        //create a new Reminder
+        DatabaseReference reminderRef = database.getReference("reminders/");
+        final String reminderId = reminderRef.push().getKey();
+        HashMap<String, String> action = new HashMap<>();
+        action.put("actionUserId", authUser.getUid()); //who
+        action.put("targetUserId", authUser.getUid());
 
+        action.put("type", "post");
+        action.put("typeId", postId);
+        //action.put("content", content);
+        Reminder reminder = new Reminder(reminderId, action, date);
+        reminderRef.child(reminderId).setValue(reminder);
+
+        //retrieve authUser
+        //retrieve authenticate user's follower list
+        //user listener
+        ValueEventListener authUserListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if(user.followers != null){
+                    //for each follower, update it reminder list
+                    for(String follower_key : user.followers.keySet()){
+                        String follower_id = user.followers.get(follower_key);
+                        DatabaseReference reminderListRef = database.getReference("users/"+follower_id+"/"+"reminders");
+                        String reminder_key = reminderListRef.push().getKey();
+                        Map<String, Object> updateReminderList = new HashMap<>();
+                        updateReminderList.put(reminder_key, reminderId);
+                        reminderListRef.updateChildren(updateReminderList);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+        DatabaseReference authUserRef = database.getReference("users").child(authUser.getUid());
+        authUserRef.addListenerForSingleValueEvent(authUserListener);
+    }
 
 
 }

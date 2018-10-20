@@ -34,6 +34,7 @@ import com.mengrudaddy.instagram.Models.Comment;
 import com.mengrudaddy.instagram.Models.Event;
 import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
+import com.mengrudaddy.instagram.Models.Reminder;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.Profile.ProfileActivity;
 import com.mengrudaddy.instagram.Profile.SinglePostActivity;
@@ -280,6 +281,33 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
                         updateEventList.put(event_list_key,eventId);
                         eventListRef.updateChildren(updateEventList);
                     }
+
+
+
+                    //update a like notification for reminder
+                    //create a new Reminder
+                    DatabaseReference reminderRef = database.getReference("reminders/");
+                    final String reminderId = reminderRef.push().getKey();
+                    HashMap<String, String> action = new HashMap<>();
+                    action.put("actionUserId", authUser.getUid()); //who
+                    action.put("targetUserId", post.userId); //on whom
+                    action.put("type", "like");
+                    action.put("typeId", post.Id);
+                    //action.put("content", content);
+                    Reminder reminder = new Reminder(reminderId, action, date);
+                    reminderRef.child(reminderId).setValue(reminder);
+                    if(user.followers != null){
+                        //for each follower, update it reminder list
+                        for(String follower_key : user.followers.keySet()){
+                            String follower_id = user.followers.get(follower_key);
+                            DatabaseReference reminderListRef = database.getReference("users/"+follower_id+"/"+"reminders");
+                            String reminder_key = reminderListRef.push().getKey();
+                            Map<String, Object> updateReminderList = new HashMap<>();
+                            updateReminderList.put(reminder_key, reminderId);
+                            reminderListRef.updateChildren(updateReminderList);
+                        }
+                    }
+
 
                     //set icon
                     likeBoolean[i] = true;
