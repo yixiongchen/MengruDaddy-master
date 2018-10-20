@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.mengrudaddy.instagram.Adapter.commentListAdapter;
 import com.mengrudaddy.instagram.Models.Comment;
 import com.mengrudaddy.instagram.Models.Event;
+import com.mengrudaddy.instagram.Models.Reminder;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 
@@ -125,62 +126,24 @@ public class CommentsListActivity extends AppCompatActivity {
         //userId path
         String indexPath = "users/"+authUser.getUid();
         userRef = database.getReference(indexPath);
+        ValueEventListener userListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+                //comment event
+                handleComment();
 
-        
 
-        //send a comment
-        send.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //Log.d(TAG, "user Id: "+postUserId);
-                DatabaseReference commentRef  = database.getReference("comments/");
-                DatabaseReference commentListRef = database.getReference("posts/"+postId+"/"+"comments");
-                String content = newComment.getText().toString();
-                if(content.trim().length() == 0){
-                    Toast.makeText(CommentsListActivity.this, "Can not be Empty", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Date date = new Date();
-                    Comment commentObject  = new Comment(authUser.getUid(),content, date);
-                    //write like object to database
-                    String CommentId = commentRef.push().getKey();
-                    commentRef.child(CommentId).setValue( commentObject);
-                    //add <UserId, CommentId> to the list in the post
-                    String key = commentListRef.push().getKey();
-                    Map<String, Object> updateValue = new HashMap<>();
-                    updateValue.put(key,CommentId); //userId:likeId
-                    commentListRef.updateChildren(updateValue);
-
-                    //if comment other user's post
-                    if(postUserId.compareTo(authUser.getUid())!=0){
-                        // update a comment notification event
-                        DatabaseReference eventRef  = database.getReference("events/");
-                        String eventId = eventRef.push().getKey();
-                        HashMap<String, String> action = new HashMap<>();
-                        action.put("userId", authUser.getUid());
-                        action.put("type", "comment");
-                        action.put("typeId", postId);
-                        action.put("content", content);
-                        Event eventObject  = new Event(eventId, action, date);
-                        eventRef.child(eventId).setValue(eventObject);
-                        //add eventId to the list of target user
-                        DatabaseReference eventListRef = database.getReference("users/"+postUserId+"/"+"events");
-                        String event_list_key = eventListRef.push().getKey();
-                        Map<String, Object> updateEventList = new HashMap<>();
-                        updateEventList.put(event_list_key,eventId);
-                        eventListRef.updateChildren(updateEventList);
-
-                        //update a comment notification for reminder
-
-                    }
-
-                    newComment.setText(" ");
-                    Toast.makeText(CommentsListActivity.this, "You successfully sent a Comment!", Toast.LENGTH_SHORT).show();
-                }
 
             }
 
-        });
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
 
+        };
+
+        userRef.addListenerForSingleValueEvent(userListener);
 
 
     }
@@ -212,6 +175,86 @@ public class CommentsListActivity extends AppCompatActivity {
         };
         postRef.orderByKey().addValueEventListener(postListener);
         mPostListener = postListener;
+    }
+
+    /*
+        handle comment click event
+     */
+    private void handleComment(){
+
+        //comment click event
+        send.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //Log.d(TAG, "user Id: "+postUserId);
+                DatabaseReference commentRef  = database.getReference("comments/");
+                DatabaseReference commentListRef = database.getReference("posts/"+postId+"/"+"comments");
+                String content = newComment.getText().toString();
+                //input is empty
+                if(content.trim().length() == 0){
+                    Toast.makeText(CommentsListActivity.this, "Can not be Empty", Toast.LENGTH_SHORT).show();
+                }
+                //send a comment
+                else{
+                    Date date = new Date();
+                    Comment commentObject  = new Comment(authUser.getUid(),content, date);
+                    //write like object to database
+                    String CommentId = commentRef.push().getKey();
+                    commentRef.child(CommentId).setValue( commentObject);
+                    //add <UserId, CommentId> to the list in the post
+                    String key = commentListRef.push().getKey();
+                    Map<String, Object> updateValue = new HashMap<>();
+                    updateValue.put(key,CommentId); //userId:likeId
+                    commentListRef.updateChildren(updateValue);
+
+                    //if comment other user's post
+                    if(postUserId.compareTo(authUser.getUid())!=0){
+                        // update a comment notification event
+                        DatabaseReference eventRef  = database.getReference("events/");
+                        String eventId = eventRef.push().getKey();
+                        HashMap<String, String> action = new HashMap<>();
+                        action.put("userId", authUser.getUid());
+                        action.put("type", "comment");
+                        action.put("typeId", postId);
+                        action.put("content", content);
+                        Event eventObject  = new Event(eventId, action, date);
+                        eventRef.child(eventId).setValue(eventObject);
+                        //add eventId to the list of target user
+                        DatabaseReference eventListRef = database.getReference("users/"+postUserId+"/"+"events");
+                        String event_list_key = eventListRef.push().getKey();
+                        Map<String, Object> updateEventList = new HashMap<>();
+                        updateEventList.put(event_list_key,eventId);
+                        eventListRef.updateChildren(updateEventList);
+                    }
+                    //update a comment notification for reminder
+                    //create a new Reminder
+                    DatabaseReference reminderRef = database.getReference("reminders/");
+                    String reminderId = reminderRef.push().getKey();
+                    HashMap<String, String> action = new HashMap<>();
+                    action.put("actionUserId", authUser.getUid()); //who
+                    action.put("targetUserId", postUserId);                           //on whom
+                    action.put("type", "comment");
+                    action.put("typeId", postId);
+                    action.put("content", content);
+                    Reminder reminder = new Reminder(reminderId, action, date);
+                    reminderRef.child(reminderId).setValue(reminder);
+                    //for each follower, update it reminder list
+                    for(String follower_key : user.followers.keySet()){
+                        String follower_id = user.followers.get(follower_key);
+                        DatabaseReference reminderListRef = database.getReference("users/"+follower_id+"/"+"reminders");
+                        String reminder_key = reminderListRef.push().getKey();
+                        Map<String, Object> updateReminderList = new HashMap<>();
+                        updateReminderList.put(reminder_key, reminderId);
+                        reminderListRef.updateChildren(updateReminderList);
+                    }
+                    newComment.setText(" ");
+                    Toast.makeText(CommentsListActivity.this, "You successfully sent a Comment!", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+        });
+
+
     }
 
 

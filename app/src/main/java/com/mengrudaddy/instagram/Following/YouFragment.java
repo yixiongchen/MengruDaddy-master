@@ -98,9 +98,6 @@ public class YouFragment extends Fragment{
         if(mEventListener != null){
             eventsRef.removeEventListener(mEventListener);
         }
-
-
-
     }
 
     /*
