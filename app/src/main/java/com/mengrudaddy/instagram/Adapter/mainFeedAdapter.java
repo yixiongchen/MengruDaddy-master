@@ -451,17 +451,19 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
         }
 
         //date
-        DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd hh:mm");
+        DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd hh:mm a");
         String toDate = dateFormat.format(post.date);
         postViewHolder.date.setText(toDate);
 
         //location
         if(post.location != null){
-
-            String address = getAddress(post.location.get("latitude"),post.location.get("longitude"));
+            Double latitude = (Double)post.location.get("latitude");
+            Double longitude = (Double)post.location.get("longitude");
+            String address = getAddress(latitude,longitude);
             postViewHolder.location.setText(address);
         }
         else{
+            //Log.d("TESTadress:", "non adress");
             postViewHolder.location.setVisibility(View.GONE);
         }
 
@@ -476,7 +478,6 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
 
         //click for user profile
         viewUserProfile(postViewHolder, post);
-
 
     }
 

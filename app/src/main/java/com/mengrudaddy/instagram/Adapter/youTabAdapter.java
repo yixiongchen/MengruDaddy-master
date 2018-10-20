@@ -89,6 +89,7 @@ public class youTabAdapter extends RecyclerView.Adapter<youTabAdapter.userViewHo
                     userViewHolder.action.setText("liked your Post");
                     //show post image
                     userViewHolder.post.setVisibility(View.VISIBLE);
+                    userViewHolder.follow.setVisibility(View.GONE);
                     accessPostImage(userViewHolder, action.get("typeId"));
                 }
                 //action type is comment
@@ -96,12 +97,14 @@ public class youTabAdapter extends RecyclerView.Adapter<youTabAdapter.userViewHo
                     userViewHolder.action.setText("commented: "+action.get("content"));
                     //show post image
                     userViewHolder.post.setVisibility(View.VISIBLE);
+                    userViewHolder.follow.setVisibility(View.GONE);
                     accessPostImage(userViewHolder, action.get("typeId"));
                 }
                 //action type is follow
                 else{
                     userViewHolder.action.setText("start to follow you");
                     userViewHolder.follow.setVisibility(View.VISIBLE);
+                    userViewHolder.post.setVisibility(View.GONE);
                     //hanlde follow button
                     handleFollow(userViewHolder, action.get("userId"), user);
 
