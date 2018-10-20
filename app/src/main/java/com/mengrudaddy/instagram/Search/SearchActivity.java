@@ -132,7 +132,6 @@ public class SearchActivity extends AppCompatActivity{
                     }
                 }
 
-
                 if(current.following!=null){
 
                     List<String> currentFollow = getListByMap(current.following, false);
@@ -148,7 +147,7 @@ public class SearchActivity extends AppCompatActivity{
                             }}
                     }
 
-                    updateUsersList();
+                    //updateUsersList();
 
                     if (userList.size()==0){
                         Log.d(TAG,"recommend popular users for users who do not have common" +
@@ -206,7 +205,6 @@ public class SearchActivity extends AppCompatActivity{
                         userList.clear();
                         DatabaseReference reference = database.getReference("users");
                         reference.addListenerForSingleValueEvent(new ValueEventListener() {
-
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 HashMap<User, Integer> suggested = new HashMap<>();
@@ -258,6 +256,7 @@ public class SearchActivity extends AppCompatActivity{
             }
         });
     }
+
 
     private void searchForMatch(final String keyword){
         Log.d(TAG, "searchForMatch: searching for a match: " + keyword);

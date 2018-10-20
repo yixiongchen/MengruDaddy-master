@@ -148,6 +148,7 @@ public class followerUserAdapter extends BaseAdapter {
                             //handle event notification
 
 
+
                             //handle reminder notification
 
 
