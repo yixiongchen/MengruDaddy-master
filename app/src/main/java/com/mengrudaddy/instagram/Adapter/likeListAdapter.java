@@ -157,6 +157,9 @@ public class likeListAdapter extends BaseAdapter {
                             updateEvent(user, like);
 
                             //update reminder notification
+                            updateReminder(user, like);
+
+
 
 
                             viewHolder.follow.setEnabled(false);

@@ -22,11 +22,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mengrudaddy.instagram.Models.Event;
+import com.mengrudaddy.instagram.Models.Like;
+import com.mengrudaddy.instagram.Models.Reminder;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class followerUserAdapter extends BaseAdapter {
@@ -146,10 +151,9 @@ public class followerUserAdapter extends BaseAdapter {
                             user_follower_list.updateChildren(followermap);
 
                             //handle event notification
-
-
-
+                            updateEvent(user, itemUser);
                             //handle reminder notification
+                            updateReminder(user, itemUser);
 
 
                             viewHolder.follow.setEnabled(false);
@@ -243,6 +247,55 @@ public class followerUserAdapter extends BaseAdapter {
         });
     }
 
+
+
+
+    private void updateEvent(final User user,  final User itemUser ){
+        //event notification updates
+        Date date = new Date();
+        DatabaseReference eventRef  = database.getReference("events/");
+        String eventId = eventRef.push().getKey();
+        HashMap<String, String> action = new HashMap<>();
+        action.put("userId", user.Id);
+        action.put("type", "follow");
+        Event eventObject  = new Event(eventId, action, date);
+        eventRef.child(eventId).setValue(eventObject);
+        //add eventId to the list of target user
+        DatabaseReference eventListRef = database.getReference("users/"+itemUser.Id+"/"+"events");
+        String event_list_key = eventListRef.push().getKey();
+        Map<String, Object> updateEventList = new HashMap<>();
+        updateEventList.put(event_list_key,eventId);
+        eventListRef.updateChildren(updateEventList);
+    }
+
+    /*
+        Activity Feed: update reminder for all the followers
+     */
+    public void updateReminder(final User user, final User itemUser){
+        Date date = new Date();
+        //update a like notification for reminder
+        //create a new Reminder
+        DatabaseReference reminderRef = database.getReference("reminders/");
+        final String reminderId = reminderRef.push().getKey();
+        HashMap<String, String> action = new HashMap<>();
+        action.put("actionUserId", user.Id); //who
+        action.put("targetUserId", itemUser.Id); //on whom
+        action.put("type", "follow");
+        //action.put("content", content);
+        Reminder reminder = new Reminder(reminderId, action, date);
+        reminderRef.child(reminderId).setValue(reminder);
+        if(user.followers != null){
+            //for each follower, update it reminder list
+            for(String follower_key : user.followers.keySet()){
+                String follower_id = user.followers.get(follower_key);
+                DatabaseReference reminderListRef = database.getReference("users/"+follower_id+"/"+"reminders");
+                String reminder_key = reminderListRef.push().getKey();
+                Map<String, Object> updateReminderList = new HashMap<>();
+                updateReminderList.put(reminder_key, reminderId);
+                reminderListRef.updateChildren(updateReminderList);
+            }
+        }
+    }
 
 
 

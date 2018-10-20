@@ -47,6 +47,7 @@ import java.util.Map;
 
 import info.debatty.java.stringsimilarity.NGram;
 
+
 public class SearchActivity extends AppCompatActivity{
     private static final String TAG = "SearchActivity";
     private Context context=SearchActivity.this;
@@ -135,7 +136,12 @@ public class SearchActivity extends AppCompatActivity{
                 if(current.following!=null){
 
                     List<String> currentFollow = getListByMap(current.following, false);
+                    /*
+                        Suggested user algorithm:
+                        Search for users that have at least two same followings and not followed by
+                        the current user
 
+                     */
                     for(int i=0; i< allUsers.size(); i++){
                         if (allUsers.get(i).following != null && current.following != null){
                             List<String> follow = getListByMap(allUsers.get(i).following, false);
@@ -147,7 +153,7 @@ public class SearchActivity extends AppCompatActivity{
                             }}
                     }
 
-                    //updateUsersList();
+                    updateUsersList();
 
                     if (userList.size()==0){
                         Log.d(TAG,"recommend popular users for users who do not have common" +
@@ -181,13 +187,9 @@ public class SearchActivity extends AppCompatActivity{
                                     }
                                 }
 
-
                                 //update the users list view
                                 updateUsersList();
                                 headtitle.setText("Popular users");
-
-                                Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
-                                        " for you. You can make some friends from the popular list!", Toast.LENGTH_LONG).show();
 
                             }
 
@@ -220,7 +222,6 @@ public class SearchActivity extends AppCompatActivity{
                                 }
                                 HashMap<User, Integer> sortedMap = sortByValue(suggested);
 
-
                                 userList = new ArrayList<>(sortedMap.keySet());
                                 Collections.reverse(userList);
 
@@ -229,7 +230,6 @@ public class SearchActivity extends AppCompatActivity{
                                         userList.remove(i);
                                     }
                                 }
-
 
                                 //update the users list view
                                 updateUsersList();
@@ -291,14 +291,11 @@ public class SearchActivity extends AppCompatActivity{
                         if(!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5){
                             results.put(user, (float) ng.distance(user.username,keyword));
                         }
-
-                        HashMap<User,Float> sortedMap = sortByValue2(results);
-
-                        userList = new ArrayList<>(sortedMap.keySet());
-
-                        updateUsersList();
                     }
 
+                    HashMap<User,Float> sortedMap = sortByValue2(results);
+                    userList = new ArrayList<>(sortedMap.keySet());
+                    updateUsersList();
                 }
 
                 @Override

@@ -24,6 +24,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mengrudaddy.instagram.Models.Event;
+import com.mengrudaddy.instagram.Models.Like;
+import com.mengrudaddy.instagram.Models.Reminder;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.Profile.ProfileActivity;
 import com.mengrudaddy.instagram.Profile.SinglePostActivity;
@@ -284,6 +286,7 @@ public class youTabAdapter extends RecyclerView.Adapter<youTabAdapter.userViewHo
 
 
                     //reminder notification updates (For Followings)
+                    updateReminder(user, userId);
 
 
 
@@ -294,11 +297,37 @@ public class youTabAdapter extends RecyclerView.Adapter<youTabAdapter.userViewHo
 
             });
 
-
-
         }
+    }
 
 
+    /*
+        Activity Feed: update reminder for all the followers
+     */
+    public void updateReminder(final User user, final String userId) {
+        Date date = new Date();
+        //update a like notification for reminder
+        //create a new Reminder
+        DatabaseReference reminderRef = database.getReference("reminders/");
+        final String reminderId = reminderRef.push().getKey();
+        HashMap<String, String> action = new HashMap<>();
+        action.put("actionUserId", user.Id); //who
+        action.put("targetUserId", userId); //on whom
+        action.put("type", "follow");
+        //action.put("content", content);
+        Reminder reminder = new Reminder(reminderId, action, date);
+        reminderRef.child(reminderId).setValue(reminder);
+        if (user.followers != null) {
+            //for each follower, update it reminder list
+            for (String follower_key : user.followers.keySet()) {
+                String follower_id = user.followers.get(follower_key);
+                DatabaseReference reminderListRef = database.getReference("users/" + follower_id + "/" + "reminders");
+                String reminder_key = reminderListRef.push().getKey();
+                Map<String, Object> updateReminderList = new HashMap<>();
+                updateReminderList.put(reminder_key, reminderId);
+                reminderListRef.updateChildren(updateReminderList);
+            }
+        }
 
     }
 
