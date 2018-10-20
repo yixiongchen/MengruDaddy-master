@@ -10,7 +10,7 @@ import java.util.Map;
 
 
 /*
-
+   Activity Feed:
    Display users following that liked photos or started following user
 
  */

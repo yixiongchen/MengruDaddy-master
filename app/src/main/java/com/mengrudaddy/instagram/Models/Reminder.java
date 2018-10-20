@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-/*
+/*  Activity Feed:
     Display activity of users that current user are following
 */
 

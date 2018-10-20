@@ -198,7 +198,6 @@ public class SearchActivity extends AppCompatActivity{
                     HashMap<User, Integer> suggested = new HashMap<>();
                     for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
 
-
                         User user = singleSnapshot.getValue(User.class);
                         if(user.followers!=null){
                             suggested.put(user, user.followers.keySet().size());
