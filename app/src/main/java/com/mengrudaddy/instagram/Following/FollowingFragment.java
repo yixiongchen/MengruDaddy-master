@@ -58,7 +58,9 @@ public class FollowingFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_following,container,false);
         mResultList = (RecyclerView) view.findViewById(R.id.following_activities);
         mResultList.setHasFixedSize(true);
-        mResultList.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager linearLayoutManager = new
+                LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        mResultList.setLayoutManager(linearLayoutManager);
 
 
         //auth

@@ -82,12 +82,14 @@ public class followingTabAdapter extends RecyclerView.Adapter<followingTabAdapte
                 //demo part
                 //load targte user image
                 if(action.get("type").compareTo("follow")==0){
+                    userViewHolder.post.setVisibility(View.GONE);
                     userViewHolder.userImage.setVisibility(View.VISIBLE);
                     //load target user profile image
                     accessUserImage(userViewHolder, action.get("targetUserId"));
                 }
                 //load post image
                 else{
+                    userViewHolder.userImage.setVisibility(View.GONE);
                     userViewHolder.post.setVisibility(View.VISIBLE);
                     //load post image
                     accessPostImage(userViewHolder,action.get("typeId"));
