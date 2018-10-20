@@ -127,18 +127,21 @@ public class likeListAdapter extends BaseAdapter {
                 if(user.following != null && user.following.containsValue(like.userId)){
                     viewHolder.follow.setEnabled(false);
                     viewHolder.follow.setText("Followed");
+
                 }
                 // user is not in the following
                 else{
                     viewHolder.follow.setText("Follow");
                     viewHolder.follow.setEnabled(true);
+                    viewHolder.follow.setTag(index);
                     viewHolder.follow.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view) {
                             //add user id to following list
                             DatabaseReference user_following_list = database.getReference("users/").child(user.Id).child("following");
                             String key = user_following_list.push().getKey();
                             HashMap<String, Object> map = new HashMap<>();
-                            map.put(key, like.userId);
+                            map.put(key,userIds[Integer.parseInt(viewHolder.follow.getTag().toString())]);
+                            //map.put(key, like.userId);
                             user_following_list.updateChildren(map);
 
                             //add user id to follower list for profile user;
@@ -153,7 +156,6 @@ public class likeListAdapter extends BaseAdapter {
                             updateEvent(user, like);
 
                             //update reminder notification
-
 
 
                             viewHolder.follow.setEnabled(false);

@@ -106,7 +106,7 @@ public class followerUserAdapter extends BaseAdapter {
         //read user info
         ValueEventListener likeListener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)  {
+            public void onDataChange(final DataSnapshot dataSnapshot)  {
                 itemUser = dataSnapshot.getValue(User.class);
 
                 //access username
@@ -128,13 +128,14 @@ public class followerUserAdapter extends BaseAdapter {
                 else{
                     viewHolder.follow.setText("Follow");
                     viewHolder.follow.setEnabled(true);
+                    viewHolder.follow.setTag(index);
                     viewHolder.follow.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view) {
                             //add user id to following list
                             DatabaseReference user_following_list = database.getReference("users/").child(user.Id).child("following");
                             String key = user_following_list.push().getKey();
                             HashMap<String, Object> map = new HashMap<>();
-                            map.put(key, itemUser.Id);
+                            map.put(key,userIds[Integer.parseInt(viewHolder.follow.getTag().toString())]);
                             user_following_list.updateChildren(map);
 
                             //add user id to follower list for profile user;
