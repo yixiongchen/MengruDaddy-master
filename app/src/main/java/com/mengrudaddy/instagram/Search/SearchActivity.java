@@ -132,7 +132,8 @@ public class SearchActivity extends AppCompatActivity{
                     }
                 }
 
-                if(current.following != null){
+
+                if(current.following!=null){
 
                     List<String> currentFollow = getListByMap(current.following, false);
 
@@ -149,6 +150,57 @@ public class SearchActivity extends AppCompatActivity{
 
                     updateUsersList();
 
+                    if (userList.size()==0){
+                        Log.d(TAG,"recommend popular users for users who do not have common" +
+                                "friends with other users");
+                        userList.clear();
+                        DatabaseReference reference = database.getReference("users");
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                HashMap<User, Integer> suggested = new HashMap<>();
+                                for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
+
+                                    User user = singleSnapshot.getValue(User.class);
+                                    if(user.followers!=null){
+                                        suggested.put(user, user.followers.keySet().size());
+                                    }
+                                    else{
+                                        suggested.put(user, 0);
+                                    }
+                                }
+                                HashMap<User, Integer> sortedMap = sortByValue(suggested);
+
+
+                                userList = new ArrayList<>(sortedMap.keySet());
+                                Collections.reverse(userList);
+
+                                for(int i =0 ; i<userList.size(); i++) {
+                                    if(userList.get(i).username.equals(current.username)){
+                                        userList.remove(i);
+                                    }
+                                }
+
+
+                                //update the users list view
+                                updateUsersList();
+                                headtitle.setText("Popular users");
+
+                                Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
+                                        " for you. You can make some friends from the popular list!", Toast.LENGTH_LONG).show();
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+
+                }else{
                     if (userList.size()==0){
                         Log.d(TAG,"recommend popular users for new users");
                         userList.clear();
@@ -185,6 +237,9 @@ public class SearchActivity extends AppCompatActivity{
                                 updateUsersList();
                                 headtitle.setText("Popular users");
 
+                                Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
+                                        " for you. You can make some friends from the popular list!", Toast.LENGTH_LONG).show();
+
                             }
 
                             @Override
@@ -193,13 +248,9 @@ public class SearchActivity extends AppCompatActivity{
                             }
                         });
                     }
-                }else{
-
-                    Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
-                                    " for you. You can make                    some friends from the popular list!",
-                            Toast.LENGTH_LONG).show();
-
                 }
+
+
             }
 
             @Override
@@ -266,7 +317,7 @@ public class SearchActivity extends AppCompatActivity{
         Iterator<User> it = map.keySet().iterator();
         while (it.hasNext()) {
             User key = it.next();
-                list.add(key);
+            list.add(key);
         }
 
         return list;
