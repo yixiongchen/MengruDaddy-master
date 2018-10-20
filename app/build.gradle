@@ -55,6 +55,6 @@ dependencies {
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     //image loader
     implementation 'com.squareup.picasso:picasso:2.5.2'
-    implementation files('C:/Users/50650/Desktop/Mobile Programming/MengruDaddy-master/libs/java-string-similarity-1.2.0.jar')
+    implementation files('libs/java-string-similarity-1.2.0.jar')
 }
 apply plugin: 'com.google.gms.google-services'

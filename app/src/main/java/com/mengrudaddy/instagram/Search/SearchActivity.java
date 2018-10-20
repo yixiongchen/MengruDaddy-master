@@ -47,6 +47,7 @@ import java.util.Map;
 
 import info.debatty.java.stringsimilarity.NGram;
 
+
 public class SearchActivity extends AppCompatActivity{
     private static final String TAG = "SearchActivity";
     private Context context=SearchActivity.this;
@@ -297,8 +298,9 @@ public class SearchActivity extends AppCompatActivity{
 
                         userList = new ArrayList<>(sortedMap.keySet());
 
-                        updateUsersList();
                     }
+
+                    updateUsersList();
 
                 }
 
