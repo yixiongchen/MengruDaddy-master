@@ -37,8 +37,6 @@ public class commentListAdapter extends BaseAdapter {
     private User user;
     private final String TAG ="commentListAdapter::";
     private FirebaseDatabase database;
-    private DatabaseReference commentRef, userRef;
-    private Comment comment;
     private String postId;
     private FirebaseStorage storage;
 
@@ -94,7 +92,7 @@ public class commentListAdapter extends BaseAdapter {
         //load commentId object
         //real time database
         database = FirebaseDatabase.getInstance();
-        commentRef = database.getReference("comments").child(id);
+        DatabaseReference commentRef = database.getReference("comments").child(id);
 
         //read user info
         ValueEventListener CommentListener = new ValueEventListener() {
@@ -102,18 +100,17 @@ public class commentListAdapter extends BaseAdapter {
             public void onDataChange(DataSnapshot dataSnapshot)  {
 
 
-
-                comment = dataSnapshot.getValue(Comment.class);
+                final Comment comment = dataSnapshot.getValue(Comment.class);
                 viewHolder.content.setText(comment.content);
                 DateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
                 String toDate = dateFormat.format(comment.date);
                 viewHolder.date.setText(toDate);
 
                 //load user info
-                accessUsername(viewHolder);
+                accessUsername(viewHolder, comment.userId);
                 //load profile image
-                accessProfileImage(viewHolder);
-
+                Log.d(TAG, "UserId: " +comment.userId);
+                accessProfileImage(viewHolder, comment.userId);
 
             }
             //viewHolder.progressBar.setVisibility(View.GONE);
@@ -121,7 +118,7 @@ public class commentListAdapter extends BaseAdapter {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        commentRef.addValueEventListener(CommentListener);
+        commentRef.addListenerForSingleValueEvent(CommentListener);
 
         return convertView;
     }
@@ -150,9 +147,8 @@ public class commentListAdapter extends BaseAdapter {
     /*
         load profile image
      */
-    public void accessProfileImage(final ViewHolder viewHolder){
-        StorageReference profile_pic_ref = storage.getReference("profile_pic/"+comment.userId);
-
+    public void accessProfileImage(final ViewHolder viewHolder, final String userId){
+        StorageReference profile_pic_ref = storage.getReference("profile_pic/"+userId);
         profile_pic_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -175,8 +171,10 @@ public class commentListAdapter extends BaseAdapter {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
+                viewHolder.imageViewPhoto.setImageResource(R.drawable.ic_action_face);
+
                 //viewHolder.progressBar.setVisibility(View.GONE);
-                Log.d(TAG, "Can not download file, please check connection");
+                //Log.d(TAG, "Can not download file, please check connection");
             }
         });
     }
@@ -186,8 +184,8 @@ public class commentListAdapter extends BaseAdapter {
         read username by userid
      */
 
-     public void accessUsername(final ViewHolder viewHolder){
-         userRef = database.getReference("users").child(comment.userId);
+     public void accessUsername(final ViewHolder viewHolder, final String userId){
+         DatabaseReference userRef = database.getReference("users").child(userId);
          //read user info
          ValueEventListener userListener = new ValueEventListener() {
              @Override

@@ -181,8 +181,8 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //write profile info to database
 
-                new_description= changed_description.getText().toString();
-                new_username = changed_name.getText().toString();
+                new_description= changed_description.getText().toString().trim();
+                new_username = changed_name.getText().toString().trim();
                 new_profile_pic = uID;
                 //upload updates
                 updateUser(authUser.getUid());

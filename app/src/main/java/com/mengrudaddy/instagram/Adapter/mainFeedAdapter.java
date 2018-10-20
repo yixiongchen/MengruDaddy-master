@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,6 +31,7 @@ import com.google.firebase.storage.StorageReference;
 import com.mengrudaddy.instagram.Comments.CommentsListActivity;
 import com.mengrudaddy.instagram.Likes.LikesListActivity;
 import com.mengrudaddy.instagram.Models.Comment;
+import com.mengrudaddy.instagram.Models.Event;
 import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
 import com.mengrudaddy.instagram.Models.User;
@@ -56,6 +58,8 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
     private FirebaseDatabase database;
     private User user;
     private boolean[] likeBoolean;
+    private FirebaseUser authUser;
+    private FirebaseAuth auth;
 
 
 
@@ -70,6 +74,8 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
         for(int i=0; i<likeBoolean.length; i++){
             likeBoolean[i]=false;
         }
+        auth = FirebaseAuth.getInstance();
+        authUser = auth.getCurrentUser();
 
     }
 
@@ -94,7 +100,7 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
-                Post post = dataSnapshot.getValue(Post.class);
+                final Post post = dataSnapshot.getValue(Post.class);
                 if(post != null){
                     accesssPostUser(postViewHolder, post.userId);
                     renderPost(postViewHolder, post, i);
@@ -244,8 +250,9 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
                 }
                 //like event
                 else{
+                    Date date = new Date();
                     //create like object
-                    Like likeObject  = new Like(post.Id, user.Id, user.username, new Date());
+                    Like likeObject  = new Like(post.Id, user.Id, user.username, date);
                     //write like object to database
                     String likeId = likeRef.push().getKey();
                     likeRef.child(likeId).setValue(likeObject);
@@ -255,6 +262,25 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
                     updateValue.put(user.Id,likeId); //userId:likeId
                     likeListRef.updateChildren(updateValue);
 
+
+                    //if like other user's post, update a like notification event
+                    if(post.userId.compareTo(authUser.getUid())!=0){
+                        DatabaseReference eventRef  = database.getReference("events/");
+                        String eventId = eventRef.push().getKey();
+                        HashMap<String, String> action = new HashMap<>();
+                        action.put("userId", authUser.getUid());
+                        action.put("type", "like");
+                        action.put("typeId", post.Id);
+                        Event eventObject  = new Event(eventId, action, date);
+                        eventRef.child(eventId).setValue(eventObject);
+                        //add eventId to the list of target user
+                        DatabaseReference eventListRef = database.getReference("users/"+post.userId+"/"+"events");
+                        String event_list_key = eventListRef.push().getKey();
+                        Map<String, Object> updateEventList = new HashMap<>();
+                        updateEventList.put(event_list_key,eventId);
+                        eventListRef.updateChildren(updateEventList);
+                    }
+
                     //set icon
                     likeBoolean[i] = true;
                     viewHolder.like.setImageDrawable(mContext.getDrawable(R.drawable.ic_action_activity));
@@ -263,7 +289,6 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
                 }
             }
         });
-
 
     }
 
@@ -277,11 +302,13 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, CommentsListActivity.class);
-                intent.putExtra("postId",post.Id);
+                Bundle extras = new Bundle();
+                extras.putString("postId",post.Id);
+                extras.putString("userId",post.userId);
+                intent.putExtras(extras);
                 mContext.startActivity(intent);
             }
         });
-
     }
 
 
@@ -301,7 +328,6 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
             }
         });
 
-
     }
 
 
@@ -313,11 +339,14 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, CommentsListActivity.class);
-                intent.putExtra("postId",post.Id);
+                Bundle extras = new Bundle();
+                extras.putString("postId",post.Id);
+                extras.putString("userId",post.userId);
+                intent.putExtras(extras);
                 mContext.startActivity(intent);
-
             }
         });
+
 
     }
 

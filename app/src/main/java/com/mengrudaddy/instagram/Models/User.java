@@ -17,6 +17,8 @@ public class User {
     public Map<String, String> followers; // follow the user
     public Map<String, String> posts; //posts list
     public String Id;
+    public Map<String, String> events; //for You Fragment
+    public Map<String, String> reminders; //for following Fragment
 
 
 
@@ -26,7 +28,9 @@ public class User {
 
     public User(String Id, String username, String email, String description, Map<String, String> Following ,
                 Map<String, String> Followers,
-                Map<String, String> Posts, String image) {
+                Map<String, String> Posts, String image,
+                Map<String, String> events,
+                Map<String, String> reminders) {
         this.Id= Id;
         this.username = username;
         this.email = email;
@@ -35,7 +39,8 @@ public class User {
         this.followers = Followers;
         this.posts = Posts;
         this.image = image;
-
+        this.events =events;
+        this.reminders = reminders;
     }
 
 }

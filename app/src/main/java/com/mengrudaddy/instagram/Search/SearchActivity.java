@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,14 +38,20 @@ import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 
 public class SearchActivity extends AppCompatActivity{
@@ -55,6 +62,8 @@ public class SearchActivity extends AppCompatActivity{
 
     EditText editTextName;
     ImageButton buttonSearch;
+
+    private TextView headtitle;
 
     RecyclerView mResultList;
     userListAdapter adapter;
@@ -93,6 +102,7 @@ public class SearchActivity extends AppCompatActivity{
         mResultList = (RecyclerView)findViewById(R.id.result_list);
         mResultList.setHasFixedSize(true);
         mResultList.setLayoutManager(new LinearLayoutManager(this));
+        headtitle=(TextView)findViewById(R.id.heading_label);
 
         RecommandUsers();
 
@@ -104,6 +114,7 @@ public class SearchActivity extends AppCompatActivity{
         buttonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                headtitle.setText("Search...");
                 String username = editTextName.getText().toString().toLowerCase(Locale.getDefault());
                 searchForMatch(username);
             }
@@ -121,7 +132,7 @@ public class SearchActivity extends AppCompatActivity{
         final String uId = currentUser.getUid();
 
         Log.d(TAG, "start to recommend");
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot singleDataSnapshot: dataSnapshot.getChildren()){
@@ -134,20 +145,29 @@ public class SearchActivity extends AppCompatActivity{
 
                 if(current.following != null){
 
-
                 List<String> currentFollow = getListByMap(current.following, false);
 
-                for(int i=0; i< allUsers.size()-1; i++){
-                    if (allUsers.get(i).following != null&current.following != null){
+                for(int i=0; i< allUsers.size(); i++){
+                    if (allUsers.get(i).following != null && current.following != null){
                     List<String> follow = getListByMap(allUsers.get(i).following, false);
                     follow.retainAll(currentFollow);
                     int num = follow.size();
-                    if ((num>=2&!allUsers.get(i).username.equals(current.username))&
+                    //for debug test
+//                    String n = allUsers.get(i).username;
+//                    String m = current.username;
+//                    String iid = current.Id;
+                    if ((num>=2 && !allUsers.get(i).username.equals(current.username)) &&
                             !allUsers.get(i).following.containsValue(current.Id)){
                         userList.add(allUsers.get(i));
                     }}
                 }
                 updateUsersList();
+
+                if (userList.size()==0){
+                    Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
+                                    " for you.",
+                            Toast.LENGTH_LONG).show();
+                }
                 }else{
 
                     Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
@@ -166,18 +186,46 @@ public class SearchActivity extends AppCompatActivity{
     private void searchForMatch(final String keyword){
         Log.d(TAG, "searchForMatch: searching for a match: " + keyword);
         userList.clear();
-        //update the users list view
+
+        DatabaseReference reference = database.getReference("users");
+        //if keywords is empty, show the most popular users by number of followers
         if(keyword.length() ==0){
 
             Log.d(TAG,"null input");
-            Toast.makeText(getApplicationContext(), "The search field should not be empty"
-                    ,Toast.LENGTH_LONG).show();
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    HashMap<User, Integer> suggested = new HashMap<>();
+                    for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
 
-        }else{
-            DatabaseReference reference = database.getReference("users");
 
-//            Query query = reference
-//                    .orderByChild("username").equalTo(keyword);
+                        User user = singleSnapshot.getValue(User.class);
+                        if(user.followers!=null){
+                            suggested.put(user, user.followers.keySet().size());
+                        }
+                        else{
+                            suggested.put(user, 0);
+                        }
+                    }
+                    HashMap<User, Integer> sortedMap = sortByValue(suggested);
+
+                    userList = new ArrayList<>(sortedMap.keySet());
+                    Collections.reverse(userList);
+                    //update the users list view
+                    updateUsersList();
+                    headtitle.setText("Popular users");
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+        //search key is not empty
+        else{
+
             Log.d(TAG,"Search for the text");
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -186,17 +234,14 @@ public class SearchActivity extends AppCompatActivity{
                         Log.d(TAG, "onDataChange: found user:" + singleSnapshot.getValue(User.class).toString());
                         String name = singleSnapshot.getValue(User.class).username.toLowerCase();
 
-                        if (name.equals(keyword)){
+                        if(name.toLowerCase().contains(keyword) || keyword.contains(name)
+                                || name.equals(keyword)){
                             userList.add(singleSnapshot.getValue(User.class));
                         }
 
-                        //update the users list view
-                        updateUsersList();}
-
-                    if(userList.size()==0){
-                        Toast.makeText(getApplicationContext(), "Sorry, there is no username \"" + keyword + "\"",
-                                Toast.LENGTH_LONG).show();
                     }
+                    //update the users list view
+                    updateUsersList();
                 }
 
                 @Override
@@ -230,6 +275,8 @@ public class SearchActivity extends AppCompatActivity{
         adapter = new userListAdapter(SearchActivity.this, R.layout.list_layout, userList);
 
         mResultList.setAdapter(adapter);
+        headtitle.setText("Search result");
+
 
     }
 
@@ -279,6 +326,31 @@ public class SearchActivity extends AppCompatActivity{
         super.onStart();
         setUpBottomNavigView();
 
+    }
+
+
+    // function to sort hashmap by values
+    public static HashMap<User, Integer> sortByValue(HashMap<User, Integer> hm)
+    {
+        // Create a list from elements of HashMap
+        List<Map.Entry<User, Integer> > list =
+                new LinkedList<Map.Entry<User, Integer> >(hm.entrySet());
+
+        // Sort the list
+        Collections.sort(list, new Comparator<Map.Entry<User, Integer> >() {
+            public int compare(Map.Entry<User, Integer> o1,
+                               Map.Entry<User, Integer> o2)
+            {
+                return (o1.getValue()).compareTo(o2.getValue());
+            }
+        });
+
+        // put data from sorted list to hashmap
+        HashMap<User, Integer> temp = new LinkedHashMap<User, Integer>();
+        for (Map.Entry<User, Integer> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+        return temp;
     }
 
 
