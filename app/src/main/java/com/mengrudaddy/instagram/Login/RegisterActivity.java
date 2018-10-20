@@ -24,8 +24,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.mengrudaddy.instagram.Home.MainActivity;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
@@ -169,12 +172,30 @@ public class RegisterActivity extends AppCompatActivity {
     }
     // [END auth_with_google]
 
-    public void onAuthSuccess(String username, FirebaseUser user){
+    public void onAuthSuccess(final String username, final FirebaseUser user){
         // Write new user
-        writeNewUser(user.getUid(), username, user.getEmail(),null);
-        // Go to MainActivity
-        startActivity(new Intent(RegisterActivity.this, MainActivity.class));
-        finish();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        ref.child("users").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    //startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                    finish();
+                } else {
+                    writeNewUser(user.getUid(), username, user.getEmail(),null);
+                    // Go to MainActivity
+                    //startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                    finish();
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     public void writeNewUser(String userId, String name, String email,String description) {
