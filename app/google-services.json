@@ -1,51 +1,27 @@
 {
   "project_info": {
-    "project_number": "3801539425",
-    "firebase_url": "https://instgram-620cd.firebaseio.com",
-    "project_id": "instgram-620cd",
-    "storage_bucket": "instgram-620cd.appspot.com"
+    "project_number": "850243482586",
+    "firebase_url": "https://instgram2-de16f.firebaseio.com",
+    "project_id": "instgram2-de16f",
+    "storage_bucket": "instgram2-de16f.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:3801539425:android:234cd355bda15237",
+        "mobilesdk_app_id": "1:850243482586:android:234cd355bda15237",
         "android_client_info": {
           "package_name": "com.mengrudaddy.instagram"
         }
       },
       "oauth_client": [
         {
-          "client_id": "3801539425-6d90l1d3867ad4h7l8be287f5grie19k.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.mengrudaddy.instagram",
-            "certificate_hash": "abfefa020f0ada65a21959b084862d313a2bbe6e"
-          }
-        },
-        {
-          "client_id": "3801539425-lqvdfiaafon8bdtmjfgfcf9tns59ha72.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.mengrudaddy.instagram",
-            "certificate_hash": "df3b79e8048887503106a3f87c8db846f4e2b6e5"
-          }
-        },
-        {
-          "client_id": "3801539425-61d94o8drmatjg2ebpkjgmme26uaucjd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.mengrudaddy.instagram",
-            "certificate_hash": "03dc0316b7b21ddb440870f8a1ebd5b48a098240"
-          }
-        },
-        {
-          "client_id": "3801539425-vds82j58jv8hnkklhklqvcd0og83rk3b.apps.googleusercontent.com",
+          "client_id": "850243482586-i5mqi4pjj3d4cccmco21gt51t5tt4rqc.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDj3FmX3uo4LZcGftfwSETyMR3ewcYAcQk"
+          "current_key": "AIzaSyCQD8yNkM-8nTJS-PhONnnYzzueaQkLl1I"
         }
       ],
       "services": {
@@ -53,13 +29,8 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "3801539425-vds82j58jv8hnkklhklqvcd0og83rk3b.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2

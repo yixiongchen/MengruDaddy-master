@@ -19,16 +19,14 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
-
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
     // on photo edition
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
@@ -37,24 +35,18 @@ dependencies {
     implementation 'ja.burhanrashid52:photoeditor:0.2.1'
     implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.github.yalantis:ucrop:2.2.2-native'
-
     // on location services
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     //implementation 'com.google.firebase:firebase-messaging:17.0.0'
-
     // Firebase Authentication
     implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation 'com.google.firebase:firebase-auth:16.0.2'
     implementation 'com.google.firebase:firebase-database:16.0.1'
     implementation 'com.google.firebase:firebase-storage:16.0.1'
-
     // Google Sign In SDK (only required for Google Sign In)
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
-
     //Exo Player
     implementation 'com.google.android.exoplayer:exoplayer:2.6.0'
-
-
     //implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     //glide
     implementation 'com.github.bumptech.glide:glide:4.4.0'
@@ -63,6 +55,6 @@ dependencies {
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     //image loader
     implementation 'com.squareup.picasso:picasso:2.5.2'
-
+    implementation files('C:/Users/50650/Desktop/Mobile Programming/MengruDaddy-master/libs/java-string-similarity-1.2.0.jar')
 }
 apply plugin: 'com.google.gms.google-services'

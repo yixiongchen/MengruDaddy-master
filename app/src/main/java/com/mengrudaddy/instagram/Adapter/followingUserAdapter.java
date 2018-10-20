@@ -229,6 +229,7 @@ public class followingUserAdapter extends BaseAdapter {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 viewHolder.progressBar.setVisibility(View.GONE);
+                viewHolder.imageViewPhoto.setImageResource(R.drawable.ic_action_face);
                 Log.d(TAG, "Can not download file, please check connection");
             }
         });

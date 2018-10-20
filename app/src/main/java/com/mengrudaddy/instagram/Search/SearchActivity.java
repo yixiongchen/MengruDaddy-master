@@ -12,10 +12,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,24 +38,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.stream.Collectors;
 
+import info.debatty.java.stringsimilarity.NGram;
 
 public class SearchActivity extends AppCompatActivity{
     private static final String TAG = "SearchActivity";
     private Context context=SearchActivity.this;
     private static final int ACTIVITY_NUM=1;
 
+    NGram ng = new NGram(2);
 
     EditText editTextName;
     ImageButton buttonSearch;
@@ -103,7 +97,7 @@ public class SearchActivity extends AppCompatActivity{
 
         //adapter = new userListAdapter(this, R.layout.list_layout, userList);
         //mResultList.setAdapter(adapter);
-        
+
         //mResultList = (RecyclerView) findViewById(R.id.result_list);
 
         buttonSearch.setOnClickListener(new View.OnClickListener() {
@@ -138,74 +132,125 @@ public class SearchActivity extends AppCompatActivity{
                     }
                 }
 
-                if(current.following != null){
 
-                List<String> currentFollow = getListByMap(current.following, false);
+                if(current.following!=null){
 
-                for(int i=0; i< allUsers.size(); i++){
-                    if (allUsers.get(i).following != null && current.following != null){
-                    List<String> follow = getListByMap(allUsers.get(i).following, false);
-                    follow.retainAll(currentFollow);
-                    int num = follow.size();
-                    if ((num>=2 && !allUsers.get(i).username.equals(current.username)) &&
-                            !allUsers.get(i).following.containsValue(current.Id)){
-                        userList.add(allUsers.get(i));
-                    }}
-                }
+                    List<String> currentFollow = getListByMap(current.following, false);
 
-                updateUsersList();
+                    for(int i=0; i< allUsers.size(); i++){
+                        if (allUsers.get(i).following != null && current.following != null){
+                            List<String> follow = getListByMap(allUsers.get(i).following, false);
+                            follow.retainAll(currentFollow);
+                            int num = follow.size();
+                            if ((num>=2 && !allUsers.get(i).username.equals(current.username)) &&
+                                    !allUsers.get(i).following.containsValue(current.Id)){
+                                userList.add(allUsers.get(i));
+                            }}
+                    }
 
-                if (userList.size()==0){
-                    Log.d(TAG,"recommend popular users for new users");
-                    userList.clear();
-                    DatabaseReference reference = database.getReference("users");
-                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    updateUsersList();
 
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            HashMap<User, Integer> suggested = new HashMap<>();
-                            for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
+                    if (userList.size()==0){
+                        Log.d(TAG,"recommend popular users for users who do not have common" +
+                                "friends with other users");
+                        userList.clear();
+                        DatabaseReference reference = database.getReference("users");
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
 
-                                User user = singleSnapshot.getValue(User.class);
-                                if(user.followers!=null){
-                                    suggested.put(user, user.followers.keySet().size());
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                HashMap<User, Integer> suggested = new HashMap<>();
+                                for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
+
+                                    User user = singleSnapshot.getValue(User.class);
+                                    if(user.followers!=null){
+                                        suggested.put(user, user.followers.keySet().size());
+                                    }
+                                    else{
+                                        suggested.put(user, 0);
+                                    }
                                 }
-                                else{
-                                    suggested.put(user, 0);
+                                HashMap<User, Integer> sortedMap = sortByValue(suggested);
+
+
+                                userList = new ArrayList<>(sortedMap.keySet());
+                                Collections.reverse(userList);
+
+                                for(int i =0 ; i<userList.size(); i++) {
+                                    if(userList.get(i).username.equals(current.username)){
+                                        userList.remove(i);
+                                    }
                                 }
+
+
+                                //update the users list view
+                                updateUsersList();
+                                headtitle.setText("Popular users");
+
+                                Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
+                                        " for you. You can make some friends from the popular list!", Toast.LENGTH_LONG).show();
+
                             }
-                            HashMap<User, Integer> sortedMap = sortByValue(suggested);
 
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                            userList = new ArrayList<>(sortedMap.keySet());
-                            Collections.reverse(userList);
-
-                            for(int i =0 ; i<userList.size(); i++) {
-                                if(userList.get(i).username.equals(current.username)){
-                                    userList.remove(i);
-                                }
                             }
+                        });
 
+                    }
 
-                            //update the users list view
-                            updateUsersList();
-                            headtitle.setText("Popular users");
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-                }
                 }else{
+                    if (userList.size()==0){
+                        Log.d(TAG,"recommend popular users for new users");
+                        userList.clear();
+                        DatabaseReference reference = database.getReference("users");
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
 
-                    Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
-                                    " for you. You can make                    some friends from the popular list!",
-                    Toast.LENGTH_LONG).show();
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                HashMap<User, Integer> suggested = new HashMap<>();
+                                for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
 
+                                    User user = singleSnapshot.getValue(User.class);
+                                    if(user.followers!=null){
+                                        suggested.put(user, user.followers.keySet().size());
+                                    }
+                                    else{
+                                        suggested.put(user, 0);
+                                    }
+                                }
+                                HashMap<User, Integer> sortedMap = sortByValue(suggested);
+
+
+                                userList = new ArrayList<>(sortedMap.keySet());
+                                Collections.reverse(userList);
+
+                                for(int i =0 ; i<userList.size(); i++) {
+                                    if(userList.get(i).username.equals(current.username)){
+                                        userList.remove(i);
+                                    }
+                                }
+
+
+                                //update the users list view
+                                updateUsersList();
+                                headtitle.setText("Popular users");
+
+                                Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
+                                        " for you. You can make some friends from the popular list!", Toast.LENGTH_LONG).show();
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
                 }
+
+
             }
 
             @Override
@@ -216,7 +261,9 @@ public class SearchActivity extends AppCompatActivity{
 
     private void searchForMatch(final String keyword){
         Log.d(TAG, "searchForMatch: searching for a match: " + keyword);
+
         userList.clear();
+        final HashMap<User, Float> results = new HashMap<>();
 
         DatabaseReference reference = database.getReference("users");
 
@@ -232,19 +279,27 @@ public class SearchActivity extends AppCompatActivity{
             Log.d(TAG,"Search for the text");
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
-                        Log.d(TAG, "onDataChange: found user:" + singleSnapshot.getValue(User.class).toString());
-                        String name = singleSnapshot.getValue(User.class).username.toLowerCase();
 
-                        if(name.toLowerCase().contains(keyword) || keyword.contains(name)
-                                || name.equals(keyword)){
-                            userList.add(singleSnapshot.getValue(User.class));
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
+
+                        Log.d(TAG, "onDataChange: found user:" + singleSnapshot.getValue(User.class).toString());
+                        User user = singleSnapshot.getValue(User.class);
+
+                        float a = (float) ng.distance(user.username,keyword);
+
+                        if(!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5){
+                            results.put(user, (float) ng.distance(user.username,keyword));
                         }
 
+                        HashMap<User,Float> sortedMap = sortByValue2(results);
+
+                        userList = new ArrayList<>(sortedMap.keySet());
+
+                        updateUsersList();
                     }
-                    //update the users list view
-                    updateUsersList();
+
                 }
 
                 @Override
@@ -253,6 +308,21 @@ public class SearchActivity extends AppCompatActivity{
                 }
             });
         }
+    }
+
+    public static List<User> getListByMap2(Map<User, Float> map) {
+        List<User> list = new ArrayList<User>();
+        List<Float> list1 = new ArrayList<Float>();
+
+        Iterator<User> it = map.keySet().iterator();
+        while (it.hasNext()) {
+            User key = it.next();
+            list.add(key);
+        }
+
+        return list;
+
+
     }
 
     public static List<String> getListByMap(Map<String, String> map,
@@ -334,6 +404,30 @@ public class SearchActivity extends AppCompatActivity{
         // put data from sorted list to hashmap
         HashMap<User, Integer> temp = new LinkedHashMap<User, Integer>();
         for (Map.Entry<User, Integer> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+        return temp;
+    }
+
+    // function to sort hashmap by values
+    public static HashMap<User, Float> sortByValue2(HashMap<User, Float> hm)
+    {
+        // Create a list from elements of HashMap
+        List<Map.Entry<User, Float> > list =
+                new LinkedList<Map.Entry<User, Float> >(hm.entrySet());
+
+        // Sort the list
+        Collections.sort(list, new Comparator<Map.Entry<User, Float> >() {
+            public int compare(Map.Entry<User, Float> o1,
+                               Map.Entry<User, Float> o2)
+            {
+                return (o1.getValue()).compareTo(o2.getValue());
+            }
+        });
+
+        // put data from sorted list to hashmap
+        HashMap<User, Float> temp = new LinkedHashMap<User, Float>();
+        for (Map.Entry<User, Float> aa : list) {
             temp.put(aa.getKey(), aa.getValue());
         }
         return temp;
