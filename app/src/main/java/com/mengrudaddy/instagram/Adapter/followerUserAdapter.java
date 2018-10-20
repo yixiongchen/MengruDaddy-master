@@ -145,6 +145,12 @@ public class followerUserAdapter extends BaseAdapter {
                             followermap.put(followerKey, user.Id);
                             user_follower_list.updateChildren(followermap);
 
+                            //handle event notification
+
+
+                            //handle reminder notification
+
+
                             viewHolder.follow.setEnabled(false);
                             viewHolder.follow.setText("Followed");
                         }});

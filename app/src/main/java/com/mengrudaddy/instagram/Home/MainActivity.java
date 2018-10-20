@@ -234,12 +234,8 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot)  {
                 user = dataSnapshot.getValue(User.class);
                 //access posts
-                if(FeedType == requestDate){
-                    accessPostsByDate();
-                }
-                else{
-                    accessPostsByLocation();
-                }
+                accessPostsByDate();
+
 
                 //setting recycleView for adapter
 
