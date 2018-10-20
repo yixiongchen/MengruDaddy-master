@@ -79,8 +79,6 @@ public class SearchActivity extends AppCompatActivity{
 
 
         userList = new ArrayList<>();
-
-
         editTextName = (EditText) findViewById(R.id.search_field);
         buttonSearch = (ImageButton) findViewById(R.id.search_btn);
 
@@ -99,7 +97,7 @@ public class SearchActivity extends AppCompatActivity{
         buttonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = editTextName.getText().toString().toLowerCase(Locale.getDefault());
+                String username = editTextName.getText().toString().trim().toLowerCase(Locale.getDefault());
                 searchForMatch(username);
             }
         });
@@ -133,12 +131,13 @@ public class SearchActivity extends AppCompatActivity{
 
                 for(int i=0; i< allUsers.size()-1; i++){
                     if (allUsers.get(i).following != null){
-                    List<String> follow = getListByMap(allUsers.get(i).following, false);
-                    follow.retainAll(currentFollow);
-                    int num = follow.size();
-                    if (num>=2&&!allUsers.get(i).Id.equals(current.Id)){
-                        userList.add(allUsers.get(i));
-                    }}
+                        List<String> follow = getListByMap(allUsers.get(i).following, false);
+                        follow.retainAll(currentFollow);
+                        int num = follow.size();
+                        if (num>=2&&!allUsers.get(i).Id.equals(current.Id)){
+                            userList.add(allUsers.get(i));
+                        }
+                    }
                 }
                 updateUsersList();
             }
@@ -170,7 +169,8 @@ public class SearchActivity extends AppCompatActivity{
                         Log.d(TAG, "onDataChange: found user:" + singleSnapshot.getValue(User.class).toString());
                         String name = singleSnapshot.getValue(User.class).username;
 
-                        if (name.equals(keyword)){
+                        if (name.toLowerCase().contains(keyword) || keyword.contains(name)
+                                || name.equals(keyword)){
                             userList.add(singleSnapshot.getValue(User.class));
                         }
                         //update the users list view
@@ -189,16 +189,18 @@ public class SearchActivity extends AppCompatActivity{
     public static List<String> getListByMap(Map<String, String> map,
                                             boolean isKey) {
         List<String> list = new ArrayList<String>();
-
-        Iterator<String> it = map.keySet().iterator();
-        while (it.hasNext()) {
-            String key = it.next().toString();
-            if (isKey) {
-                list.add(key);
-            } else {
-                list.add(map.get(key));
+        if(map != null){
+            Iterator<String> it = map.keySet().iterator();
+            while (it.hasNext()) {
+                String key = it.next().toString();
+                if (isKey) {
+                    list.add(key);
+                } else {
+                    list.add(map.get(key));
+                }
             }
         }
+
 
         return list;
     }

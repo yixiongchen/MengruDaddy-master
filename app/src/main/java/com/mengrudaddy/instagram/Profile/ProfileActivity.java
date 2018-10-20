@@ -40,6 +40,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mengrudaddy.instagram.Adapter.photoAdapter;
 import com.mengrudaddy.instagram.Login.LoginActivity;
+import com.mengrudaddy.instagram.Models.Event;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 import com.mengrudaddy.instagram.utils.BottomNavigHelper;
@@ -47,7 +48,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -73,7 +76,6 @@ public class ProfileActivity extends AppCompatActivity{
     private StorageReference profile_pic_ref;
     //photo storage
     private ArrayList<String> photoIds;
-
     private String profileId; //profile user id
 
 
@@ -87,7 +89,6 @@ public class ProfileActivity extends AppCompatActivity{
 
         // Get intent data
         Intent i = getIntent();
-
 
         //View initialization
         title=(TextView)findViewById(R.id.toolbar_userprofile);
@@ -103,7 +104,6 @@ public class ProfileActivity extends AppCompatActivity{
         gridview = (GridView) findViewById(R.id.gridView);
         profile_pic = (CircleImageView) findViewById(R.id.profile_image) ;
 
-
         //real time database
         database = FirebaseDatabase.getInstance();
         // get storage
@@ -111,8 +111,6 @@ public class ProfileActivity extends AppCompatActivity{
         //auth
         auth = FirebaseAuth.getInstance();
         authUser = auth.getCurrentUser();
-
-
         if (authUser == null) {
             finish();
         }
@@ -123,7 +121,7 @@ public class ProfileActivity extends AppCompatActivity{
             profileId = i.getExtras().getString("id");
         }
 
-        //Profile userId path
+        //Personal profile
         if(profileId == null){
             profileId = authUser.getUid();
             editFile.setText("Edit Profile");
@@ -135,6 +133,7 @@ public class ProfileActivity extends AppCompatActivity{
                 }
             });
         }
+        //view other profile
         else{
             Log.d(TAG, "View other user");
             //set toolbar
@@ -205,8 +204,29 @@ public class ProfileActivity extends AppCompatActivity{
                             followermap.put(followerKey, authUser.getUid());
                             user_follower_list.updateChildren(followermap);
 
+
+                            //event notification updates
+                            Date date = new Date();
+                            DatabaseReference eventRef  = database.getReference("events/");
+                            String eventId = eventRef.push().getKey();
+                            HashMap<String, String> action = new HashMap<>();
+                            action.put("userId", authUser.getUid());
+                            action.put("type", "follow");
+                            //action.put("typeId", post.Id);
+                            Event eventObject  = new Event(eventId, action, date);
+                            eventRef.child(eventId).setValue(eventObject);
+                            //add eventId to the list of target user
+                            DatabaseReference eventListRef = database.getReference("users/"+profileId+"/"+"events");
+                            String event_list_key = eventListRef.push().getKey();
+                            Map<String, Object> updateEventList = new HashMap<>();
+                            updateEventList.put(event_list_key,eventId);
+                            eventListRef.updateChildren(updateEventList);
+
+
                             editFile.setEnabled(false);
                             editFile.setText("Followed");
+
+
                         }
                     });
 
@@ -317,12 +337,13 @@ public class ProfileActivity extends AppCompatActivity{
                         String photoUrl = parent.getItemAtPosition(position).toString();
                         Intent i = new Intent(getApplicationContext(), SinglePostActivity.class);
                         // Pass image index
-                        i.putExtra("postId", photoUrl);
-                        i.putExtra("userId", profileId);
+                        Bundle extras = new Bundle();
+                        extras.putString("postId", photoUrl);
+                        //extras.putString("userId", profileId);
+                        i.putExtras(extras);
                         startActivity(i);
                     }
                 });
-
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}

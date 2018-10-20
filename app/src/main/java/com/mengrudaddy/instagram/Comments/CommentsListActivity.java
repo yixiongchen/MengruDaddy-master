@@ -1,9 +1,11 @@
 package com.mengrudaddy.instagram.Comments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mengrudaddy.instagram.Adapter.commentListAdapter;
 import com.mengrudaddy.instagram.Models.Comment;
+import com.mengrudaddy.instagram.Models.Event;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.R;
 
@@ -32,33 +35,40 @@ import java.util.Map;
 public class CommentsListActivity extends AppCompatActivity {
 
 
-    private final String TAG = "LikesListActivity::";
+    private final String TAG = "CommentListActivity::";
     private Context context=CommentsListActivity.this;
     private static final int ACTIVITY_NUM=4;
     private User user;
     private FirebaseUser authUser;
     private FirebaseAuth auth;
     private FirebaseDatabase database;
-    private DatabaseReference userRef,postRef;
-    private ValueEventListener mUserListener, mPostListener;
+    private DatabaseReference userRef, postRef;
+    private ValueEventListener mPostListener;
     private commentListAdapter adapter;
     private ListView listView;
     private EditText newComment;
     private ImageView send;
     private ProgressBar progressBar;
-
-    private String[] commentIdList;
     private String postId;
+    private String postUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments_list);
 
-        //receive commentId list
-        commentIdList = getIntent().getStringArrayExtra("CommentIdList");
+
         //receive postId
-        postId = getIntent().getStringExtra("postId");
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        postId = extras.getString("postId");
+        //receive userId
+        postUserId = extras.getString("userId");
+        Log.d(TAG, "get postId:: "+postId);
+        //Log.d(TAG, "get userId:: "+postUserId);
+
+
+
 
         //access use profile and set up adpater
         listView = (ListView)findViewById(R.id.listView) ;
@@ -104,9 +114,7 @@ public class CommentsListActivity extends AppCompatActivity {
         if (mPostListener != null) {
             postRef.removeEventListener(mPostListener);
         }
-        if(mUserListener != null){
-            userRef.removeEventListener(mUserListener);
-        }
+
     }
 
 
@@ -117,46 +125,63 @@ public class CommentsListActivity extends AppCompatActivity {
         //userId path
         String indexPath = "users/"+authUser.getUid();
         userRef = database.getReference(indexPath);
-        //read user info
-        ValueEventListener userListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)  {
-                user = dataSnapshot.getValue(User.class);
-                //initialize send button
-                send.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
 
-                        DatabaseReference commentRef  = database.getReference("comments/");
-                        DatabaseReference commentListRef = database.getReference("posts/"+postId+"/"+"comments");
-                        String content = newComment.getText().toString();
-                        if(content.trim().length() == 0){
-                            Toast.makeText(CommentsListActivity.this, "Can not be Empty", Toast.LENGTH_SHORT).show();
-                        }
-                        else{
-                            Comment commentObject  = new Comment(authUser.getUid(),user.username,content, new Date());
-                            //write like object to database
-                            String CommentId = commentRef.push().getKey();
-                            commentRef.child(CommentId).setValue( commentObject);
+        
 
-                            //add <UserId, LikeId> to the list in the post
-                            String key = commentListRef.push().getKey();
-                            Map<String, Object> updateValue = new HashMap<>();
-                            updateValue.put(key,CommentId); //userId:likeId
-                            commentListRef.updateChildren(updateValue);
-                            newComment.setText(" ");
-                            Toast.makeText(CommentsListActivity.this, "You successfully sent a Comment!", Toast.LENGTH_SHORT).show();
-                        }
+        //send a comment
+        send.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //Log.d(TAG, "user Id: "+postUserId);
+                DatabaseReference commentRef  = database.getReference("comments/");
+                DatabaseReference commentListRef = database.getReference("posts/"+postId+"/"+"comments");
+                String content = newComment.getText().toString();
+                if(content.trim().length() == 0){
+                    Toast.makeText(CommentsListActivity.this, "Can not be Empty", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Date date = new Date();
+                    Comment commentObject  = new Comment(authUser.getUid(),content, date);
+                    //write like object to database
+                    String CommentId = commentRef.push().getKey();
+                    commentRef.child(CommentId).setValue( commentObject);
+                    //add <UserId, CommentId> to the list in the post
+                    String key = commentListRef.push().getKey();
+                    Map<String, Object> updateValue = new HashMap<>();
+                    updateValue.put(key,CommentId); //userId:likeId
+                    commentListRef.updateChildren(updateValue);
+
+                    //if comment other user's post
+                    if(postUserId.compareTo(authUser.getUid())!=0){
+                        // update a comment notification event
+                        DatabaseReference eventRef  = database.getReference("events/");
+                        String eventId = eventRef.push().getKey();
+                        HashMap<String, String> action = new HashMap<>();
+                        action.put("userId", authUser.getUid());
+                        action.put("type", "comment");
+                        action.put("typeId", postId);
+                        action.put("content", content);
+                        Event eventObject  = new Event(eventId, action, date);
+                        eventRef.child(eventId).setValue(eventObject);
+                        //add eventId to the list of target user
+                        DatabaseReference eventListRef = database.getReference("users/"+postUserId+"/"+"events");
+                        String event_list_key = eventListRef.push().getKey();
+                        Map<String, Object> updateEventList = new HashMap<>();
+                        updateEventList.put(event_list_key,eventId);
+                        eventListRef.updateChildren(updateEventList);
+
+                        //update a comment notification for reminder
 
                     }
 
-                });
+                    newComment.setText(" ");
+                    Toast.makeText(CommentsListActivity.this, "You successfully sent a Comment!", Toast.LENGTH_SHORT).show();
+                }
 
             }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        };
-        userRef.addValueEventListener(userListener);
-        mUserListener = userListener;
+
+        });
+
+
 
     }
 

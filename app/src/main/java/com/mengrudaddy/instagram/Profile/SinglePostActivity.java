@@ -32,6 +32,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mengrudaddy.instagram.Comments.CommentsListActivity;
 import com.mengrudaddy.instagram.Likes.LikesListActivity;
+import com.mengrudaddy.instagram.Models.Event;
 import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
 import com.mengrudaddy.instagram.Models.User;
@@ -89,9 +90,13 @@ public class SinglePostActivity extends AppCompatActivity {
 
         // Get intent data
         Intent i = getIntent();
+        Bundle extras = i.getExtras();
         // get post id
-        postId = i.getExtras().getString("postId");
-        userId = i.getExtras().getString("userId");
+        postId = extras.getString("postId");
+        //userId = extras.getString("userId");
+
+        //Log.d(TAG, "postId is: "+postId);
+        //Log.d(TAG, "userId is: "+userId);
 
         //views
         imageView = (ImageView) findViewById(R.id.image);
@@ -134,14 +139,13 @@ public class SinglePostActivity extends AppCompatActivity {
         String indexPath = "posts/"+postId;
         postRef = database.getReference(indexPath);
 
-        //the user's path
-        userRef = database.getReference("users/"+userId);
 
         //firebase storage
         storage = FirebaseStorage.getInstance();
         //storage location: posts/postid/
         String postRef = "posts/images/";
         imageReference = storage.getReference(postRef).child(postId);
+        //show the post image
         imageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -166,78 +170,13 @@ public class SinglePostActivity extends AppCompatActivity {
                 Log.d(TAG, "Can not download file, please check connection");
             }
         });
-        //read user info
-        accessUserProfile();
+
+
         //read post info
         accessPostProfile();
 
-        //click like button
-        like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //like object reference
-                DatabaseReference likeRef  = database.getReference("likes/");
-                DatabaseReference likeListRef = database.getReference("posts/"+postId+"/"+"likes");
-                //unllike event
-                if(likeBoolean){
-                    HashMap<String, String> map =( HashMap<String, String>)post.likes;
-                    String likeId = map.get(authUser.getUid());
-                    //remove <userid, likeId> from likesList
-                    likeListRef.child(authUser.getUid()).removeValue();
-                    //remove Like object from database
-                    likeRef.child(likeId).removeValue();
-                    //set icon
-                    likeBoolean = false;
-                    like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
-                    Toast.makeText(SinglePostActivity.this, "You unliked the Post!", Toast.LENGTH_SHORT).show();
 
-                }
-                //like event
-                else{
-                    //create like object
-                    Like likeObject  = new Like(postId, authUser.getUid(), user.username, new Date());
-                    //write like object to database
-                    String likeId = likeRef.push().getKey();
-                    likeRef.child(likeId).setValue(likeObject);
-
-                    //add <UserId, LikeId> to the list in the post
-                    Map<String, Object> updateValue = new HashMap<>();
-                    updateValue.put(authUser.getUid(),likeId); //userId:likeId
-                    likeListRef.updateChildren(updateValue);
-
-                    //set icon
-                    likeBoolean = true;
-                    like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
-                    Toast.makeText(SinglePostActivity.this, "You Liked the Post!", Toast.LENGTH_SHORT).show();
-
-                }
-            }
-        });
-
-
-        //click comment button
-        comment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SinglePostActivity.this, CommentsListActivity.class);
-                intent.putExtra("postId",postId);
-                startActivity(intent);
-
-            }
-        });
-
-        //view all comments
-        numComments.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SinglePostActivity.this, CommentsListActivity.class);
-                intent.putExtra("postId",postId);
-                startActivity(intent);
-
-            }
-        });
-
-        //view all likes
+        //click event for viewing all likes
         numLikes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -282,13 +221,7 @@ public class SinglePostActivity extends AppCompatActivity {
         Menu menu = bottomNavigationView.getMenu();
         MenuItem mItem = menu.getItem(ACTIVITY_NUM);
         mItem.setChecked(true);
-        if(authUser.getUid().compareTo(userId) == 0){
-            mItem.setEnabled(false);
-        }
-        else{
-            mItem.setEnabled(true);
-        }
-
+        mItem.setEnabled(true);
 
     }
 
@@ -300,89 +233,12 @@ public class SinglePostActivity extends AppCompatActivity {
         final ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
+                //first get the post object
                 post = dataSnapshot.getValue(Post.class);
-
-                Date postdate = post.date;
-                Double latitude = null;
-                Double longitude = null;
-                if(post.location !=null){
-                    latitude = post.location.get("latitude");
-                    longitude = post.location.get("longitude");
-                }
-
-                DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
-                String todate = dateFormat.format(postdate);
-                date.setText(todate);
-                if(description == null){
-                    description.setVisibility(View.GONE);
-                }
-                else{
-                    description.setText(user.username + ": " +post.description);
-                }
-
-                if(latitude ==null || longitude == null){
-                    location.setVisibility(View.GONE);
-                }
-                else{
-                    String address = getAddress(latitude, longitude);
-                    location.setText(address);
-                }
-
-                if(post.comments == null){
-                    numComments.setVisibility(View.GONE);
-                }
-                else{
-                    numComments.setVisibility(View.VISIBLE);
-                    numComments.setText("View all "+Integer.toString(post.comments.keySet().size())+" Comments");
-                }
-
-                if(post.likes == null) {
-                    numLikes.setVisibility(View.GONE);
-                    likeBoolean = false;
-                    like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
-
-                }
-                else{
-                    numLikes.setVisibility(View.VISIBLE);
-                    numLikes.setText(Integer.toString(post.likes.keySet().size())+" likes");
-                    if(post.likes.containsKey(authUser.getUid())){
-                        likeBoolean = true;
-                        like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_like));
-                    }
-                }
-                //load image
-                //load profile image
-                //access Profile user
-                profile_pic_ref = storage.getReference().child("profile_pic/"+post.userId);
-                if(user.image != null){
-                    profile_pic_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            //picasso lib load remote image
-                            Picasso.with(getApplicationContext()).load(uri.toString()).into(profileImage,
-                                    new com.squareup.picasso.Callback() {
-                                        @Override
-                                        public void onSuccess() {
-                                            //do smth when picture is loaded successfully
-                                            progressBar.setVisibility(View.GONE);
-                                        }
-                                        @Override
-                                        public void onError() {
-                                            progressBar.setVisibility(View.GONE);
-                                            //do smth when there is picture loading error
-                                        }
-                                    });
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            progressBar.setVisibility(View.GONE);
-                            Log.d(TAG, "Can not download file, please check connection");
-                        }
-                    });
-
-                }
+                //retrieve the userid of the poster
+                userId = post.userId;
+                //access the user info by userId
+                accessUserProfile(userId);
 
             }
             @Override
@@ -392,25 +248,205 @@ public class SinglePostActivity extends AppCompatActivity {
         mPostListener = postListener;
     }
 
+
      /*
       Read the user info from database
      */
-     private void accessUserProfile(){
+     private void accessUserProfile(String userId){
 
-         //read user info
+         //user listener
          ValueEventListener userListener = new ValueEventListener() {
              @Override
              public void onDataChange(DataSnapshot dataSnapshot)  {
+                 //retrieve user object
                  user = dataSnapshot.getValue(User.class);
+                 //set username
                  userName.setText(user.username);
+                 Date postdate = post.date;
+
+                 //set location
+                 if(post.location !=null){
+                     String address = getAddress(post.location.get("latitude"), post.location.get("longitude"));
+                     location.setText(address);
+                 }
+                 else{
+                     location.setVisibility(View.GONE);
+                 }
+
+                 //set dat view
+                 DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
+                 String todate = dateFormat.format(postdate);
+                 date.setText(todate);
+
+                 //set description
+                 if(description == null){
+                     description.setVisibility(View.GONE);
+                 }
+                 else{
+                     description.setText(user.username + ": " +post.description);
+                 }
+
+                 //set num of comments
+                 if(post.comments == null){
+                     numComments.setVisibility(View.GONE);
+                 }
+                 else{
+                     numComments.setVisibility(View.VISIBLE);
+                     numComments.setText("View all "+Integer.toString(post.comments.keySet().size())+" Comments");
+                 }
+
+                 //set like icon
+                 if(post.likes == null) {
+                     numLikes.setVisibility(View.GONE);
+                     likeBoolean = false;
+                     like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
+
+                 }
+
+                 //set num of likes
+                 else{
+                     numLikes.setVisibility(View.VISIBLE);
+                     numLikes.setText(Integer.toString(post.likes.keySet().size())+" likes");
+                     if(post.likes.containsKey(authUser.getUid())){
+                         likeBoolean = true;
+                         like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_like));
+                     }
+                 }
+
+                 //load profile image
+                 profile_pic_ref = storage.getReference().child("profile_pic/"+post.userId);
+                 if(user.image != null){
+                     profile_pic_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                         @Override
+                         public void onSuccess(Uri uri) {
+                             //picasso lib load remote image
+                             Picasso.with(getApplicationContext()).load(uri.toString()).into(profileImage,
+                                     new com.squareup.picasso.Callback() {
+                                         @Override
+                                         public void onSuccess() {
+                                             //do smth when picture is loaded successfully
+                                             //progressBar.setVisibility(View.GONE);
+                                         }
+                                         @Override
+                                         public void onError() {
+                                             //progressBar.setVisibility(View.GONE);
+                                             //do smth when there is picture loading error
+                                         }
+                                     });
+
+                         }
+                     }).addOnFailureListener(new OnFailureListener() {
+                         @Override
+                         public void onFailure(@NonNull Exception exception) {
+                             //progressBar.setVisibility(View.GONE);
+                             Log.d(TAG, "Can not download file, please check connection");
+                         }
+                     });
+                 }
+
+                 //handle comment and like clicker
+                 //click like button
+                 like.setOnClickListener(new View.OnClickListener() {
+                     @Override
+                     public void onClick(View v) {
+                         //like object reference
+                         DatabaseReference likeRef  = database.getReference("likes/");
+                         DatabaseReference likeListRef = database.getReference("posts/"+postId+"/"+"likes");
+
+                         //unlike event
+                         if(likeBoolean){
+                             HashMap<String, String> map =( HashMap<String, String>)post.likes;
+                             String likeId = map.get(authUser.getUid());
+                             //remove <userid, likeId> from likesList
+                             likeListRef.child(authUser.getUid()).removeValue();
+                             //remove Like object from database
+                             likeRef.child(likeId).removeValue();
+                             //set icon
+                             likeBoolean = false;
+                             like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
+                             Toast.makeText(SinglePostActivity.this, "You unliked the Post!", Toast.LENGTH_SHORT).show();
+
+                         }
+                         //like event
+                         else{
+                             Date date = new Date();
+                             //create like object
+                             Like likeObject  = new Like(postId, authUser.getUid(), user.username, date);
+                             //write like object to database
+                             String likeId = likeRef.push().getKey();
+                             likeRef.child(likeId).setValue(likeObject);
+
+                             //add <UserId, LikeId> to the list in the post
+                             Map<String, Object> updateValue = new HashMap<>();
+                             updateValue.put(authUser.getUid(),likeId); //userId:likeId
+                             likeListRef.updateChildren(updateValue);
+
+
+                             //if like other user's post, update a like notification event
+                             if(post.userId.compareTo(authUser.getUid())!=0){
+                                 DatabaseReference eventRef  = database.getReference("events/");
+                                 String eventId = eventRef.push().getKey();
+                                 HashMap<String, String> action = new HashMap<>();
+                                 action.put("userId", authUser.getUid());
+                                 action.put("type", "like");
+                                 action.put("typeId", postId);
+                                 Event eventObject  = new Event(eventId, action, date);
+                                 eventRef.child(eventId).setValue(eventObject);
+                                 //add eventId to the list of target user
+                                 DatabaseReference eventListRef = database.getReference("users/"+post.userId+"/"+"events");
+                                 String event_list_key = eventListRef.push().getKey();
+                                 Map<String, Object> updateEventList = new HashMap<>();
+                                 updateEventList.put(event_list_key,eventId);
+                                 eventListRef.updateChildren(updateEventList);
+
+                             }
+                             //set icon
+                             likeBoolean = true;
+                             like.setImageDrawable(getApplicationContext().getDrawable(R.drawable.ic_action_activity));
+                             Toast.makeText(SinglePostActivity.this, "You Liked the Post!", Toast.LENGTH_SHORT).show();
+
+                         }
+
+                     }
+                 });
+
+                 //click comment button
+                 comment.setOnClickListener(new View.OnClickListener() {
+                     @Override
+                     public void onClick(View v) {
+                         Intent intent = new Intent(SinglePostActivity.this, CommentsListActivity.class);
+                         Bundle extras = new Bundle();
+                         extras.putString("postId",postId);
+                         extras.putString("userId", post.userId);
+                         intent.putExtras(extras);
+                         startActivity(intent);
+
+                     }
+                 });
+
+                 //view all comments
+                 numComments.setOnClickListener(new View.OnClickListener() {
+                     @Override
+                     public void onClick(View v) {
+                         Intent intent = new Intent(SinglePostActivity.this, CommentsListActivity.class);
+                         Bundle extras = new Bundle();
+                         extras.putString("postId",postId);
+                         extras.putString("userId", post.userId);
+                         intent.putExtras(extras);
+                         startActivity(intent);
+
+                     }
+                 });
 
              }
              @Override
              public void onCancelled(DatabaseError databaseError) {}
          };
+         //the user's path
+         Log.d(TAG, userId);
+         userRef = database.getReference("users/"+userId);
          userRef.addValueEventListener(userListener);
          mUserListener = userListener;
-
      }
 
 

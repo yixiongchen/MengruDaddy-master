@@ -53,6 +53,7 @@ public class FollowingFragment extends Fragment{
             testList.add(new User());
         }
 
+
         adapter = new followingTabAdapter(getContext(),R.layout.list_following,testList);
         // set adapter
         mResultList.setAdapter(adapter);

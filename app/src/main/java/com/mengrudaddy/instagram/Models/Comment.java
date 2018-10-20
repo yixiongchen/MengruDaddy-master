@@ -10,7 +10,7 @@ import java.util.Map;
 public class Comment {
 
 
-    public String username;
+
     public String userId;
     public String content;
     public Date date;
@@ -20,8 +20,7 @@ public class Comment {
 
     }
 
-    public Comment(String userId, String username, String content, Date date){
-        this.username = username;
+    public Comment(String userId,  String content, Date date){
         this.userId =userId;
         this.content = content;
         this.date =date;
@@ -31,7 +30,6 @@ public class Comment {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("username", username);
         result.put("userId", userId);
         result.put("content", content);
         result.put("date", date);

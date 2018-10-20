@@ -37,7 +37,6 @@
                 android:layout_marginTop="20dp"
                 android:layout_toEndOf="@+id/profile_image"
                 android:fontFamily="@font/nunito_semibold"
-                android:text="Mack Daddy"
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:textSize="14sp" />
@@ -51,7 +50,6 @@
                 android:layout_marginTop="5dp"
                 android:layout_toEndOf="@+id/profile_image"
                 android:fontFamily="@font/nunito_semibold"
-                android:text="Liked Jack's post/start to foloowing Jack"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
         </LinearLayout>

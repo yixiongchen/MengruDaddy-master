@@ -46,7 +46,6 @@
                 android:layout_marginTop="5dp"
                 android:layout_toEndOf="@+id/profile_image"
                 android:fontFamily="@font/nunito_semibold"
-                android:text="Liked your post/start to foloowing youuuuuu"
                 android:textColor="@color/black"
                 android:textSize="10sp" />
         </LinearLayout>
