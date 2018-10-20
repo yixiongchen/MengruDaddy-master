@@ -34,13 +34,13 @@ public class followerUserAdapter extends BaseAdapter {
 
     private String[] followerIds,userIds;
     private final Context mContext;
-    private User user, likeUser;
+    private User user, followerUser;
     private static final String TAG = "followerUserAdapter";
     private FirebaseDatabase database;
     private DatabaseReference followerRef,userRef;
     private FirebaseStorage storage;
 
-    //private Like like;
+    private User itemUser;
 
 
     public followerUserAdapter (Context context, String[] followerIds, User user){
@@ -107,20 +107,20 @@ public class followerUserAdapter extends BaseAdapter {
         ValueEventListener likeListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
-                user = dataSnapshot.getValue(User.class);
+                itemUser = dataSnapshot.getValue(User.class);
 
                 //access username
                 accessUsername(viewHolder);
                 //access profile image
                 accessProfileImage(viewHolder);
-                userIds[index] = user.Id;
+                userIds[index] = itemUser.Id;
 
                 //user is AuthUser
-                if(user.Id.compareTo(user.Id)==0){
+                if(user.Id.compareTo(itemUser.Id)==0){
                     viewHolder.follow.setVisibility(View.GONE);
                 }
                 // user is not in the following
-                if(user.following != null && user.following.containsValue(user.Id)){
+                if(user.following != null && user.following.containsValue(itemUser.Id)){
                     viewHolder.follow.setEnabled(false);
                     viewHolder.follow.setText("Followed");
                 }
@@ -134,11 +134,11 @@ public class followerUserAdapter extends BaseAdapter {
                             DatabaseReference user_following_list = database.getReference("users/").child(user.Id).child("following");
                             String key = user_following_list.push().getKey();
                             HashMap<String, Object> map = new HashMap<>();
-                            map.put(key, user.Id);
+                            map.put(key, itemUser.Id);
                             user_following_list.updateChildren(map);
 
                             //add user id to follower list for profile user;
-                            DatabaseReference user_follower_list = database.getReference("users/").child(user.Id).child("followers");
+                            DatabaseReference user_follower_list = database.getReference("users/").child(itemUser.Id).child("followers");
                             String followerKey = user_follower_list.push().getKey();
                             HashMap<String, Object> followermap = new HashMap<>();
                             followermap.put(followerKey, user.Id);
@@ -183,13 +183,13 @@ public class followerUserAdapter extends BaseAdapter {
         read username from user profile
      */
     public void accessUsername(final followerUserAdapter.ViewHolder viewHolder){
-        userRef = database.getReference("users").child(user.Id);
+        userRef = database.getReference("users").child(itemUser.Id);
         //read user info
         ValueEventListener userListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)  {
-                likeUser = dataSnapshot.getValue(User.class);
-                viewHolder.username.setText(likeUser.username);
+                followerUser = dataSnapshot.getValue(User.class);
+                viewHolder.username.setText(followerUser.username);
 
             }
             @Override
@@ -203,7 +203,7 @@ public class followerUserAdapter extends BaseAdapter {
        load profile image
     */
     public void accessProfileImage(final followerUserAdapter.ViewHolder viewHolder){
-        StorageReference profile_pic_ref = storage.getReference("profile_pic/"+user.Id);
+        StorageReference profile_pic_ref = storage.getReference("profile_pic/"+itemUser.Id);
 
         profile_pic_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
