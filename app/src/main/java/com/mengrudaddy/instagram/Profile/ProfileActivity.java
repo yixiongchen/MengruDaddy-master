@@ -144,7 +144,6 @@ public class ProfileActivity extends AppCompatActivity{
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            //getSupportActionBar().setTitle("Post");
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -263,10 +262,10 @@ public class ProfileActivity extends AppCompatActivity{
                 ProfileUser = dataSnapshot.getValue(User.class);
                 title.setText(ProfileUser.username);
                 username.setText(ProfileUser.username);
-
                 //set title name
-                //getSupportActionBar().setTitle(ProfileUser.username);
-
+                if(profileId.compareTo(authUser.getUid())!=0){
+                    getSupportActionBar().setTitle(username.getText().toString());
+                }
                 if(ProfileUser.email != null){
                     email.setText(ProfileUser.email);
                 }

@@ -267,15 +267,18 @@ public class SinglePostActivity extends AppCompatActivity {
 
                  //set location
                  if(post.location !=null){
-                     String address = getAddress(post.location.get("latitude"), post.location.get("longitude"));
+                     Double latitude = post.location.get("latitude");
+                     Double longitude = post.location.get("longitude");
+                     String address = getAddress(latitude,longitude);
                      location.setText(address);
+                     //location.setText(address);
                  }
                  else{
                      location.setVisibility(View.GONE);
                  }
 
                  //set dat view
-                 DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
+                 DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd hh:mm a");
                  String todate = dateFormat.format(postdate);
                  date.setText(todate);
 

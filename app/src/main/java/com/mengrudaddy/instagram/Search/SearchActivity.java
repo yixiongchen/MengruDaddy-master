@@ -136,6 +136,8 @@ public class SearchActivity extends AppCompatActivity{
                 if(current.following!=null){
 
                     List<String> currentFollow = getListByMap(current.following, false);
+
+
                     /*
                         Suggested user algorithm:
                         Search for users that have at least two same followings and not followed by
@@ -152,6 +154,7 @@ public class SearchActivity extends AppCompatActivity{
                                 userList.add(allUsers.get(i));
                             }}
                     }
+
 
                     updateUsersList();
 
@@ -179,6 +182,9 @@ public class SearchActivity extends AppCompatActivity{
 
 
                                 userList = new ArrayList<>(sortedMap.keySet());
+
+
+
                                 Collections.reverse(userList);
 
                                 for(int i =0 ; i<userList.size(); i++) {
@@ -231,12 +237,10 @@ public class SearchActivity extends AppCompatActivity{
                                     }
                                 }
 
+
                                 //update the users list view
                                 updateUsersList();
                                 headtitle.setText("Popular users");
-
-                                Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
-                                        " for you. You can make some friends from the popular list!", Toast.LENGTH_LONG).show();
 
                             }
 
@@ -269,7 +273,7 @@ public class SearchActivity extends AppCompatActivity{
         if(keyword.isEmpty()) {
 
             Log.d(TAG, "null input");
-            Toast.makeText(getApplicationContext(), "The search bar should not be empty", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "The search bar can not be empty", Toast.LENGTH_LONG).show();
 
             //search key is not empty
 
@@ -287,7 +291,6 @@ public class SearchActivity extends AppCompatActivity{
                         User user = singleSnapshot.getValue(User.class);
 
                         float a = (float) ng.distance(user.username,keyword);
-
                         if(!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5){
                             results.put(user, (float) ng.distance(user.username,keyword));
                         }
@@ -295,7 +298,9 @@ public class SearchActivity extends AppCompatActivity{
 
                     HashMap<User,Float> sortedMap = sortByValue2(results);
                     userList = new ArrayList<>(sortedMap.keySet());
+                    Collections.reverse(userList);
                     updateUsersList();
+                    headtitle.setText("Search result");
                 }
 
                 @Override
@@ -344,7 +349,7 @@ public class SearchActivity extends AppCompatActivity{
         adapter = new userListAdapter(SearchActivity.this, R.layout.list_layout, userList);
 
         mResultList.setAdapter(adapter);
-        headtitle.setText("Search result");
+
 
 
     }

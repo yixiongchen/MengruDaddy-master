@@ -49,9 +49,7 @@ public class userListAdapter extends RecyclerView.Adapter<userListAdapter.userVi
     public void onBindViewHolder(@NonNull userViewHolder userViewHolder, final int i) {
         final User user = userList.get(i);
 
-        if(i <= 2){
-            userViewHolder.popularView.setVisibility(View.VISIBLE);
-        }
+
 
         userViewHolder.textViewUsername.setText(user.username);
         userViewHolder.textViewEmail.setText(user.email);
@@ -79,7 +77,7 @@ public class userListAdapter extends RecyclerView.Adapter<userListAdapter.userVi
 
     public class userViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView imageView, popularView;
+        ImageView imageView;
         TextView textViewUsername, textViewEmail;
         ProgressBar progressBar;
 
@@ -90,9 +88,9 @@ public class userListAdapter extends RecyclerView.Adapter<userListAdapter.userVi
             textViewUsername = itemView.findViewById(R.id.name_text);
             textViewEmail = itemView.findViewById(R.id.email_text);
             progressBar = itemView.findViewById(R.id.progressBar);
-            popularView = itemView.findViewById(R.id.popularView);
 
-            popularView.setVisibility(View.GONE);
+
+
 
         }
     }
