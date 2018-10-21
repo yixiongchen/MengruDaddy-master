@@ -150,7 +150,7 @@ public class SearchActivity extends AppCompatActivity{
                             follow.retainAll(currentFollow);
                             int num = follow.size();
                             if ((num>=2 && !allUsers.get(i).username.equals(current.username)) &&
-                                    !allUsers.get(i).following.containsValue(current.Id)){
+                                    !current.following.containsValue(allUsers.get(i).Id)){
                                 userList.add(allUsers.get(i));
                             }}
                     }
@@ -274,7 +274,7 @@ public class SearchActivity extends AppCompatActivity{
 
             Log.d(TAG, "null input");
             //Toast.makeText(getApplicationContext(), "The search bar can not be empty", Toast.LENGTH_LONG).show();
-
+            headtitle.setText("Can not be Empty");
             //search key is not empty
 
         }else{
@@ -289,16 +289,20 @@ public class SearchActivity extends AppCompatActivity{
 
                         Log.d(TAG, "onDataChange: found user:" + singleSnapshot.getValue(User.class).toString());
                         User user = singleSnapshot.getValue(User.class);
+                        String username = user.username.toLowerCase();
+                        String email =  user.email.toLowerCase();
 
-                        float a = (float) ng.distance(user.username,keyword);
-                        if(!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5){
-                            results.put(user, (float) ng.distance(user.username,keyword));
+                        //float a = (float) ng.distance(user.username,keyword);
+                        if(username.contains(keyword) || keyword.contains(username)
+                                || email.contains(keyword) || keyword.contains(email)){
+
+                            userList.add(user);
                         }
                     }
 
-                    HashMap<User,Float> sortedMap = sortByValue2(results);
-                    userList = new ArrayList<>(sortedMap.keySet());
-                    Collections.reverse(userList);
+                    //HashMap<User,Float> sortedMap = sortByValue2(results);
+                    //userList = new ArrayList<>(sortedMap.keySet());
+                    //Collections.reverse(userList);
                     updateUsersList();
                     headtitle.setText("Search result");
                 }
