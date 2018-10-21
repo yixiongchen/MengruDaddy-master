@@ -30,14 +30,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mengrudaddy.instagram.Comments.CommentsListActivity;
 import com.mengrudaddy.instagram.Likes.LikesListActivity;
-import com.mengrudaddy.instagram.Models.Comment;
 import com.mengrudaddy.instagram.Models.Event;
 import com.mengrudaddy.instagram.Models.Like;
 import com.mengrudaddy.instagram.Models.Post;
 import com.mengrudaddy.instagram.Models.Reminder;
 import com.mengrudaddy.instagram.Models.User;
 import com.mengrudaddy.instagram.Profile.ProfileActivity;
-import com.mengrudaddy.instagram.Profile.SinglePostActivity;
 import com.mengrudaddy.instagram.R;
 import com.squareup.picasso.Picasso;
 
@@ -50,6 +48,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static com.yalantis.ucrop.UCropFragment.TAG;
 
 public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postViewHolder> {
 
@@ -381,20 +381,20 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
     /*
         handle click for user profile
      */
-    private void viewUserProfile(final mainFeedAdapter.postViewHolder viewHolder, final Post post){
-        viewHolder.username.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(mContext, ProfileActivity.class);
-                intent.putExtra("id",post.userId);
-                mContext.startActivity(intent);
+                private void viewUserProfile(final mainFeedAdapter.postViewHolder viewHolder, final Post post){
+                    viewHolder.username.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(mContext, ProfileActivity.class);
+                            intent.putExtra("id",post.userId);
+                            mContext.startActivity(intent);
 
-            }
-        });
+                        }
+                    });
 
-        viewHolder.profile_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                    viewHolder.profile_image.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
                 Intent intent = new Intent(mContext, ProfileActivity.class);
                 intent.putExtra("id",post.userId);
                 mContext.startActivity(intent);
@@ -466,6 +466,7 @@ public class mainFeedAdapter extends RecyclerView.Adapter<mainFeedAdapter.postVi
             //Log.d("TESTadress:", "non adress");
             postViewHolder.location.setVisibility(View.GONE);
         }
+
 
         //click for like
         handleLike(postViewHolder, post, i);
