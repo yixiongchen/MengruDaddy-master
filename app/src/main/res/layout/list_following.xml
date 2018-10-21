@@ -51,12 +51,12 @@
                 android:textSize="10sp"/>
         </LinearLayout>
         <ImageView
-            android:id="@+id/post"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginLeft="50dp"
-            android:src="@drawable/ic_func_filter"/>
+        android:id="@+id/post"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="50dp"
+        android:src="@drawable/ic_func_filter"/>
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/userImage"
             android:layout_width="40dp"
