@@ -46,9 +46,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import info.debatty.java.stringsimilarity.NGram;
-
-
 public class SearchActivity extends AppCompatActivity{
     private static final String TAG = "SearchActivity";
     private Context context=SearchActivity.this;
@@ -268,65 +265,30 @@ public class SearchActivity extends AppCompatActivity{
 
     private void searchForMatch(final String keyword){
         Log.d(TAG, "searchForMatch: searching for a match: " + keyword);
-
         userList.clear();
-        final HashMap<User, Float> results = new HashMap<>();
+        //update the users list view
+        if(keyword.length() ==0){
 
-        DatabaseReference reference = database.getReference("users");
-
-        if(keyword.isEmpty()) {
-
-            Log.d(TAG, "null input");
-            Toast.makeText(getApplicationContext(), "The search bar should not be empty", Toast.LENGTH_LONG).show();
-
-            //search key is not empty
+            Log.d(TAG,"null input");
 
         }else{
-
+            DatabaseReference reference = database.getReference("users");
+            //            Query query = reference
+            //                    .orderByChild("username").equalTo(keyword);
             Log.d(TAG,"Search for the text");
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-
                 public void onDataChange(DataSnapshot dataSnapshot) {
-
                     for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
-
                         Log.d(TAG, "onDataChange: found user:" + singleSnapshot.getValue(User.class).toString());
-                        User user = singleSnapshot.getValue(User.class);
+                        String name = singleSnapshot.getValue(User.class).username;
 
-                        float a = (float) ng.distance(user.username,keyword);
-
-                        if(isNumeric(keyword)){
-
-                        if(ng.distance(user.username,keyword)<0.5&&isNumeric(user.username)){
-                            results.put(user, (float) ng.distance(user.username,keyword));
+                        if (name.contains(keyword)){
+                            userList.add(singleSnapshot.getValue(User.class));
                         }
-
-                        HashMap<User,Float> sortedMap = sortByValue2(results);
-
-                        userList = new ArrayList<>(sortedMap.keySet());
-
-                    }else if (isChinese(keyword)){
-
-                            if(ng.distance(user.username,keyword)<0.5 &&isChinese(user.username)){
-                                results.put(user, (float) ng.distance(user.username,keyword));
-                            }
-
-                            HashMap<User,Float> sortedMap = sortByValue2(results);
-
-                            userList = new ArrayList<>(sortedMap.keySet());
-
-                        }else {
-                            if(ng.distance(user.username,keyword)<0.5){
-                                results.put(user, (float) ng.distance(user.username,keyword));
-                            }
-
-                            HashMap<User,Float> sortedMap = sortByValue2(results);
-
-                            userList = new ArrayList<>(sortedMap.keySet());
-                        }
+                        //update the users list view
+                        updateUsersList();
                     }
-                    updateUsersList();
                 }
 
                 @Override
@@ -336,7 +298,7 @@ public class SearchActivity extends AppCompatActivity{
             });
         }
     }
-
+    
     public static List<User> getListByMap2(Map<User, Float> map) {
         List<User> list = new ArrayList<User>();
         List<Float> list1 = new ArrayList<Float>();
@@ -435,49 +397,5 @@ public class SearchActivity extends AppCompatActivity{
         }
         return temp;
     }
-
-    // function to sort hashmap by values
-    public static HashMap<User, Float> sortByValue2(HashMap<User, Float> hm)
-    {
-        // Create a list from elements of HashMap
-        List<Map.Entry<User, Float> > list =
-                new LinkedList<Map.Entry<User, Float> >(hm.entrySet());
-
-        // Sort the list
-        Collections.sort(list, new Comparator<Map.Entry<User, Float> >() {
-            public int compare(Map.Entry<User, Float> o1,
-                               Map.Entry<User, Float> o2)
-            {
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
-
-        // put data from sorted list to hashmap
-        HashMap<User, Float> temp = new LinkedHashMap<User, Float>();
-        for (Map.Entry<User, Float> aa : list) {
-            temp.put(aa.getKey(), aa.getValue());
-        }
-        return temp;
-    }
-
-    public static boolean isNumeric(String str){
-        Pattern pattern = Pattern.compile("[0-9]*");
-        return pattern.matcher(str).matches();
-    }
-
-    public static boolean isChinese(char c) {
-        return c >= 0x4E00 &&  c <= 0x9FA5;// judge based on the bytecode
-    }
-    // judge whether string contain chinese
-    public static boolean isChinese(String str) {
-        if (str == null) return false;
-        for (char c : str.toCharArray()) {
-            if (isChinese(c)) return true;// return if there is any one chinese word
-        }
-        return false;
-    }
-
-
-
 }
 
