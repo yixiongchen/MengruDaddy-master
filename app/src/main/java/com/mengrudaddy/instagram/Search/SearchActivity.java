@@ -298,8 +298,7 @@ public class SearchActivity extends AppCompatActivity{
 
                         if(isNumeric(keyword)){
 
-                        if((!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5)
-                                &&isNumeric(user.username)){
+                        if(ng.distance(user.username,keyword)<0.5&&isNumeric(user.username)){
                             results.put(user, (float) ng.distance(user.username,keyword));
                         }
 
@@ -309,8 +308,7 @@ public class SearchActivity extends AppCompatActivity{
 
                     }else if (isChinese(keyword)){
 
-                            if((!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5)
-                                    &&isChinese(user.username)){
+                            if(ng.distance(user.username,keyword)<0.5 &&isChinese(user.username)){
                                 results.put(user, (float) ng.distance(user.username,keyword));
                             }
 
@@ -319,7 +317,7 @@ public class SearchActivity extends AppCompatActivity{
                             userList = new ArrayList<>(sortedMap.keySet());
 
                         }else {
-                            if(!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5){
+                            if(ng.distance(user.username,keyword)<0.5){
                                 results.put(user, (float) ng.distance(user.username,keyword));
                             }
 
