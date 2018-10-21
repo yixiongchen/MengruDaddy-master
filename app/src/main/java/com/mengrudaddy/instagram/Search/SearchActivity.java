@@ -44,6 +44,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import info.debatty.java.stringsimilarity.NGram;
 
@@ -125,6 +126,7 @@ public class SearchActivity extends AppCompatActivity{
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                HashMap<User, Integer> selectedUsers = new HashMap<>();
                 for(DataSnapshot singleDataSnapshot: dataSnapshot.getChildren()){
                     User user = singleDataSnapshot.getValue(User.class);
                     allUsers.add(user);
@@ -133,28 +135,27 @@ public class SearchActivity extends AppCompatActivity{
                     }
                 }
 
+
                 if(current.following!=null){
 
                     List<String> currentFollow = getListByMap(current.following, false);
 
-
-                    /*
-                        Suggested user algorithm:
-                        Search for users that have at least two same followings and not followed by
-                        the current user
-
-                     */
                     for(int i=0; i< allUsers.size(); i++){
                         if (allUsers.get(i).following != null && current.following != null){
                             List<String> follow = getListByMap(allUsers.get(i).following, false);
                             follow.retainAll(currentFollow);
                             int num = follow.size();
                             if ((num>=2 && !allUsers.get(i).username.equals(current.username)) &&
-                                    !allUsers.get(i).following.containsValue(current.Id)){
-                                userList.add(allUsers.get(i));
+                                    !current.following.containsValue(allUsers.get(i).Id)){
+                                selectedUsers.put(allUsers.get(i),allUsers.get(i).following.size());
                             }}
-                    }
+                            HashMap<User,Integer> sortedMap = sortByValue(selectedUsers);
+                        userList = new ArrayList<>(sortedMap.keySet());
+                        Collections.reverse(userList);
 
+                        headtitle.setText("Recommenced users");
+
+                    }
 
                     updateUsersList();
 
@@ -180,11 +181,7 @@ public class SearchActivity extends AppCompatActivity{
                                 }
                                 HashMap<User, Integer> sortedMap = sortByValue(suggested);
 
-
                                 userList = new ArrayList<>(sortedMap.keySet());
-
-
-
                                 Collections.reverse(userList);
 
                                 for(int i =0 ; i<userList.size(); i++) {
@@ -196,6 +193,9 @@ public class SearchActivity extends AppCompatActivity{
                                 //update the users list view
                                 updateUsersList();
                                 headtitle.setText("Popular users");
+
+                                Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
+                                        " for you. You can make some friends from the popular list!", Toast.LENGTH_LONG).show();
 
                             }
 
@@ -213,6 +213,7 @@ public class SearchActivity extends AppCompatActivity{
                         userList.clear();
                         DatabaseReference reference = database.getReference("users");
                         reference.addListenerForSingleValueEvent(new ValueEventListener() {
+
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 HashMap<User, Integer> suggested = new HashMap<>();
@@ -228,6 +229,7 @@ public class SearchActivity extends AppCompatActivity{
                                 }
                                 HashMap<User, Integer> sortedMap = sortByValue(suggested);
 
+
                                 userList = new ArrayList<>(sortedMap.keySet());
                                 Collections.reverse(userList);
 
@@ -241,6 +243,9 @@ public class SearchActivity extends AppCompatActivity{
                                 //update the users list view
                                 updateUsersList();
                                 headtitle.setText("Popular users");
+
+                                Toast.makeText(getApplicationContext(), "Sorry, we cannot recommend friends" +
+                                        " for you. You can make some friends from the popular list!", Toast.LENGTH_LONG).show();
 
                             }
 
@@ -261,7 +266,6 @@ public class SearchActivity extends AppCompatActivity{
         });
     }
 
-
     private void searchForMatch(final String keyword){
         Log.d(TAG, "searchForMatch: searching for a match: " + keyword);
 
@@ -273,7 +277,7 @@ public class SearchActivity extends AppCompatActivity{
         if(keyword.isEmpty()) {
 
             Log.d(TAG, "null input");
-            //Toast.makeText(getApplicationContext(), "The search bar can not be empty", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "The search bar should not be empty", Toast.LENGTH_LONG).show();
 
             //search key is not empty
 
@@ -291,16 +295,40 @@ public class SearchActivity extends AppCompatActivity{
                         User user = singleSnapshot.getValue(User.class);
 
                         float a = (float) ng.distance(user.username,keyword);
-                        if(!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5){
+
+                        if(isNumeric(keyword)){
+
+                        if((!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5)
+                                &&isNumeric(user.username)){
                             results.put(user, (float) ng.distance(user.username,keyword));
                         }
-                    }
 
-                    HashMap<User,Float> sortedMap = sortByValue2(results);
-                    userList = new ArrayList<>(sortedMap.keySet());
-                    Collections.reverse(userList);
+                        HashMap<User,Float> sortedMap = sortByValue2(results);
+
+                        userList = new ArrayList<>(sortedMap.keySet());
+
+                    }else if (isChinese(keyword)){
+
+                            if((!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5)
+                                    &&isChinese(user.username)){
+                                results.put(user, (float) ng.distance(user.username,keyword));
+                            }
+
+                            HashMap<User,Float> sortedMap = sortByValue2(results);
+
+                            userList = new ArrayList<>(sortedMap.keySet());
+
+                        }else {
+                            if(!user.username.equals(current.username)&&ng.distance(user.username,keyword)<0.5){
+                                results.put(user, (float) ng.distance(user.username,keyword));
+                            }
+
+                            HashMap<User,Float> sortedMap = sortByValue2(results);
+
+                            userList = new ArrayList<>(sortedMap.keySet());
+                        }
+                    }
                     updateUsersList();
-                    headtitle.setText("Search result");
                 }
 
                 @Override
@@ -323,8 +351,8 @@ public class SearchActivity extends AppCompatActivity{
 
         return list;
 
-
     }
+
 
     public static List<String> getListByMap(Map<String, String> map,
                                             boolean isKey) {
@@ -349,7 +377,7 @@ public class SearchActivity extends AppCompatActivity{
         adapter = new userListAdapter(SearchActivity.this, R.layout.list_layout, userList);
 
         mResultList.setAdapter(adapter);
-
+        headtitle.setText("Search result");
 
 
     }
@@ -432,6 +460,23 @@ public class SearchActivity extends AppCompatActivity{
             temp.put(aa.getKey(), aa.getValue());
         }
         return temp;
+    }
+
+    public static boolean isNumeric(String str){
+        Pattern pattern = Pattern.compile("[0-9]*");
+        return pattern.matcher(str).matches();
+    }
+
+    public static boolean isChinese(char c) {
+        return c >= 0x4E00 &&  c <= 0x9FA5;// judge based on the bytecode
+    }
+    // judge whether string contain chinese
+    public static boolean isChinese(String str) {
+        if (str == null) return false;
+        for (char c : str.toCharArray()) {
+            if (isChinese(c)) return true;// return if there is any one chinese word
+        }
+        return false;
     }
 
 
