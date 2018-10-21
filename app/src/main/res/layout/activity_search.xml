@@ -26,7 +26,7 @@
         android:id="@id/search_layout"
         android:layout_below="@id/heading_label"
         android:paddingLeft="30dp"
-        android:paddingTop="30dp"
+        android:paddingTop="20dp"
         android:orientation="horizontal">
 
     <EditText
@@ -43,10 +43,7 @@
         android:hint="Search user here"
         android:inputType="textPersonName"
         android:paddingBottom="10dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:paddingTop="10dp"
-        android:textColor="@color/textNotClicked"
+        android:textColor="@color/textClicked"
         android:textSize="16sp" />
     <!--         android:background="@drawable/search_layout" -->
     <ImageButton
